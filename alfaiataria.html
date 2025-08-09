@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vita Septem – Alfaiataria | Men's Fashion</title>
+  <meta name="description" content="Alfaiataria Vita Septem: blazers, camisas e calças com caimento impecável. Elegância premium, clean e atemporal." />
+  <meta name="theme-color" content="#880c21" />
+  <!-- Open Graph -->
+  <meta property="og:title" content="Vita Septem – Alfaiataria" />
+  <meta property="og:description" content="Blazers, camisas e calças de alfaiataria. Moda masculina premium e clean." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="icon.png" />
+  <meta property="og:locale" content="pt_BR" />
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="icon.ico">
+  
+  <style>
+  :root{
+    --wine:#880c21; --wine-600:#a11837; --black:#0e0e0f; --gray-900:#17171a;
+    --gray-700:#232327; --gray-500:#6b6b72; --white:#ffffff; --radius:18px;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    color:var(--white); background:linear-gradient(180deg,var(--black),var(--gray-900) 35%, #0b0b0c);
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  }
+  a{color:inherit; text-decoration:none}
+  .container{max-width:1200px; margin:0 auto; padding:0 20px}
+
+  /* Header – só a logo e em tamanho grande */
+  header{
+    position:sticky; top:0; z-index:50; backdrop-filter:saturate(140%) blur(8px);
+    background:rgba(13,13,15,.7); border-bottom:1px solid rgba(255,255,255,.06)
+  }
+  .nav{display:flex; align-items:center; justify-content:center; padding:20px 0}
+  .brand{display:flex; gap:12px; align-items:center; justify-content:center}
+  .brand img{height:90px; width:auto; object-fit:contain} /* LOGO GRANDE */
+  .brand .title{display:none} /* manter só a marca gráfica */
+  .nav a.cta{display:none}    /* esconder botões/links do topo */
+
+  /* Hero */
+  .hero{position:relative; overflow:hidden; isolation:isolate;}
+  .hero::before{
+    content:""; position:absolute; inset:-20%; background:
+      radial-gradient(80% 60% at 70% 20%, rgba(136,12,33,.35), transparent 60%),
+      radial-gradient(60% 40% at 10% 10%, rgba(255,255,255,.08), transparent 60%);
+    z-index:-1; filter:blur(10px)
+  }
+  .hero-grid{display:grid; grid-template-columns:1.1fr .9fr; gap:36px; align-items:center; padding:68px 0}
+  .kicker{color:#e9e9ea; letter-spacing:.14em; text-transform:uppercase; font-size:.82rem}
+  h1{
+    margin:.35rem 0 1rem; font-family:"Playfair Display",serif; font-weight:700;
+    font-size:clamp(2.1rem, 3.2vw + 1rem, 3.6rem); line-height:1.05;
+  }
+  .lead{color:#d9d9dd; font-size:1.05rem; max-width:48ch}
+  .actions{display:flex; gap:12px; margin-top:22px; flex-wrap:wrap}
+  .btn{
+    display:inline-flex; align-items:center; gap:10px; padding:12px 18px; border-radius:14px; font-weight:600;
+    background:var(--wine); border:1px solid rgba(255,255,255,.1); box-shadow:var(--shadow);
+    transition:transform .15s ease, background .2s ease, box-shadow .2s ease;
+  }
+  .btn:hover{background:var(--wine-600); transform:translateY(-1px)}
+  .btn.secondary{background:transparent; border-color:rgba(255,255,255,.18)}
+  .hero-visual{
+    background:linear-gradient(180deg,#141416, #0d0d0f);
+    border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); min-height:360px;
+    display:grid; place-items:center; position:relative; overflow:hidden;
+  }
+  .tag{position:absolute; top:14px; right:14px; padding:6px 10px; border-radius:999px;
+    background:rgba(136,12,33,.18); border:1px solid rgba(136,12,33,.5); font-size:.78rem}
+
+  /* Products */
+  section{padding:56px 0}
+  .section-title{font-family:"Playfair Display",serif; font-weight:700; font-size:2rem; margin:0 0 14px;}
+  .muted{color:#cfcfd6; margin:0 0 26px}
+  .grid{display:grid; gap:18px; grid-template-columns:repeat(12,1fr)}
+  .card{
+    grid-column:span 4; background:linear-gradient(180deg,#141416,#101013);
+    border:1px solid rgba(255,255,255,.08); border-radius:16px; overflow:hidden; transition:transform .15s ease;
+  }
+  .card:hover{transform:translateY(-3px)}
+  .card img{width:100%; height:260px; object-fit:cover; background:#0f0f11}
+  .card .p{padding:14px 14px 16px}
+  .price{display:flex; align-items:center; justify-content:space-between; margin-top:6px}
+  .price s{color:#9a9aa3; font-size:.95rem}
+  .price strong{font-size:1.1rem}
+  .badge{background:rgba(136,12,33,.22); border:1px solid rgba(136,12,33,.55); padding:4px 10px; border-radius:999px; font-size:.78rem}
+  .buy{margin-top:12px; width:100%; text-align:center; padding:10px 12px; border-radius:12px; background:#1a1a1e; border:1px solid rgba(255,255,255,.12)}
+  .buy:hover{border-color:rgba(255,255,255,.22)}
+  .select{margin-top:10px; width:100%; padding:10px 12px; background:#121214; color:#fff; border:1px solid rgba(255,255,255,.12); border-radius:12px}
+
+  /* Footer */
+  footer{border-top:1px solid rgba(255,255,255,.08); padding:28px 0 60px; color:#cfcfd6}
+  .brand-small{display:flex; gap:10px; align-items:center}
+  .brand-small img{width:28px; height:28px}
+  .footer-grid{display:grid; grid-template-columns:1.2fr .8fr; gap:22px}
+  .social a{display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border:1px solid rgba(255,255,255,.12); border-radius:12px; margin-right:10px}
+
+  /* WhatsApp FAB */
+  .fab{position:fixed; right:18px; bottom:18px; background:#25D366; color:#000; font-weight:700;
+    padding:12px 14px; border-radius:999px; box-shadow:var(--shadow); z-index:60}
+
+  /* Responsive */
+  @media (max-width: 980px){
+    .hero-grid{grid-template-columns:1fr; padding:44px 0}
+    .grid .card{grid-column:span 6}
+    .footer-grid{grid-template-columns:1fr}
+    .brand img{height:56px} /* logo ainda grande no tablet */
+  }
+  @media (max-width: 640px){
+    .grid .card{grid-column:span 12}
+    .brand img{height:44px} /* logo ajusta no mobile */
+  }
+</style>
+
+
+  <!-- JSON-LD (loja) -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"ClothingStore",
+    "name":"Vita Septem – Men's Fashion",
+    "address":{"@type":"PostalAddress","addressLocality":"São João do Caru","addressRegion":"MA","addressCountry":"BR"},
+    "url":"https://vitaseptem.example",
+    "logo":"icon.png",
+    "sameAs":["https://www.instagram.com/vitaseptem"]
+  }
+  </script>
+</head>
+<body>
+  <a href="https://wa.me/5599981543912?text=Quero%20alfaiataria%20Vita%20Septem" class="fab" aria-label="Falar no WhatsApp">WhatsApp</a>
+
+  <header>
+    <div class="container nav">
+      <div class="brand" aria-label="Vita Septem">
+        <img src="icon2.png" alt="Logo Vita Septem" />
+        <div class="title">VITA SEPTEM</div>
+      </div>
+      <nav>
+        <a href="index.html#colecao" class="cta">Voltar à coleção</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="kicker">Men’s Fashion • Alfaiataria</div>
+          <h1>Alfaiataria que impõe respeito — sem exageros.</h1>
+          <p class="lead">Blazers, camisas e calças com cortes limpos e tecidos respiráveis. Feitos para culto, trabalho e eventos — elegância premium, clean e atemporal.</p>
+          <div class="actions">
+            <a href="#produtos" class="btn">Ver peças</a>
+            <a href="https://www.instagram.com/vitaseptem" class="btn secondary" target="_blank" rel="noopener">Instagram</a>
+          </div>
+        </div>
+        <div class="hero-visual" role="img" aria-label="Preview editorial da alfaiataria">
+          <span class="tag">Coleção 2026</span>
+          <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1400&auto=format&fit=crop" alt="Alfaiataria Vita Septem" style="width:100%; height:100%; object-fit:cover;">
+        </div>
+      </div>
+    </section>
+
+    <!-- LISTA DE PRODUTOS -->
+    <section id="produtos">
+      <div class="container">
+        <h2 class="section-title">Alfaiataria</h2>
+        <p class="muted">Escolha seu tamanho e compre direto pelo WhatsApp com nome do produto, SKU e valor prontos na mensagem.</p>
+        <div class="grid" id="grid"></div>
+      </div>
+    </section>
+
+    <!-- CONTATO/ENDEREÇO -->
+    <section>
+      <div class="container footer-grid" role="contentinfo">
+        <div>
+          <h3 class="section-title">Visite a loja</h3>
+          <p class="muted">Rua Nova, Centro – São João do Caru / MA<br/>Seg–Sáb: 9h às 19h</p>
+          <div class="social">
+            <a href="https://wa.me/5599981543912?text=Quero%20um%20atendimento%20Vita%20Septem">WhatsApp</a>
+            <a href="https://www.instagram.com/vitaseptem" target="_blank" rel="noopener">Instagram</a>
+          </div>
+        </div>
+        <div aria-hidden="true">
+          <iframe title="Mapa da loja" width="100%" height="220" style="border:0; border-radius:14px"
+            loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps?q=São%20João%20do%20Caru%20MA&output=embed"></iframe>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap">
+      <div class="brand-small">
+        <img src="icon.png" alt="" aria-hidden="true">
+        <span>© <span id="year"></span> Vita Septem – Men’s Fashion</span>
+      </div>
+      <small>Desenvolvido para performance e conversão.</small>
+    </div>
+  </footer>
+
+  <script>
+    // Número do WhatsApp (com DDI+DDD)
+    const WHATSAPP = "5599981543912";
+    const currency = v => v ? v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) : "";
+
+    // Produtos de ALFAIATARIA (com SKU e tamanhos)
+    const products = [
+      {
+        title: "Blazer Leve Linho",
+        sku: "VS-BLZ-001",
+        image: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=1200&auto=format&fit=crop",
+        price: 449.00, compareAt: 0, badge: "Edição 2026",
+        sizes: ["P","M","G","GG"], slug: "blazer-linho"
+      },
+      {
+        title: "Calça Chino Alfaiataria",
+        sku: "VS-CHN-002",
+        image: "https://images.unsplash.com/photo-1542326237-94b1c5a538d6?q=80&w=1200&auto=format&fit=crop",
+        price: 229.90, compareAt: 269.90, badge: "Best seller",
+        sizes: ["38","40","42","44"], slug: "chino-alfaiataria"
+      },
+      {
+        title: "Camisa Social Classic Slim",
+        sku: "VS-CMS-010",
+        image: "https://images.unsplash.com/photo-1520975922284-54243f13c6d1?q=80&w=1200&auto=format&fit=crop",
+        price: 199.90, compareAt: 239.90, badge: "Novo",
+        sizes: ["P","M","G","GG"], slug: "camisa-classic"
+      }
+    ];
+
+    const grid = document.getElementById('grid');
+
+    function render(){
+      grid.innerHTML = "";
+      products.forEach(p=>{
+        const card = document.createElement('article'); card.className = 'card';
+
+        const selectId = `size-${p.sku}`;
+        card.innerHTML = `
+          <img src="${p.image}" alt="${p.title}">
+          <div class="p">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px">
+              <h3 style="margin:0; font-size:1.05rem">${p.title}</h3>
+              ${p.badge?`<span class="badge">${p.badge}</span>`:""}
+            </div>
+
+            <div style="color:#9c9ca3; font-size:.9rem; margin-top:4px">SKU: ${p.sku}</div>
+
+            <div class="price">
+              <div>${p.compareAt ? `<s>${currency(p.compareAt)}</s>`:""}</div>
+              <strong>${currency(p.price)}</strong>
+            </div>
+
+            <select class="select" id="${selectId}" aria-label="Selecionar tamanho para ${p.title}">
+              <option value="">Escolha o tamanho (opcional)</option>
+              ${p.sizes.map(s=>`<option value="${s}">${s}</option>`).join('')}
+            </select>
+
+            <a class="buy" href="#" data-sku="${p.sku}" data-title="${p.title}" data-price="${p.price}" data-slug="${p.slug}" onclick="return buy(this)">
+              Comprar pelo WhatsApp
+            </a>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function buy(el){
+      const title = el.dataset.title;
+      const sku = el.dataset.sku;
+      const price = Number(el.dataset.price);
+      const slug = el.dataset.slug;
+      const select = document.getElementById('size-'+sku);
+      const size = select ? select.value : "";
+      const sizeTxt = size ? ` | Tamanho: ${size}` : "";
+      const msg = `Olá! Quero comprar: ${title}${sizeTxt} | SKU: ${sku} | Preço: ${currency(price)} | Link: ${location.href.split('#')[0]}#${slug}`;
+      const url = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
+      window.open(url,'_blank');
+      return false;
+    }
+
+    render();
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
