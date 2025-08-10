@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fornecedores | Vita Septem</title>
+  <link rel="icon" href="/assets/logo-mark.svg">
+  <link rel="stylesheet" href="/css/theme.css">
+  <script>
+    window.ENV = window.ENV || {
+      SUPABASE_URL: "https://dwqkuwqmlhvplmgwksas.supabase.co",
+      SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cWt1d3FtbGh2cGxtZ3drc2FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODM4NjksImV4cCI6MjA3MDM1OTg2OX0._pFblnBzx5cf0SUfAC_w-kmcdFbidZsh23XKXJR98ng"
+    };
+  </script>
+  <script type="module" src="/js/main.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+  <div id="toasts"></div>
+
+  <!-- Modal: Novo/Editar Fornecedor -->
+  <div class="modal" id="mdlSupplier" aria-hidden="true">
+    <div class="box">
+      <div class="head">
+        <strong id="supTitle">Novo Fornecedor</strong>
+        <button class="btn ghost" onclick="document.getElementById('mdlSupplier').classList.remove('open')">Fechar</button>
+      </div>
+      <div class="body">
+        <form id="frmSupplier">
+          <input type="hidden" id="sup_id">
+          <div class="form-row">
+            <div class="col-6">
+              <label for="sup_name">Nome</label>
+              <input class="input" id="sup_name" required>
+            </div>
+            <div class="col-6">
+              <label for="sup_email">E-mail</label>
+              <input class="input" id="sup_email" type="email">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col-6">
+              <label for="sup_phone">Telefone</label>
+              <input class="input" id="sup_phone">
+            </div>
+            <div class="col-6">
+              <label for="sup_terms">Condições de Pagamento</label>
+              <input class="input" id="sup_terms" placeholder="ex.: 30/60 dias, à vista, etc.">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col-6">
+              <label for="sup_lead">Lead time (dias)</label>
+              <input class="input" id="sup_lead" type="number" min="0">
+            </div>
+            <div class="col-6">
+              <label for="sup_active">Ativo</label>
+              <select id="sup_active" class="input"><option value="true">Sim</option><option value="false">Não</option></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col-12">
+              <label for="sup_notes">Observações</label>
+              <textarea class="input" id="sup_notes" rows="3"></textarea>
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; justify-content:flex-end">
+            <button type="button" class="btn secondary" id="btnCancelSup">Cancelar</button>
+            <button type="submit" class="btn" id="btnSaveSup">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Importar CSV de Preços -->
+  <div class="modal" id="mdlPriceCSV" aria-hidden="true">
+    <div class="box">
+      <div class="head">
+        <strong>Importar CSV de Preços do Fornecedor</strong>
+        <button class="btn ghost" onclick="document.getElementById('mdlPriceCSV').classList.remove('open')">Fechar</button>
+      </div>
+      <div class="body">
+        <p class="small">Selecione o fornecedor e importe CSV com colunas: <b>sku,price_cents,moq</b> (cabeçalho obrigatório).</p>
+        <div class="form-row">
+          <div class="col-6">
+            <label for="selSupPrice">Fornecedor</label>
+            <select id="selSupPrice" class="input"></select>
+          </div>
+          <div class="col-6">
+            <label>&nbsp;</label>
+            <input type="file" id="priceCSV" accept=".csv" class="input">
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:12px">
+          <button class="btn secondary" onclick="document.getElementById('mdlPriceCSV').classList.remove('open')">Cancelar</button>
+          <button class="btn" id="btnDoPriceImport">Importar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { requireAuth } from "/js/lib/auth.js";
+    import { mountLayout } from "/js/lib/layout.js";
+    import "/js/modules/suppliers.js";
+
+    const session = await requireAuth();
+    if (!session) return;
+
+    mountLayout("suppliers");
+
+    document.getElementById("pageContent").innerHTML = `
+      <h1 class="section-title" style="margin-top:6px">Fornecedores</h1>
+
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+          <input class="input" id="q" placeholder="Buscar fornecedor" style="flex:1; min-width:220px">
+          <select class="input" id="active">
+            <option value="">Todos</option>
+            <option value="true">Ativos</option>
+            <option value="false">Inativos</option>
+          </select>
+          <button class="btn" id="btnNew">Novo Fornecedor</button>
+          <button class="btn secondary" id="btnImportPrices">Importar preços (CSV)</button>
+          <button class="btn ghost" id="btnExportSuppliers">Exportar fornecedores</button>
+        </div>
+      </div>
+
+      <div class="grid cols-2">
+        <div class="card">
+          <div class="small" style="margin-bottom:8px">Lista</div>
+          <table class="table">
+            <thead><tr><th>Nome</th><th>E-mail</th><th>Lead</th><th>Pagamento</th><th>Ativo</th><th class="text-right">Ações</th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px">
+            <div class="small" id="pagingInfo">—</div>
+            <div style="display:flex; gap:8px">
+              <button class="btn ghost" id="prev">Anterior</button>
+              <button class="btn ghost" id="next">Próximo</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="small" style="margin-bottom:8px">Preços por SKU (Fornecedor selecionado)</div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:8px">
+            <select id="selSupplier" class="input" style="min-width:220px"></select>
+            <input class="input" id="skuSearch" placeholder="Filtrar por SKU">
+          </div>
+          <table class="table">
+            <thead><tr><th>SKU</th><th class="text-right">Preço (cents)</th><th class="text-right">MOQ</th><th class="text-right">Ações</th></tr></thead>
+            <tbody id="priceRows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div class="small" style="margin-bottom:8px">Comparar Preço por SKU</div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:8px">
+          <input class="input" id="cmpSku" placeholder="Digite o SKU para comparar">
+          <button class="btn" id="btnCmp">Comparar</button>
+        </div>
+        <table class="table">
+          <thead><tr><th>Fornecedor</th><th class="text-right">Preço (cents)</th><th class="text-right">MOQ</th></tr></thead>
+          <tbody id="cmpRows"></tbody>
+        </table>
+      </div>
+    `;
+
+    window.VS_SUPPLIERS.init(); // inicia tudo
+  </script>
+</body>
+</html>

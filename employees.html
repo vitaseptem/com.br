@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Funcionários | Vita Septem</title>
+  <link rel="icon" href="/assets/logo-mark.svg">
+  <link rel="stylesheet" href="/css/theme.css">
+  <script>
+    window.ENV = window.ENV || {
+      SUPABASE_URL:"https://dwqkuwqmlhvplmgwksas.supabase.co",
+      SUPABASE_ANON_KEY:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cWt1d3FtbGh2cGxtZ3drc2FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODM4NjksImV4cCI6MjA3MDM1OTg2OX0._pFblnBzx5cf0SUfAC_w-kmcdFbidZsh23XKXJR98ng"
+    };
+  </script>
+  <script type="module" src="/js/main.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+  <div id="toasts"></div>
+
+  <!-- Modal: Novo/Editar Funcionário -->
+  <div class="modal" id="mdlEmp" aria-hidden="true">
+    <div class="box">
+      <div class="head">
+        <strong id="empTitle">Novo Funcionário</strong>
+        <button class="btn ghost" onclick="document.getElementById('mdlEmp').classList.remove('open')">Fechar</button>
+      </div>
+      <div class="body">
+        <form id="frmEmp">
+          <input type="hidden" id="emp_id">
+          <div class="form-row">
+            <div class="col-6">
+              <label>Nome</label>
+              <input id="emp_name" class="input" required>
+            </div>
+            <div class="col-6">
+              <label>E-mail (login)</label>
+              <input id="emp_email" class="input" type="email" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col-6">
+              <label>Papel (RBAC)</label>
+              <select id="emp_role" class="input">
+                <option value="admin">admin</option>
+                <option value="manager">manager</option>
+                <option value="seller">seller</option>
+                <option value="cashier">cashier</option>
+                <option value="viewer">viewer</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label>Ativo</label>
+              <select id="emp_active" class="input"><option value="true">Sim</option><option value="false">Não</option></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col-12">
+              <label>Observações</label>
+              <input id="emp_notes" class="input">
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; justify-content:flex-end">
+            <button type="button" class="btn secondary" id="btnCancelEmp">Cancelar</button>
+            <button type="submit" class="btn" id="btnSaveEmp">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { requireAuth, assertRole } from "/js/lib/auth.js";
+    import { mountLayout } from "/js/lib/layout.js";
+    import "/js/modules/employees.js";
+
+    const session = await requireAuth();
+    if (!session) return;
+    // Somente admin/manager
+    assertRole(["admin","manager"]);
+
+    mountLayout("employees");
+    document.getElementById("pageContent").innerHTML = `
+      <h1 class="section-title" style="margin-top:6px">Funcionários & Papéis</h1>
+
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+          <input class="input" id="q" placeholder="Buscar por nome ou e-mail" style="flex:1; min-width:220px">
+          <select class="input" id="role"><option value="">Todos papéis</option><option>admin</option><option>manager</option><option>seller</option><option>cashier</option><option>viewer</option></select>
+          <select class="input" id="active"><option value="">Todos</option><option value="true">Ativos</option><option value="false">Inativos</option></select>
+          <button class="btn" id="btnNew">Novo Funcionário</button>
+          <button class="btn ghost" id="btnExport">Exportar CSV</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <table class="table">
+          <thead><tr><th>Nome</th><th>E-mail</th><th>Papel</th><th>Ativo</th><th>Último acesso</th><th class="text-right">Ações</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    `;
+
+    window.VS_EMPLOYEES.init();
+  </script>
+</body>
+</html>

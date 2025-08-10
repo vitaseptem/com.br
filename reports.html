@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Relatórios | Vita Septem</title>
+  <link rel="icon" href="/assets/logo-mark.svg">
+  <link rel="stylesheet" href="/css/theme.css">
+  <script>
+    window.ENV = window.ENV || {
+      SUPABASE_URL:"https://dwqkuwqmlhvplmgwksas.supabase.co",
+      SUPABASE_ANON_KEY:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cWt1d3FtbGh2cGxtZ3drc2FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODM4NjksImV4cCI6MjA3MDM1OTg2OX0._pFblnBzx5cf0SUfAC_w-kmcdFbidZsh23XKXJR98ng"
+    };
+  </script>
+  <script type="module" src="/js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+  <div id="toasts"></div>
+
+  <script type="module">
+    import { requireAuth } from "/js/lib/auth.js";
+    import { mountLayout } from "/js/lib/layout.js";
+    import "/js/modules/reports.js";
+
+    const session = await requireAuth();
+    if (!session) return;
+
+    mountLayout("reports");
+    document.getElementById("pageContent").innerHTML = `
+      <h1 class="section-title" style="margin-top:6px">Relatórios</h1>
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex; gap:8px; flex-wrap:wrap">
+          <input class="input" id="d1" type="date">
+          <input class="input" id="d2" type="date">
+          <select class="input" id="prov"><option value="">Todos provedores</option><option>google_ads</option><option>meta_ads</option></select>
+          <button class="btn" id="btnReload">Atualizar</button>
+          <button class="btn ghost" id="btnExport">Exportar CSV</button>
+        </div>
+      </div>
+
+      <div class="grid cols-2">
+        <div class="card"><div class="small">Vendas por dia</div><canvas id="salesChart" height="160"></canvas></div>
+        <div class="card"><div class="small">Ads: Spend x Revenue</div><canvas id="adsChart" height="160"></canvas></div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="small">Top produtos</div>
+        <table class="table"><thead><tr><th>SKU</th><th>Título</th><th class="text-right">Qtde</th><th class="text-right">Receita</th></tr></thead><tbody id="top"></tbody></table>
+      </div>
+    `;
+
+    window.VS_REPORTS.init();
+  </script>
+</body>
+</html>
