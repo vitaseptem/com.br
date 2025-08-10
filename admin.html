@@ -7,42 +7,18 @@
   <meta name="theme-color" content="#880c21"/>
   <link rel="icon" href="icon.ico" type="image/x-icon"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+
   <style>
     :root{
-      --wine:#880c21; --wine-600:#a11837; --black:#0e0e0f; --gray-900:#17171a; --gray-800:#1a1a1e; --gray-700:#232327; --gray-600:#2a2a2f; --gray-500:#6b6b72; --white:#fff; --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.35);
-      --ok:#21d07a; --warn:#e2b93b; --danger:#ff5d5d;
+      --wine:#880c21; --wine-600:#a11837; --black:#0e0e0f; --gray-900:#17171a; --gray-800:#1a1a1e; --gray-700:#232327; --gray-600:#2a2a2f; --gray-500:#6b6b72; --white:#fff;
+      --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.35); --ok:#21d07a; --warn:#e2b93b; --danger:#ff5d5d;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; color:var(--white); background:linear-gradient(180deg,var(--black),var(--gray-900) 35%, #0b0b0c)}
     a{color:inherit; text-decoration:none}
 
-    /* ---------- LOGIN ---------- */
-    .login-wrap{min-height:100vh; display:grid; place-items:center; padding:24px}
-    .login-card{
-      width:100%; max-width:560px; background:linear-gradient(180deg,#151518,#101013);
-      border:1px solid rgba(255,255,255,.08); border-radius:20px; box-shadow:var(--shadow); overflow:hidden
-    }
-    .login-head{
-      display:flex; align-items:center; gap:12px; padding:18px; border-bottom:1px solid rgba(255,255,255,.06);
-      background:radial-gradient(70% 120% at 80% -10%, rgba(136,12,33,.25), transparent 60%)
-    }
-    .login-head img{height:52px; width:52px; border-radius:12px; object-fit:cover}
-    .login-head b{font-family:"Playfair Display",serif; font-size:1.4rem}
-    .login-body{padding:18px}
-    .field{display:flex; flex-direction:column; gap:6px; margin-bottom:12px}
-    .field label{font-size:.92rem; color:#e9e9ea}
-    .input{width:100%; padding:12px 14px; border-radius:12px; background:#121214; color:#fff; border:1px solid rgba(255,255,255,.12); outline:none}
-    .input:focus{border-color:rgba(255,255,255,.26)}
-    .login-actions{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:8px}
-    .btn{display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:12px; font-weight:600; border:1px solid rgba(255,255,255,.14); background:#19191d; cursor:pointer}
-    .btn.primary{background:var(--wine); border-color:rgba(255,255,255,.12)}
-    .btn:hover{filter:brightness(1.06)}
-    .helper{font-size:.9rem; color:#cfcfd6}
-    .msg-ok{color:#a2f3c9}
-    .msg-err{color:#ff8080}
-
-    /* ---------- APP ---------- */
+    /* Topbar / layout (dashboard) */
     header{position:sticky; top:0; z-index:40; backdrop-filter:saturate(140%) blur(8px); background:rgba(13,13,15,.7); border-bottom:1px solid rgba(255,255,255,.06)}
     .topbar{max-width:1280px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; gap:12px}
     .brand{display:flex; align-items:center; gap:10px}
@@ -51,6 +27,9 @@
     .topbar .grow{flex:1}
     .search{display:flex; gap:8px; align-items:center; background:#131316; border:1px solid rgba(255,255,255,.08); padding:8px 10px; border-radius:12px; min-width:260px}
     .search input{background:transparent; border:none; outline:0; color:#fff; width:100%}
+    .btn{display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:12px; font-weight:600; border:1px solid rgba(255,255,255,.14); background:#19191d; cursor:pointer}
+    .btn.primary{background:var(--wine); border-color:rgba(255,255,255,.12)}
+    .btn:hover{filter:brightness(1.06)}
 
     .layout{max-width:1280px; margin:20px auto; padding:0 20px; display:grid; grid-template-columns:320px 1fr; gap:18px}
     .panel{background:linear-gradient(180deg,#141416,#101013); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); overflow:hidden}
@@ -67,6 +46,8 @@
     .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:14px}
     .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
 
+    .field{display:flex; flex-direction:column; gap:6px}
+    .field label{font-size:.9rem; color:#e9e9ea}
     .input, select{width:100%; padding:10px 12px; border-radius:12px; background:#121214; color:#fff; border:1px solid rgba(255,255,255,.12); outline:none}
     .input:focus, select:focus{border-color:rgba(255,255,255,.26)}
 
@@ -80,43 +61,57 @@
     .stat{background:#15151a; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:12px}
     .stat b{display:block; font-size:1.2rem}
 
-    @media (max-width:1000px){
-      .layout{grid-template-columns:1fr}
-      .list{max-height:none}
-      .statgrid{grid-template-columns:repeat(2,1fr)}
+    @media (max-width:1000px){ .layout{grid-template-columns:1fr} .list{max-height:none} .statgrid{grid-template-columns:repeat(2,1fr)} }
+
+    /* ---------- Login overlay ---------- */
+    #loginWrap{
+      position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:24px;
+      background:radial-gradient(100% 100% at 50% 0%, rgba(136,12,33,.18), transparent 50%), linear-gradient(180deg,#0b0b0c,#0f0f12);
+      z-index:100; transition:opacity .2s ease;
     }
+    #loginCard{
+      width:100%; max-width:520px; background:linear-gradient(180deg,#151518,#0f0f11);
+      border:1px solid rgba(255,255,255,.08); border-radius:16px; box-shadow:var(--shadow); padding:22px;
+    }
+    #loginHead{display:flex; gap:12px; align-items:center; margin-bottom:10px}
+    #loginHead img{width:36px; height:36px}
+    #loginHead b{font-family:"Playfair Display",serif; font-size:1.3rem}
+    #loginMsg{margin-top:10px; color:#cfcfd6}
+    .login-actions{margin-top:12px; display:flex; gap:10px; align-items:center}
+    .pill{display:inline-block; padding:4px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:#16161a; font-size:.82rem}
+    [hidden]{display:none !important;}
   </style>
 </head>
 <body>
-  <!-- LOGIN -->
-  <section id="loginWrap" class="login-wrap">
-    <div class="login-card" role="dialog" aria-labelledby="loginTitle">
-      <div class="login-head">
-        <img src="icon.png" alt="Logo Vita Septem">
+  <!-- LOGIN OVERLAY -->
+  <section id="loginWrap" hidden>
+    <div id="loginCard">
+      <div id="loginHead">
+        <img src="icon.png" alt="Vita Septem"/>
         <div>
-          <b id="loginTitle">Vita Points – Admin</b>
-          <div class="helper">Acesse para gerenciar clientes e pontos.</div>
+          <b>Vita Points – Admin</b>
+          <div class="muted" style="font-size:.9rem">Acesse para gerenciar clientes e pontos.</div>
         </div>
       </div>
-      <form id="formLogin" class="login-body" autocomplete="on" novalidate>
-        <div class="field">
-          <label for="admEmail">E-mail</label>
-          <input id="admEmail" type="email" class="input" placeholder="admin@vitaseptem.com" required autocomplete="email" />
+      <form id="formLogin" class="grid-2" autocomplete="on" novalidate>
+        <div class="field" style="grid-column:span 2">
+          <label for="loginEmail">E-mail</label>
+          <input id="loginEmail" type="email" class="input" placeholder="seu@email.com" required>
         </div>
-        <div class="field">
-          <label for="admPass">Senha</label>
-          <input id="admPass" type="password" class="input" placeholder="••••••••" required autocomplete="current-password" />
+        <div class="field" style="grid-column:span 2">
+          <label for="loginPass">Senha</label>
+          <input id="loginPass" type="password" class="input" placeholder="••••••••" required>
         </div>
-        <div class="login-actions">
-          <button id="btnLogin" type="submit" class="btn primary">Entrar</button>
-          <span id="loginMsg" class="helper">—</span>
+        <div class="login-actions" style="grid-column:span 2">
+          <button class="btn primary" type="submit">Entrar</button>
+          <span id="loginMsg" class="pill">—</span>
         </div>
       </form>
     </div>
   </section>
 
-  <!-- APP -->
-  <header id="appHeader" hidden>
+  <!-- DASHBOARD -->
+  <header>
     <div class="topbar">
       <div class="brand"><img src="icon.png" alt=""><b>Vita Points – Admin</b></div>
       <div class="grow">
@@ -132,7 +127,7 @@
     </div>
   </header>
 
-  <main id="appMain" class="layout" hidden>
+  <main class="layout">
     <aside class="panel" id="panelList">
       <div class="p">
         <h3 class="headline">Clientes</h3>
@@ -227,84 +222,71 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ====== SUPABASE ======
+    // ====== Supabase ======
     const SUPABASE_URL = "https://dwqkuwqmlhvplmgwksas.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cWt1d3FtbGh2cGxtZ3drc2FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODM4NjksImV4cCI6MjA3MDM1OTg2OX0._pFblnBzx5cf0SUfAC_w-kmcdFbidZsh23XKXJR98ng";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
+    });
 
-    // ====== HELPERS ======
+    // ====== Helpers ======
     const el = (id)=>document.getElementById(id);
     const fmtBRL = (n)=> (n==null?"": Number(n).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}));
     const fmtInt = (v)=>Number(v||0).toLocaleString('pt-BR');
-    const pad5 = (v)=> String(v??"").padStart(5,'0');
+    function setInfo(target, msg, tone=""){ target.textContent = msg; target.style.color = tone==="error"?"#ff8080": tone==="ok"?"#a2f3c9":"#cfcfd6"; }
 
-    // ====== STATE ======
     let overview = [];
     let current = null;
-    let handlersBound = false;
 
-    // ====== LOGIN GATE ======
-    function showLogin(msg){
-      el('loginWrap').hidden = false;
-      el('appHeader').hidden = true;
-      el('appMain').hidden = true;
-      el('loginMsg').textContent = msg || '—';
-      el('loginMsg').className = 'helper';
-    }
-    function hideLogin(){
-      el('loginWrap').hidden = true;
-      el('appHeader').hidden = false;
-      el('appMain').hidden = false;
-    }
+    // ====== Login overlay logic ======
+    function showLogin(msg){ el('loginWrap').hidden = false; setInfo(el('loginMsg'), msg||"—"); }
+    function hideLogin(){ el('loginWrap').hidden = true; }
 
-    async function gate(){
+    async function boot(){
       const { data:{ session } } = await supabase.auth.getSession();
-      if(!session){ showLogin('—'); return; }
+      if (!session) { showLogin("—"); return; }
       hideLogin();
-      await loadOverview();
+      await safeLoadOverview();
     }
 
-    // Login submit
     el('formLogin').addEventListener('submit', async (e)=>{
       e.preventDefault();
-      const email = el('admEmail').value.trim();
-      const password = el('admPass').value.trim();
-      el('loginMsg').textContent = 'Entrando...';
-      el('loginMsg').className = 'helper';
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if(error){
-        el('loginMsg').textContent = /Email not confirmed/i.test(error.message) ? 'Confirme seu e-mail antes de entrar.' : 'E-mail ou senha inválidos.';
-        el('loginMsg').className = 'helper msg-err';
-        return;
-      }
-      el('loginMsg').textContent = 'OK! Carregando...';
-      el('loginMsg').className = 'helper msg-ok';
+      const email = el('loginEmail').value.trim();
+      const password = el('loginPass').value.trim();
+      setInfo(el('loginMsg'), "Entrando…");
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error){ setInfo(el('loginMsg'), "E-mail ou senha inválidos.", "error"); return; }
+      setInfo(el('loginMsg'), "OK! Carregando…", "ok");
       hideLogin();
-      await loadOverview();
+      await safeLoadOverview();
     });
 
-    // ====== DASHBOARD ======
+    el('btnSair').onclick = async ()=>{ await supabase.auth.signOut(); showLogin("Sessão encerrada."); };
+
+    async function safeLoadOverview(){
+      try{
+        await loadOverview();
+      }catch(err){
+        console.error(err);
+        showLogin("Sem permissão. Confirme que seu usuário está em staff como admin.");
+      }
+    }
+
+    // ====== Dashboard logic (igual ao antigo) ======
     async function loadOverview(){
       const { data, error } = await supabase.rpc('admin_get_members_overview');
-      if(error){
-        console.error(error);
-        showLogin('Sem permissão. Confirme que seu usuário está em STAFF como admin.');
-        return;
-      }
+      if(error) throw error;
       overview = data||[];
       renderList(overview);
-
       const totalMembers = overview.length;
       const sumPoints = overview.reduce((a,b)=>a+(b.points||0),0);
       const earned = overview.reduce((a,b)=>a+(b.total_earned||0),0);
-      const spent  = overview.reduce((a,b)=>a+(b.total_spent||0),0);
+      const spent = overview.reduce((a,b)=>a+(b.total_spent||0),0);
       el('stMembers').textContent = fmtInt(totalMembers);
-      el('stPoints').textContent  = fmtInt(sumPoints);
-      el('stEarned').textContent  = fmtInt(earned);
-      el('stSpent').textContent   = fmtInt(spent);
-      el('listHint').textContent  = `${fmtInt(totalMembers)} cliente(s)`;
-
-      bindHandlersOnce();
+      el('stPoints').textContent = fmtInt(sumPoints);
+      el('stEarned').textContent = fmtInt(earned);
+      el('stSpent').textContent = fmtInt(spent);
+      el('listHint').textContent = `${fmtInt(totalMembers)} cliente(s)`;
     }
 
     function renderList(list){
@@ -314,16 +296,14 @@
         const row = document.createElement('div');
         row.className = 'row'; row.dataset.id = m.id;
         row.innerHTML = `
-          <div><b>${pad5(m.member_no)}</b> — ${m.name||'—'}</div>
+          <div><b>${String(m.member_no).padStart(2,'0')}</b> — ${m.name||'—'}</div>
           <div class="tag">${m.points||0} pts</div>`;
         row.onclick = ()=>selectMember(m.id);
         box.appendChild(row);
       });
     }
 
-    function markActive(id){
-      document.querySelectorAll('.row').forEach(r=> r.classList.toggle('active', r.dataset.id===id));
-    }
+    function markActive(id){ document.querySelectorAll('.row').forEach(r=> r.classList.toggle('active', r.dataset.id===id)); }
 
     async function selectMember(id){
       markActive(id);
@@ -331,7 +311,7 @@
       if(error||!mem){ alert('Não foi possível carregar o cliente.'); return; }
       current = mem;
       el('mName').value = mem.name||'';
-      el('mNo').value = pad5(mem.member_no);
+      el('mNo').value = String(mem.member_no).padStart(2,'0');
       el('mPoints').value = mem.points||0;
       el('mVip').value = mem.is_vip? 'true':'false';
       el('mBirth').value = mem.birthdate? new Date(mem.birthdate).toISOString().slice(0,10): '';
@@ -372,8 +352,7 @@
       const { error } = await supabase.from('members').update(upd).eq('id', current.id);
       if(error){ el('msgPerfil').textContent = 'Erro ao salvar.'; el('msgPerfil').style.color = '#ff8080'; return; }
       el('msgPerfil').textContent = 'Perfil salvo.'; el('msgPerfil').style.color = '#a2f3c9';
-      await selectMember(current.id);
-      await loadOverview();
+      await selectMember(current.id); await loadOverview();
     }
 
     function parseMoneyBR(v){
@@ -390,8 +369,7 @@
       const motivo = el('opMotivo').value || 'Compra';
       const { data, error } = await supabase.rpc('admin_add_purchase_points', { p_member_id: current.id, p_amount_brl: val, p_reason: motivo });
       if(error){ el('opMsg').textContent = 'Erro: sem permissão ou RPC indisponível.'; el('opMsg').style.color = '#ff8080'; return; }
-      el('opMsg').textContent = `OK: +${data||0} ponto(s).`;
-      el('opMsg').style.color = '#a2f3c9';
+      el('opMsg').textContent = `OK: +${data||0} ponto(s).`; el('opMsg').style.color = '#a2f3c9';
       await selectMember(current.id); await loadOverview();
     }
 
@@ -402,8 +380,7 @@
       const motivo = el('opMotivo').value || (delta>0? 'Crédito manual':'Estorno manual');
       const { error } = await supabase.rpc('admin_add_points', { p_member_id: current.id, p_delta: delta, p_reason: motivo, p_value_brl: 0, p_bonus_mult: 1 });
       if(error){ el('opMsg').textContent = 'Erro ao lançar delta.'; el('opMsg').style.color = '#ff8080'; return; }
-      el('opMsg').textContent = `OK: ${delta>0?'+':''}${delta} ponto(s).`;
-      el('opMsg').style.color = '#a2f3c9';
+      el('opMsg').textContent = `OK: ${delta>0?'+':''}${delta} ponto(s).`; el('opMsg').style.color = '#a2f3c9';
       await selectMember(current.id); await loadOverview();
     }
 
@@ -414,21 +391,18 @@
       const motivo = el('opMotivo').value || 'Ajuste manual';
       const { data, error } = await supabase.rpc('admin_set_points', { p_member_id: current.id, p_new_points: alvo, p_reason: motivo });
       if(error){ el('opMsg').textContent = 'Erro ao ajustar.'; el('opMsg').style.color = '#ff8080'; return; }
-      el('opMsg').textContent = `OK: diferença aplicada ${data>0?'+':''}${data}`;
-      el('opMsg').style.color = '#a2f3c9';
+      el('opMsg').textContent = `OK: diferença aplicada ${data>0?'+':''}${data}`; el('opMsg').style.color = '#a2f3c9';
       await selectMember(current.id); await loadOverview();
     }
 
     async function opResgatar(){
       if(!current) return;
       const parts = (el('opReward').value||'').split('|');
-      const code = parts[0];
-      const cost = parseInt(parts[1]||'0',10);
+      const code = parts[0]; const cost = parseInt(parts[1]||'0',10);
       const note = el('opRewardNote').value || '';
       const { error } = await supabase.rpc('admin_redeem_reward', { p_member_id: current.id, p_reward_code: code, p_points_cost: cost, p_note: note });
       if(error){ el('opMsg').textContent = 'Erro ao resgatar (pontos insuficientes ou permissão).'; el('opMsg').style.color = '#ff8080'; return; }
-      el('opMsg').textContent = `OK: resgate ${code} (-${cost} pts).`;
-      el('opMsg').style.color = '#a2f3c9';
+      el('opMsg').textContent = `OK: resgate ${code} (-${cost} pts).`; el('opMsg').style.color = '#a2f3c9';
       await selectMember(current.id); await loadOverview();
     }
 
@@ -436,51 +410,30 @@
       if(!overview.length){ alert('Nada para exportar.'); return; }
       const cols = ['id','name','phone','member_no','points','is_vip','birthdate','created_at','total_earned','total_spent','last_activity'];
       const lines = [cols.join(';')];
-      overview.forEach(r=>{
-        const row = cols.map(k=> (r[k]??'')).join(';');
-        lines.push(row);
-      });
+      overview.forEach(r=>{ const row = cols.map(k=> (r[k]??'')).join(';'); lines.push(row); });
       const blob = new Blob(["\ufeff"+lines.join('\n')], {type:'text/csv;charset=utf-8'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `vita-points-overview-${new Date().toISOString().slice(0,10)}.csv`;
-      a.click();
-      URL.revokeObjectURL(a.href);
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = `vita-points-overview-${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(a.href);
     }
 
     async function doSearch(){
       const q = el('q').value.trim();
-      if(!q){
-        renderList(overview);
-        el('listHint').textContent = `${fmtInt(overview.length)} cliente(s)`;
-        return;
-      }
+      if(!q){ renderList(overview); el('listHint').textContent = `${fmtInt(overview.length)} cliente(s)`; return; }
       const { data, error } = await supabase.rpc('admin_search_members', { q });
       if(error){ console.error(error); return; }
       const merged = (data||[]).map(m=> ({...m, total_earned:0, total_spent:0}));
-      el('listHint').textContent = `${fmtInt(merged.length)} resultado(s)`;
-      renderList(merged);
+      el('listHint').textContent = `${fmtInt(merged.length)} resultado(s)`; renderList(merged);
     }
 
-    function bindHandlersOnce(){
-      if(handlersBound) return; handlersBound = true;
-      el('btnOverview').onclick = loadOverview;
-      el('btnExport').onclick = exportCSV;
-      el('btnBuscar').onclick = doSearch;
-      el('btnClear').onclick = ()=>{ el('q').value=''; renderList(overview); el('listHint').textContent = `${fmtInt(overview.length)} cliente(s)`; };
-      el('btnSair').onclick = async ()=>{ await supabase.auth.signOut(); showLogin('Sessão encerrada.'); };
+    // Bindings
+    el('btnOverview').onclick = loadOverview;
+    el('btnExport').onclick = exportCSV;
+    el('btnBuscar').onclick = doSearch;
+    el('btnClear').onclick = ()=>{ el('q').value=''; renderList(overview); el('listHint').textContent = `${fmtInt(overview.length)} cliente(s)`; };
+    el('q').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ doSearch(); } });
 
-      el('btnCompra').onclick = opCompra;
-      el('btnDelta').onclick  = opDelta;
-      el('btnSet').onclick    = opSet;
-      el('btnResgatar').onclick = opResgatar;
-      el('btnSalvarPerfil').onclick = salvarPerfil;
-
-      el('q').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ doSearch(); } });
-    }
-
-    // start
-    gate();
+    // Start
+    boot();
   </script>
 </body>
 </html>
