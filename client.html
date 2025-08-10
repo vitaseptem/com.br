@@ -291,222 +291,259 @@
     </div>
   </footer>
 
-  <!-- Libs -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  // ==== CONFIG SUPABASE ====
+  const SUPABASE_URL = "https://dwqkuwqmlhvplmgwksas.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cWt1d3FtbGh2cGxtZ3drc2FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODM4NjksImV4cCI6MjA3MDM1OTg2OX0._pFblnBzx5cf0SUfAC_w-kmcdFbidZsh23XKXJR98ng";
 
-  <script>
-    // ========================= CONFIGURAÇÃO (COLE SUAS CHAVES) =========================
-    const SUPABASE_URL = "https://dwqkuwqmlhvplmgwksas.supabase.co"; // <-- troque
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cWt1d3FtbGh2cGxtZ3drc2FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODM4NjksImV4cCI6MjA3MDM1OTg2OX0._pFblnBzx5cf0SUfAC_w-kmcdFbidZsh23XKXJR98ng";                    // <-- troque
-    // ==================================================================================
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+  });
 
-    const supabase = (window.supabase && SUPABASE_URL.startsWith("http"))
-      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-      : null;
+  // ==== UI helpers ====
+  const $ = (id)=>document.getElementById(id);
+  const pad = (n)=> String(n).padStart(5,'0');          // 00001 … 32767
 
-    // Utilidades de UI
-    const byId = (id) => document.getElementById(id);
-    const pad = (n) => String(n).padStart(2, "0");
+  const thresholds = [
+    { p: 50,  label: "10% OFF próxima compra" },
+    { p: 100, label: "Camiseta básica Vita Septem" },
+    { p: 150, label: "Polo ou calça social 20% OFF" },
+    { p: 200, label: "Camisa social premium" },
+    { p: 300, label: "Vale-compras R$ 200,00" },
+  ];
 
-    const thresholds = [
-      {p:50,  label:"10% OFF próxima compra"},
-      {p:100, label:"Camiseta básica Vita Septem"},
-      {p:150, label:"Polo ou calça social 20% OFF"},
-      {p:200, label:"Camisa social premium"},
-      {p:300, label:"Vale-compras R$ 200,00"},
-    ];
+  const ui = {
+    loginForm: $('formLogin'), cadForm: $('formCadastro'),
+    loginMsg: $('loginMsg'),   cadMsg: $('cadMsg'),
+    painel: $('painel'),
+    uNome: $('uNome'), uCard: $('uCard'), uStatus: $('uStatus'),
+    uPontos: $('uPontos'), bar: $('bar'), uMensagem: $('uMensagem'),
+    tRewards: $('tRewards'), btnSair: $('btnSair'),
+    btnCardQR: $('btnCardQR'),
+    qrCanvas: $('qrCanvas'),   // se existir
+    qrBox: $('qrBox')          // se você criou um <div id="qrBox">
+  };
 
-    const ui = {
-      loginForm: byId('formLogin'),
-      cadForm: byId('formCadastro'),
-      loginMsg: byId('loginMsg'),
-      cadMsg: byId('cadMsg'),
-      painel: byId('painel'),
-      uNome: byId('uNome'),
-      uCard: byId('uCard'),
-      uStatus: byId('uStatus'),
-      uPontos: byId('uPontos'),
-      bar: byId('bar'),
-      uMensagem: byId('uMensagem'),
-      tRewards: byId('tRewards'),
-      btnSair: byId('btnSair'),
-      btnCardQR: byId('btnCardQR'),
-      qrCanvas: byId('qrCanvas'),
-    };
+  let currentUser = null;
+  let currentMember = null;
 
-    let currentUser = null;
-    let currentMember = null;
+  function setInfo(el, msg, tone=""){
+    if(!el) return;
+    el.textContent = msg || "";
+    el.style.color = tone==="error" ? "#ff8080" : tone==="ok" ? "#a2f3c9" : "#cfcfd6";
+  }
 
-    function setInfo(el, msg, tone=""){
-      if(!el) return; el.textContent = msg || "";
-      el.style.color = tone==="error" ? "#ff8080" : tone==="ok" ? "#a2f3c9" : "#cfcfd6";
+  function validateMemberNo(raw){
+    const n = parseInt(String(raw).replace(/\D/g,""), 10);
+    if (isNaN(n)) return { ok:false, reason:"Informe um número entre 1 e 32767" };
+    if (n < 1 || n > 32767) return { ok:false, reason:"O número deve ser de 01 até 32767" };
+    return { ok:true, value:n };
+  }
+
+  function rewardRows(points){
+    return thresholds.map(t=>{
+      const ok = points >= t.p;
+      const cls = ok ? "ok" : (points >= Math.max(0, t.p-25) ? "warn" : "danger");
+      const status = ok ? "Disponível para resgate" : `Faltam ${t.p - points} pts`;
+      return `<tr><td>${t.p}</td><td>${t.label}</td><td class="${cls}">${status}</td></tr>`;
+    }).join("");
+  }
+
+  function progressMsg(points){
+    const next = thresholds.find(t => points < t.p);
+    if (!next) return "Você atingiu a faixa máxima de recompensas! 🙌";
+    const falta = next.p - points;
+    return `Faltam ${falta} ponto(s) para ${next.label}.`;
+  }
+
+  function updateUIWithMember(m){
+    currentMember = m;
+    ui.uNome.textContent = m.name || "Cliente";
+    ui.uCard.textContent = pad(m.member_no);
+    ui.uStatus.textContent = m.is_vip ? "VIP" : "Cliente";
+
+    const pts = m.points ?? 0;
+    ui.uPontos.textContent = pts;
+    const next = thresholds.find(t=> pts < t.p) || thresholds.at(-1);
+    const denom = next ? next.p : 300;
+    const pct = Math.max(0, Math.min(100, Math.round((pts/denom)*100)));
+    ui.bar.style.width = pct + "%";
+
+    ui.uMensagem.textContent = progressMsg(pts);
+    ui.tRewards.innerHTML = rewardRows(pts);
+    ui.painel.style.display = "block";
+  }
+
+  function hidePainel(){
+    ui.painel.style.display = "none";
+    ui.tRewards.innerHTML = "";
+    if (ui.qrCanvas) ui.qrCanvas.style.display = "none";
+    if (ui.qrBox) { ui.qrBox.style.display = "none"; ui.qrBox.innerHTML = ""; }
+  }
+
+  // ===== Sessão =====
+  async function loadSession(){
+    const { data:{ user } } = await supabase.auth.getUser();
+    if (user){
+      currentUser = user;
+      await ensureMemberOrPrompt();
+    } else {
+      currentUser = null; hidePainel();
+    }
+  }
+
+  async function ensureMemberOrPrompt(){
+    const { data, error } = await supabase
+      .from('members')
+      .select('id,name,phone,member_no,points,is_vip,created_at')
+      .eq('id', currentUser.id)
+      .maybeSingle();
+
+    if (error){ console.error(error); hidePainel(); return; }
+
+    if (!data){
+      // Conta logada mas sem linha em members -> peça para finalizar cadastro
+      setInfo(ui.loginMsg, 'Conta criada. Finalize o cadastro informando seu nº do cartão.', 'error');
+      const cadEmail = $('cadEmail');
+      if (cadEmail) cadEmail.value = currentUser.email || '';
+      location.hash = '#acesso';
+      hidePainel();
+      return;
     }
 
-    function validateMemberNo(raw){
-      const n = parseInt(String(raw).replace(/\D/g,""), 10);
-      if (isNaN(n)) return {ok:false, reason:"Informe um número entre 1 e 300"};
-      if (n<1 || n>300) return {ok:false, reason:"O número deve ser de 01 até 300"};
-      return {ok:true, value:n};
+    updateUIWithMember(data);
+    if (location.hash !== '#painel') location.hash = '#painel';
+  }
+
+  supabase.auth.onAuthStateChange(async (_e, session)=>{
+    if (session?.user){ currentUser = session.user; await ensureMemberOrPrompt(); }
+    else { currentUser = null; hidePainel(); }
+  });
+
+  // ===== Login =====
+  ui.loginForm?.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    setInfo(ui.loginMsg, "Entrando...");
+    const email = $('loginEmail').value.trim();
+    const password = $('loginPass').value.trim();
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error){
+      const msg = /Email not confirmed/i.test(error.message)
+        ? "Confirme seu e-mail antes de entrar."
+        : "E-mail ou senha inválidos.";
+      setInfo(ui.loginMsg, msg, "error");
+      return;
+    }
+    setInfo(ui.loginMsg, "Login realizado.", "ok");
+    currentUser = data.user;
+    await ensureMemberOrPrompt();
+  });
+
+  // ===== Cadastro =====
+  ui.cadForm?.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    setInfo(ui.cadMsg, "Cadastrando...");
+
+    const name = $('cadNome').value.trim();
+    const phone = $('cadTelefone').value.trim();
+    const email = $('cadEmail').value.trim();
+    const password = $('cadPass').value.trim();
+    const rawNo = $('cadMemberNo').value.trim();
+
+    if (!name || !email || (!currentUser && !password)){
+      setInfo(ui.cadMsg, "Preencha nome, e-mail e senha.", "error");
+      return;
     }
 
-    function rewardRows(points){
-      return thresholds.map(t=>{
-        const ok = points >= t.p;
-        const cls = ok ? "ok" : (points >= Math.max(0, t.p-25) ? "warn" : "danger");
-        const status = ok ? "Disponível para resgate" : `Faltam ${t.p - points} pts`;
-        return `<tr><td>${t.p}</td><td>${t.label}</td><td class="${cls}">${status}</td></tr>`;
-      }).join("");
-    }
+    const v = validateMemberNo(rawNo);
+    if (!v.ok){ setInfo(ui.cadMsg, v.reason, "error"); return; }
+    const member_no = v.value;
 
-    function progressMsg(points){
-      const next = thresholds.find(t=> points < t.p);
-      if (!next) return "Você atingiu a faixa máxima de recompensas! 🙌";
-      const falta = next.p - points;
-      return `Faltam ${falta} ponto(s) para ${next.label}.`;
-    }
-
-    function updateUIWithMember(m){
-      currentMember = m;
-      ui.uNome.textContent = m.name || "Cliente";
-      ui.uCard.textContent = pad(m.member_no);
-      ui.uStatus.textContent = m.is_vip ? "VIP" : "Cliente";
-      const pts = m.points ?? 0;
-      ui.uPontos.textContent = pts;
-      const next = thresholds.find(t=> pts < t.p) || thresholds[thresholds.length-1];
-      const denom = next ? next.p : 300;
-      const pct = Math.max(0, Math.min(100, Math.round((pts/denom)*100)));
-      ui.bar.style.width = pct + "%";
-      ui.uMensagem.textContent = progressMsg(pts);
-      ui.tRewards.innerHTML = rewardRows(pts);
-      ui.painel.style.display = "block";
-    }
-
-    function hidePainel(){
-      ui.painel.style.display = "none";
-      ui.tRewards.innerHTML = "";
-      ui.qrCanvas.style.display = "none";
-    }
-
-    // ---------------- Sessão ----------------
-    async function loadSession(){
-      if(!supabase){ return; }
-      const { data: { session } } = await supabase.auth.getSession();
-      if(session?.user){
-        currentUser = session.user;
-        await loadMemberProfile();
-      }else{
-        currentUser = null; hidePainel();
-      }
-    }
-
-    async function loadMemberProfile(){
-      if(!supabase || !currentUser) return;
-      const { data, error } = await supabase
-        .from('members')
-        .select('id,name,phone,member_no,points,is_vip,created_at')
-        .eq('id', currentUser.id)
-        .maybeSingle();
-
-      if(error){ console.error(error); hidePainel(); return; }
-      if(!data){ // sem linha na tabela -> força logout para manter coerência
-        await supabase.auth.signOut(); hidePainel(); return;
-      }
-      updateUIWithMember(data);
-      if(location.hash !== '#painel') location.hash = '#painel';
-    }
-
-    // ---------------- Login ----------------
-    ui.loginForm?.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      setInfo(ui.loginMsg, "Entrando...");
-      const email = byId('loginEmail').value.trim();
-      const password = byId('loginPass').value.trim();
-      if(!supabase){ setInfo(ui.loginMsg, "Configure as chaves do Supabase no topo do arquivo.", "error"); return; }
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if(error){ setInfo(ui.loginMsg, "E-mail ou senha inválidos.", "error"); return; }
-      setInfo(ui.loginMsg, "Login realizado.", "ok");
-      currentUser = data.user; await loadMemberProfile();
-    });
-
-    // ---------------- Cadastro ----------------
-    ui.cadForm?.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      setInfo(ui.cadMsg, "Cadastrando...");
-      const name = byId('cadNome').value.trim();
-      const phone = byId('cadTelefone').value.trim();
-      const email = byId('cadEmail').value.trim();
-      const password = byId('cadPass').value.trim();
-      const rawNo = byId('cadMemberNo').value.trim();
-
-      if(!supabase){ setInfo(ui.cadMsg, "Configure as chaves do Supabase no topo do arquivo.", "error"); return; }
-      if(!name || !email || !password){ setInfo(ui.cadMsg, "Preencha nome, e-mail e senha.", "error"); return; }
-
-      const v = validateMemberNo(rawNo);
-      if(!v.ok){ setInfo(ui.cadMsg, v.reason, "error"); return; }
-      const member_no = v.value;
-
-      // 1) criar usuário auth
+    // Se já está logado e só faltava criar a linha em members
+    let userId = currentUser?.id;
+    if (!userId){
       const { data:sign, error:signErr } = await supabase.auth.signUp({ email, password });
-      if(signErr){
-        setInfo(ui.cadMsg, signErr.message?.includes("User already registered") ? "Este e-mail já está cadastrado." : "Erro ao criar conta.", "error");
+      if (signErr){
+        setInfo(ui.cadMsg,
+          signErr.message?.includes("User already registered") ? "Este e-mail já está cadastrado." : "Erro ao criar conta.",
+          "error"
+        );
         return;
       }
-
-      const userId = sign.user?.id;
-      if(!userId){
+      userId = sign.user?.id;
+      if (!userId){
         setInfo(ui.cadMsg, "Conta criada. Verifique seu e-mail para confirmar e depois faça login.", "ok");
         return;
       }
+    }
 
-      // 2) criar linha na tabela members
-      const { error:insErr } = await supabase.from('members').insert([{
-        id: userId, name, phone: phone || null, member_no, points: 0, is_vip: false
-      }]);
+    const { error:insErr } = await supabase.from('members').insert([{
+      id: userId, name, phone: phone || null, member_no, points: 0, is_vip: false
+    }]);
 
-      if(insErr){
-        if(String(insErr.code) === "23505"){
-          setInfo(ui.cadMsg, "Este número de cartão já está em uso. Escolha outro entre 01 e 300.", "error");
-        } else if (String(insErr.code) === "23514") {
-          setInfo(ui.cadMsg, "Número fora do intervalo permitido (01–300).", "error");
-        } else {
-          setInfo(ui.cadMsg, "Não foi possível finalizar o cadastro.", "error");
-        }
-        return;
+    if (insErr){
+      if (String(insErr.code) === "23505"){
+        setInfo(ui.cadMsg, "Este número de cartão já está em uso. Escolha outro entre 01 e 32767.", "error");
+      } else if (String(insErr.code) === "23514"){
+        setInfo(ui.cadMsg, "Número fora do intervalo permitido (01–32767).", "error");
+      } else {
+        setInfo(ui.cadMsg, "Não foi possível finalizar o cadastro.", "error");
       }
+      return;
+    }
 
-      setInfo(ui.cadMsg, "Conta criada com sucesso!", "ok");
-      await loadSession();
-    });
+    setInfo(ui.cadMsg, "Cadastro concluído!", "ok");
+    await loadSession();
+  });
 
-    // ---------------- Sair ----------------
-    ui.btnSair?.addEventListener('click', async ()=>{
-      if(!supabase) return; await supabase.auth.signOut(); currentUser = null; hidePainel(); location.hash = '#acesso';
-    });
+  // ===== Sair =====
+  ui.btnSair?.addEventListener('click', async ()=>{
+    await supabase.auth.signOut();
+    currentUser = null; hidePainel(); location.hash = '#acesso';
+  });
 
-    // ---------------- QR do cartão ----------------
-    ui.btnCardQR?.addEventListener('click', ()=>{
-      if(!currentMember) return;
-      const url = `${location.origin}${location.pathname}?mn=${pad(currentMember.member_no)}#acesso`;
-      ui.qrCanvas.style.display = "block";
-      QRCode.toCanvas(ui.qrCanvas, url, { width: 180 }, (error) => { if (error) console.error(error); });
-    });
+  // ===== QR do cartão =====
+  function showQR(text){
+    // Preferência: qrcodejs (div). Fallback: QRCode.toCanvas (canvas).
+    if (ui.qrBox && window.QRCode && typeof window.QRCode === 'function'){
+      ui.qrBox.style.display = 'block';
+      ui.qrBox.innerHTML = '';
+      new QRCode(ui.qrBox, { text, width: 180, height: 180, colorDark:'#000', colorLight:'#fff' });
+      return;
+    }
+    if (ui.qrCanvas && window.QRCode && typeof window.QRCode.toCanvas === 'function'){
+      ui.qrCanvas.style.display = 'block';
+      QRCode.toCanvas(ui.qrCanvas, text, { width: 180 }, (err)=>{ if (err) console.error(err); });
+      return;
+    }
+    alert('Biblioteca de QRCode não carregada. Use qrcodejs (cdnjs).');
+  }
 
-    // ---------------- Pré-preenche número via ?mn=001 ----------------
-    (function prefill(){
-      const params = new URLSearchParams(location.search);
-      const mn = params.get("mn");
-      if(mn){
-        const el = byId('cadMemberNo');
-        if(el) el.value = mn.replace(/\D/g,"").slice(0,3);
-      }
-    })();
+  ui.btnCardQR?.addEventListener('click', ()=>{
+    if (!currentMember) return;
+    const url = `${location.origin}${location.pathname}?mn=${pad(currentMember.member_no)}#acesso`;
+    showQR(url);
+  });
 
-    // Rodapé ano
-    byId('year').textContent = new Date().getFullYear();
+  // ===== Pré-preenche via ?mn=00001 =====
+  (function prefill(){
+    const params = new URLSearchParams(location.search);
+    const mn = params.get("mn");
+    if (mn){
+      const el = $('cadMemberNo');
+      if (el) el.value = mn.replace(/\D/g,"").slice(0,5);
+    }
+  })();
 
-    // Inicializa sessão
-    loadSession();
-  </script>
+  // footer
+  $('year').textContent = new Date().getFullYear();
+
+  // start
+  loadSession();
+</script>
 </body>
+
 </html>
