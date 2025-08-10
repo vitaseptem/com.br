@@ -291,20 +291,21 @@
     </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script>
-  // ==== CONFIG SUPABASE ====
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  // ====== SUPABASE ======
   const SUPABASE_URL = "https://dwqkuwqmlhvplmgwksas.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cWt1d3FtbGh2cGxtZ3drc2FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODM4NjksImV4cCI6MjA3MDM1OTg2OX0._pFblnBzx5cf0SUfAC_w-kmcdFbidZsh23XKXJR98ng";
-
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
   });
 
-  // ==== UI helpers ====
+  // ====== UI helpers ======
   const $ = (id)=>document.getElementById(id);
-  const pad = (n)=> String(n).padStart(5,'0');          // 00001 … 32767
+  const pad = (n)=> String(n).padStart(5,'0'); // 00001…32767
 
   const thresholds = [
     { p: 50,  label: "10% OFF próxima compra" },
@@ -315,21 +316,28 @@
   ];
 
   const ui = {
-    loginForm: $('formLogin'), cadForm: $('formCadastro'),
-    loginMsg: $('loginMsg'),   cadMsg: $('cadMsg'),
-    painel: $('painel'),
-    uNome: $('uNome'), uCard: $('uCard'), uStatus: $('uStatus'),
-    uPontos: $('uPontos'), bar: $('bar'), uMensagem: $('uMensagem'),
-    tRewards: $('tRewards'), btnSair: $('btnSair'),
+    loginForm: $('formLogin'),
+    cadForm:   $('formCadastro'),
+    loginMsg:  $('loginMsg'),
+    cadMsg:    $('cadMsg'),
+    painel:    $('painel'),
+    uNome:     $('uNome'),
+    uCard:     $('uCard'),
+    uStatus:   $('uStatus'),
+    uPontos:   $('uPontos'),
+    bar:       $('bar'),
+    uMensagem: $('uMensagem'),
+    tRewards:  $('tRewards'),
+    btnSair:   $('btnSair'),
     btnCardQR: $('btnCardQR'),
-    qrCanvas: $('qrCanvas'),   // se existir
-    qrBox: $('qrBox')          // se você criou um <div id="qrBox">
+    qrCanvas:  $('qrCanvas'), // opcional
+    qrBox:     $('qrBox')     // opcional (div para QR)
   };
 
   let currentUser = null;
   let currentMember = null;
 
-  function setInfo(el, msg, tone=""){
+  function setInfo(el, msg, tone="") {
     if(!el) return;
     el.textContent = msg || "";
     el.style.color = tone==="error" ? "#ff8080" : tone==="ok" ? "#a2f3c9" : "#cfcfd6";
@@ -368,8 +376,7 @@
     ui.uPontos.textContent = pts;
     const next = thresholds.find(t=> pts < t.p) || thresholds.at(-1);
     const denom = next ? next.p : 300;
-    const pct = Math.max(0, Math.min(100, Math.round((pts/denom)*100)));
-    ui.bar.style.width = pct + "%";
+    ui.bar.style.width = Math.max(0, Math.min(100, Math.round((pts/denom)*100))) + "%";
 
     ui.uMensagem.textContent = progressMsg(pts);
     ui.tRewards.innerHTML = rewardRows(pts);
@@ -383,14 +390,16 @@
     if (ui.qrBox) { ui.qrBox.style.display = "none"; ui.qrBox.innerHTML = ""; }
   }
 
-  // ===== Sessão =====
+  // ====== Sessão (rápida) ======
   async function loadSession(){
-    const { data:{ user } } = await supabase.auth.getUser();
-    if (user){
-      currentUser = user;
+    // pega da memória local (rápido)
+    const { data:{ session } } = await supabase.auth.getSession();
+    if (session?.user){
+      currentUser = session.user;
       await ensureMemberOrPrompt();
     } else {
-      currentUser = null; hidePainel();
+      currentUser = null;
+      hidePainel();
     }
   }
 
@@ -404,7 +413,7 @@
     if (error){ console.error(error); hidePainel(); return; }
 
     if (!data){
-      // Conta logada mas sem linha em members -> peça para finalizar cadastro
+      // logado mas sem linha na members
       setInfo(ui.loginMsg, 'Conta criada. Finalize o cadastro informando seu nº do cartão.', 'error');
       const cadEmail = $('cadEmail');
       if (cadEmail) cadEmail.value = currentUser.email || '';
@@ -417,12 +426,12 @@
     if (location.hash !== '#painel') location.hash = '#painel';
   }
 
-  supabase.auth.onAuthStateChange(async (_e, session)=>{
+  supabase.auth.onAuthStateChange(async (_event, session)=>{
     if (session?.user){ currentUser = session.user; await ensureMemberOrPrompt(); }
     else { currentUser = null; hidePainel(); }
   });
 
-  // ===== Login =====
+  // ====== Login ======
   ui.loginForm?.addEventListener('submit', async (e)=>{
     e.preventDefault();
     setInfo(ui.loginMsg, "Entrando...");
@@ -442,7 +451,7 @@
     await ensureMemberOrPrompt();
   });
 
-  // ===== Cadastro =====
+  // ====== Cadastro ======
   ui.cadForm?.addEventListener('submit', async (e)=>{
     e.preventDefault();
     setInfo(ui.cadMsg, "Cadastrando...");
@@ -462,7 +471,7 @@
     if (!v.ok){ setInfo(ui.cadMsg, v.reason, "error"); return; }
     const member_no = v.value;
 
-    // Se já está logado e só faltava criar a linha em members
+    // se já está logado e só faltava a linha em members
     let userId = currentUser?.id;
     if (!userId){
       const { data:sign, error:signErr } = await supabase.auth.signUp({ email, password });
@@ -499,27 +508,41 @@
     await loadSession();
   });
 
-  // ===== Sair =====
+  // ====== Sair (corrigido) ======
   ui.btnSair?.addEventListener('click', async ()=>{
-    await supabase.auth.signOut();
-    currentUser = null; hidePainel(); location.hash = '#acesso';
+    try { await supabase.auth.signOut(); } catch {}
+    currentUser = null;
+    hidePainel();
+    // garante reset visual e âncora
+    location.hash = '#acesso';
+    // força limpar qualquer cache da sessão
+    location.reload();
   });
 
-  // ===== QR do cartão =====
-  function showQR(text){
-    // Preferência: qrcodejs (div). Fallback: QRCode.toCanvas (canvas).
-    if (ui.qrBox && window.QRCode && typeof window.QRCode === 'function'){
-      ui.qrBox.style.display = 'block';
-      ui.qrBox.innerHTML = '';
-      new QRCode(ui.qrBox, { text, width: 180, height: 180, colorDark:'#000', colorLight:'#fff' });
-      return;
+  // ====== QR do cartão (usando qrcode@1.5.3) ======
+  function ensureCanvas(){
+    if (ui.qrCanvas) return ui.qrCanvas;
+    // cria se não existir
+    const c = document.createElement('canvas');
+    c.id = 'qrCanvas';
+    c.style.background = '#fff';
+    c.style.borderRadius = '12px';
+    c.style.padding = '8px';
+    const container = ui.qrBox || ui.painel || document.body;
+    container.appendChild(c);
+    ui.qrCanvas = c;
+    return c;
+  }
+
+  async function showQR(text){
+    const canvas = ensureCanvas();
+    canvas.style.display = 'block';
+    try {
+      await QRCode.toCanvas(canvas, text, { width: 200, margin: 1 });
+    } catch (e) {
+      console.error('QR error', e);
+      alert('Não foi possível gerar o QR. Recarregue a página.');
     }
-    if (ui.qrCanvas && window.QRCode && typeof window.QRCode.toCanvas === 'function'){
-      ui.qrCanvas.style.display = 'block';
-      QRCode.toCanvas(ui.qrCanvas, text, { width: 180 }, (err)=>{ if (err) console.error(err); });
-      return;
-    }
-    alert('Biblioteca de QRCode não carregada. Use qrcodejs (cdnjs).');
   }
 
   ui.btnCardQR?.addEventListener('click', ()=>{
@@ -528,7 +551,7 @@
     showQR(url);
   });
 
-  // ===== Pré-preenche via ?mn=00001 =====
+  // ====== Pré-preenche via ?mn=00001 ======
   (function prefill(){
     const params = new URLSearchParams(location.search);
     const mn = params.get("mn");
@@ -538,14 +561,17 @@
     }
   })();
 
-  // footer
-  $('year').textContent = new Date().getFullYear();
+  // rodapé
+  if ($('year')) $('year').textContent = new Date().getFullYear();
 
-  // start
+  // start rápido
   loadSession();
+});
 </script>
+
 </body>
 
 </html>
+
 
 
