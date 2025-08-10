@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vita Septem – Campanha</title>
+  <meta name="description" content="Campanha temática da Vita Septem com ofertas especiais, contagem regressiva e cupons." />
+  <meta name="theme-color" content="#880c21" />
+  <!-- Open Graph -->
+  <meta property="og:title" content="Vita Septem – Campanha" />
+  <meta property="og:description" content="Ofertas especiais por tempo limitado. Garanta já o seu." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="icon.png" />
+  <meta property="og:locale" content="pt_BR" />
+  <!-- Fonts & Favicon -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="icon.ico">
+
+  <style>
+    :root{
+      --wine:#880c21; --wine-600:#a11837; /* estes dois podem ser sobrescritos via JS com a cor da campanha */
+      --black:#0e0e0f; --gray-900:#17171a; --gray-800:#1c1c20; --gray-700:#232327; --gray-600:#34343a; --gray-500:#8c8c94;
+      --white:#ffffff; --radius:18px; --shadow:0 10px 30px rgba(0,0,0,.35); --success:#25D366; --muted:#cfcfd6;
+      --accent-soft: rgba(136,12,33,.18);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--white); background:linear-gradient(180deg,var(--black),var(--gray-900) 35%, #0b0b0c);
+      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    }
+    a{color:inherit; text-decoration:none}
+    .container{max-width:1200px; margin:0 auto; padding:0 20px}
+
+    /* Header */
+    header{position:sticky; top:0; z-index:70; backdrop-filter:saturate(140%) blur(8px);
+      background:rgba(13,13,15,.7); border-bottom:1px solid rgba(255,255,255,.06)}
+    .nav{display:flex; align-items:center; justify-content:center; padding:18px 0}
+    .brand{display:flex; align-items:center; gap:12px}
+    .brand img{height:110px; width:auto; object-fit:contain}
+
+    /* Hero */
+    .hero{position:relative; overflow:hidden; isolation:isolate}
+    .hero::before{
+      content:""; position:absolute; inset:-20%;
+      background:
+        radial-gradient(80% 60% at 70% 20%, rgba(136,12,33,.35), transparent 60%),
+        radial-gradient(60% 40% at 10% 10%, rgba(255,255,255,.08), transparent 60%);
+      z-index:-1; filter:blur(10px)
+    }
+    .hero-grid{display:grid; grid-template-columns:1.1fr .9fr; gap:36px; align-items:center; padding:64px 0}
+    .kicker{color:#e9e9ea; letter-spacing:.14em; text-transform:uppercase; font-size:.82rem}
+    h1{margin:.35rem 0 1rem; font-family:"Playfair Display",serif; font-weight:700;
+       font-size:clamp(2.1rem, 3.2vw + 1rem, 3.6rem); line-height:1.05;}
+    .lead{color:#d9d9dd; font-size:1.05rem; max-width:52ch}
+    .btn{display:inline-flex; align-items:center; gap:10px; padding:12px 18px; border-radius:14px; font-weight:600;
+         background:var(--wine); border:1px solid rgba(255,255,255,.1); box-shadow:var(--shadow);
+         transition:transform .15s ease, background .2s ease;}
+    .btn:hover{background:var(--wine-600); transform:translateY(-1px)}
+    .btn.secondary{background:transparent; border-color:rgba(255,255,255,.18)}
+    .btn.ghost{background:#1a1a1e; border:1px solid rgba(255,255,255,.12)}
+    .hero-visual{background:linear-gradient(180deg,#141416,#0d0d0f);
+      border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); min-height:360px;
+      display:grid; place-items:center; position:relative; overflow:hidden}
+    .hero-visual img{width:100%; height:100%; object-fit:cover}
+    .tag{position:absolute; top:14px; right:14px; padding:6px 10px; border-radius:999px;
+      background:var(--accent-soft); border:1px solid rgba(136,12,33,.5); font-size:.78rem}
+
+    /* Countdown */
+    .countdown{display:flex; gap:12px; margin-top:16px}
+    .timer{display:flex; gap:8px; align-items:center; font-variant-numeric:tabular-nums}
+    .pill{background:#131316; border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:8px 10px; text-align:center; min-width:62px}
+    .pill b{display:block; font-size:1.1rem}
+
+    /* Sections */
+    section{padding:56px 0}
+    .section-title{font-family:"Playfair Display",serif; font-weight:700; font-size:2rem; margin:0 0 14px}
+    .muted{color:var(--muted); margin:0 0 26px}
+    .grid{display:grid; gap:18px; grid-template-columns:repeat(12,1fr)}
+
+    /* Deal cards */
+    .card{grid-column:span 4; background:linear-gradient(180deg,#141416,#101013);
+      border:1px solid rgba(255,255,255,.08); border-radius:16px; overflow:hidden; transition:transform .15s ease; position:relative}
+    .card:hover{transform:translateY(-3px)}
+    .card .media{height:220px; background:#0f0f11}
+    .card .media img{width:100%; height:100%; object-fit:cover}
+    .card .p{padding:14px}
+    .badge{background:rgba(136,12,33,.22); border:1px solid rgba(136,12,33,.55); padding:4px 10px; border-radius:999px; font-size:.78rem}
+    .price{display:flex; align-items:center; gap:12px; margin-top:10px; font-variant-numeric:tabular-nums}
+    .price s{color:#9a9aa3}
+    .price strong{font-size:1.2rem}
+    .buy{margin-top:12px; width:100%; text-align:center; padding:12px 14px; border-radius:12px; background:#1a1a1e; border:1px solid rgba(255,255,255,.12); font-weight:600}
+    .buy:hover{border-color:rgba(255,255,255,.22)}
+    .off{position:absolute; top:10px; left:10px; padding:6px 10px; border-radius:999px; background:var(--wine); font-weight:700; box-shadow:var(--shadow)}
+
+    /* Banners strip */
+    .banners{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+    .banners img{width:100%; height:180px; object-fit:cover; border-radius:14px; border:1px solid rgba(255,255,255,.08); cursor:pointer}
+
+    /* Testimonials */
+    .testi{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
+    .quote{background:linear-gradient(180deg,#141416,#101013); border:1px solid rgba(255,255,255,.08);
+      border-radius:16px; padding:18px; color:#e7e7ea}
+    .quote b{display:block; margin-top:10px; color:#fff}
+    .stars{letter-spacing:2px}
+
+    /* FAQ */
+    details.faq{background:linear-gradient(180deg,#141416,#101013); border:1px solid rgba(255,255,255,.08);
+      border-radius:16px; padding:14px 16px}
+    details.faq:not(:last-child){margin-bottom:12px}
+    details.faq summary{cursor:pointer; font-weight:600}
+
+    /* WhatsApp FAB */
+    .fab{position:fixed; right:18px; bottom:18px; background:var(--success); color:#000; font-weight:700;
+      padding:12px 14px; border-radius:999px; box-shadow:var(--shadow); z-index:130}
+
+    /* Footer */
+    footer{border-top:1px solid rgba(255,255,255,.08); padding:28px 0 60px; color:var(--muted)}
+    .brand-small{display:flex; gap:10px; align-items:center}
+    .brand-small img{width:28px; height:28px}
+
+    /* Modal Gallery */
+    .modal{position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.7); z-index:120}
+    .modal.open{display:grid}
+    .modal .box{max-width:980px; width:92vw; background:#101013; border:1px solid rgba(255,255,255,.12);
+                border-radius:16px; overflow:hidden}
+    .modal .slides{position:relative}
+    .modal img{width:100%; height:70vh; object-fit:cover; background:#0b0b0c}
+    .modal .ctrl{position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,.5);
+                 border:1px solid rgba(255,255,255,.2); padding:12px; border-radius:12px; cursor:pointer}
+    .modal .prev{left:12px} .modal .next{right:12px}
+    .modal .close{position:absolute; top:12px; right:12px; background:#000; border:1px solid rgba(255,255,255,.25); padding:8px 10px; border-radius:10px; cursor:pointer}
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .hero-grid{grid-template-columns:1fr; padding:44px 0}
+      .grid .card{grid-column:span 6}
+      .banners{grid-template-columns:1fr 1fr}
+      .testi{grid-template-columns:1fr}
+      .brand img{height:76px}
+    }
+    @media (max-width: 640px){
+      .grid .card{grid-column:span 12}
+      .banners{grid-template-columns:1fr}
+      .brand img{height:64px}
+    }
+  </style>
+</head>
+<body>
+  <!-- FAB WhatsApp -->
+  <a href="https://wa.me/5599981543912?text=Quero%20aproveitar%20a%20campanha%20Vita%20Septem" class="fab" aria-label="Falar no WhatsApp">WhatsApp</a>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <a class="brand" href="index.html#hero" aria-label="Ir para o início">
+        <img src="icon2.png" alt="Logo Vita Septem">
+      </a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section id="hero" class="hero" aria-label="Campanha Temática">
+    <div class="container hero-grid">
+      <div>
+        <div class="kicker" id="heroBadge">Campanha</div>
+        <h1 id="heroTitle">Ofertas Especiais</h1>
+        <p class="lead" id="heroLead">Descontos por tempo limitado em peças selecionadas.</p>
+
+        <!-- Countdown -->
+        <div class="countdown">
+          <div class="timer" id="timer">
+            <div class="pill"><b id="tDays">00</b><small>Dias</small></div>
+            <div class="pill"><b id="tHours">00</b><small>Horas</small></div>
+            <div class="pill"><b id="tMins">00</b><small>Min</small></div>
+            <div class="pill"><b id="tSecs">00</b><small>Seg</small></div>
+          </div>
+          <span class="badge" id="heroCoupon" style="align-self:center; display:none"></span>
+        </div>
+
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:22px">
+          <a href="#ofertas" class="btn">Ver ofertas</a>
+          <a href="#banners" class="btn secondary">Ver campanha</a>
+        </div>
+      </div>
+      <div class="hero-visual" role="img" aria-label="Banner da campanha">
+        <span class="tag" id="heroTag">Por tempo limitado</span>
+        <img id="heroImg" src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=1600&auto=format&fit=crop" alt="Campanha Vita Septem">
+      </div>
+    </div>
+  </section>
+
+  <!-- OFERTAS -->
+  <section id="ofertas" aria-labelledby="ttl-ofertas">
+    <div class="container">
+      <h2 class="section-title" id="ttl-ofertas">Ofertas em destaque</h2>
+      <p class="muted" id="offersDesc">Seleção curada com foco em custo-benefício.</p>
+      <div class="grid" id="dealGrid"></div>
+      <div class="muted" id="dealEmpty" style="display:none">Nenhuma oferta cadastrada no momento.</div>
+    </div>
+  </section>
+
+  <!-- BANNERS / GALERIA -->
+  <section id="banners" aria-labelledby="ttl-banners">
+    <div class="container">
+      <h2 class="section-title" id="ttl-banners">Imagens da campanha</h2>
+      <p class="muted">Clique para ampliar.</p>
+      <div class="banners" id="bannerStrip"></div>
+    </div>
+  </section>
+
+  <!-- DEPOIMENTOS -->
+  <section aria-labelledby="ttl-depo" id="depo">
+    <div class="container">
+      <h2 class="section-title" id="ttl-depo">Quem comprou, recomenda</h2>
+      <div class="testi" id="testiGrid"></div>
+      <div class="muted" id="testiEmpty" style="display:none">Seja o primeiro a avaliar.</div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section aria-labelledby="ttl-faq">
+    <div class="container">
+      <h2 class="section-title" id="ttl-faq">Regras rápidas</h2>
+      <div id="faqList"></div>
+    </div>
+  </section>
+
+  <!-- CONTATO/LOCAL -->
+  <section aria-label="Informações de contato e localização">
+    <div class="container" style="display:grid; grid-template-columns:1.2fr .8fr; gap:22px">
+      <div>
+        <h3 class="section-title" style="margin-top:0">Visite a loja</h3>
+        <p class="muted">Rua Nova, Centro – São João do Caru / MA<br/>Seg–Sáb: 9h às 19h</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap">
+          <a class="btn ghost" href="https://wa.me/5599981543912?text=Quero%20aproveitar%20a%20campanha%20Vita%20Septem">WhatsApp</a>
+          <a class="btn ghost" href="https://www.instagram.com/vitaseptem" target="_blank" rel="noopener">Instagram</a>
+        </div>
+      </div>
+      <div aria-hidden="true">
+        <iframe title="Mapa da loja" width="100%" height="220" style="border:0; border-radius:14px"
+          loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          src="https://www.google.com/maps?q=São%20João%20do%20Caru%20MA&output=embed"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap">
+      <div class="brand-small">
+        <img src="icon.png" alt="" aria-hidden="true">
+        <span>© <span id="year"></span> Vita Septem – Men’s Fashion</span>
+      </div>
+      <small>Desenvolvido para performance e conversão.</small>
+    </div>
+  </footer>
+
+  <!-- Modal Galeria -->
+  <div class="modal" id="galModal" aria-hidden="true" role="dialog" aria-label="Galeria de campanha">
+    <div class="box">
+      <button class="close" onclick="closeGal()" aria-label="Fechar">Fechar ✕</button>
+      <div class="slides">
+        <button class="ctrl prev" onclick="prevGal()" aria-label="Imagem anterior">‹</button>
+        <img id="galImg" src="" alt="Imagem da campanha">
+        <button class="ctrl next" onclick="nextGal()" aria-label="Próxima imagem">›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // ====== Config ======
+    const SUPABASE_URL = "https://dwqkuwqmlhvplmgwksas.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cWt1d3FtbGh2cGxtZ3drc2FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODM4NjksImV4cCI6MjA3MDM1OTg2OX0._pFblnBzx5cf0SUfAC_w-kmcdFbidZsh23XKXJR98ng";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth:{ persistSession:false }});
+    const BUCKET = "campaigns"; // bucket público para imagens da campanha
+    const WHATSAPP = "5599981543912";
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ====== Slug via query ======
+    const params = new URLSearchParams(location.search);
+    const CAMPAIGN_SLUG = params.get('slug') || 'black-friday-2026';
+
+    // ===== Helpers =====
+    const $ = (id)=> document.getElementById(id);
+    const fmtBRL = (c)=> (c/100).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+    function storageUrl(path){
+      try{
+        const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+        return data.publicUrl || "";
+      }catch{ return ""; }
+    }
+    function imgUrlFrom(obj){
+      if(!obj) return "";
+      if(obj.url) return obj.url;
+      if(obj.path) return storageUrl(obj.path);
+      return "";
+    }
+    function pctOff(price, compare){
+      if(!compare || compare<=0 || price<=0 || price>=compare) return 0;
+      return Math.round((1 - (price/compare)) * 100);
+    }
+    function wa(text){
+      const url = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
+      window.open(url,'_blank'); return false;
+    }
+    function setAccent(hex){
+      if(!/^#?[0-9a-f]{6}$/i.test((hex||'').replace('#',''))) return;
+      const v = hex.startsWith('#')? hex : `#${hex}`;
+      document.documentElement.style.setProperty('--wine', v);
+      document.documentElement.style.setProperty('--wine-600', v);
+      document.documentElement.style.setProperty('--accent-soft', v+'22'); // leve transparência
+    }
+
+    // ===== DOM refs =====
+    const heroImg = $('heroImg'), heroTitle = $('heroTitle'), heroLead = $('heroLead'), heroBadge = $('heroBadge'), heroTag = $('heroTag'), heroCoupon = $('heroCoupon');
+    const dealGrid = $('dealGrid'), dealEmpty = $('dealEmpty'), offersDesc = $('offersDesc');
+    const bannerStrip = $('bannerStrip');
+    const testiGrid = $('testiGrid'), testiEmpty = $('testiEmpty');
+    const faqList = $('faqList');
+
+    // Countdown
+    const tDays=$('tDays'), tHours=$('tHours'), tMins=$('tMins'), tSecs=$('tSecs');
+    let endAt = null, tickId = null;
+    function pad(n){ return String(n).padStart(2,'0'); }
+    function startCountdown(iso){
+      if(tickId) clearInterval(tickId);
+      endAt = iso ? new Date(iso) : null;
+      if(!endAt || isNaN(endAt.getTime())) return;
+      const tick = ()=>{
+        const now = new Date();
+        let ms = endAt - now;
+        if(ms <= 0){
+          tDays.textContent = tHours.textContent = tMins.textContent = tSecs.textContent = '00';
+          clearInterval(tickId);
+          heroTag.textContent = 'Campanha encerrada';
+          return;
+        }
+        const s = Math.floor(ms/1000);
+        const d = Math.floor(s/86400);
+        const h = Math.floor((s%86400)/3600);
+        const m = Math.floor((s%3600)/60);
+        const se = s%60;
+        tDays.textContent = pad(d); tHours.textContent = pad(h); tMins.textContent = pad(m); tSecs.textContent = pad(se);
+      };
+      tick(); tickId = setInterval(tick, 1000);
+    }
+
+    // ===== Gallery modal =====
+    const galModal = $('galModal'), galImg = $('galImg');
+    let GAL = []; let gi = 0;
+    function openGal(i=0){ if(!GAL.length) return; gi = i; galImg.src = GAL[gi]; galModal.classList.add('open'); galModal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+    function closeGal(){ galModal.classList.remove('open'); galModal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+    function prevGal(){ gi = (gi-1+GAL.length)%GAL.length; galImg.src = GAL[gi]; }
+    function nextGal(){ gi = (gi+1)%GAL.length; galImg.src = GAL[gi]; }
+    window.closeGal=closeGal; window.prevGal=prevGal; window.nextGal=nextGal;
+    galModal.addEventListener('click', (e)=>{ if(e.target===galModal) closeGal(); });
+    window.addEventListener('keydown', (e)=>{ if(!galModal.classList.contains('open')) return; if(e.key==='Escape') closeGal(); if(e.key==='ArrowLeft') prevGal(); if(e.key==='ArrowRight') nextGal(); });
+
+    // ===== Templates =====
+    function dealCard(d){
+      const img = d.image_url || (d.image_path ? storageUrl(d.image_path) : "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=1600&auto=format&fit=crop");
+      const off = pctOff(d.price_cents||0, d.compare_at_cents||0);
+      const safe = {
+        title: d.title, sku: d.sku, price_cents: d.price_cents||0, slug: d.slug || '',
+      };
+      const data = encodeURIComponent(JSON.stringify(safe));
+      return `
+        <article class="card" id="${d.slug||''}">
+          ${off? `<div class="off">-${off}%</div>`:''}
+          <div class="media"><img src="${img}" alt="${d.title||'Oferta'}"></div>
+          <div class="p">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px">
+              <h3 style="margin:0">${d.title||'Oferta'}</h3>
+              ${d.badge ? `<span class="badge">${d.badge}</span>`:''}
+            </div>
+            ${d.subtitle? `<p class="muted" style="margin:6px 0 0">${d.subtitle}</p>`:''}
+            <div class="price">
+              <div>${(d.compare_at_cents>0 && d.compare_at_cents > d.price_cents) ? `<s>${fmtBRL(d.compare_at_cents)}</s>`:''}</div>
+              <strong>${fmtBRL(d.price_cents||0)}</strong>
+            </div>
+            <button class="buy" onclick='(function(x){ const p=(x.price_cents/100).toLocaleString("pt-BR",{style:"currency",currency:"BRL"}); wa("Quero a oferta: "+x.title+" | SKU: "+(x.sku||"-")+" | Preço: "+p+" | Link: "+location.href.split("#")[0]+"#"+(x.slug||"")); })(JSON.parse(decodeURIComponent("${data}")))' aria-label="Comprar pelo WhatsApp">Comprar pelo WhatsApp</button>
+            ${d.product_url ? `<a class="buy" href="${d.product_url}" target="_blank" rel="noopener" aria-label="Ver no catálogo">Ver no catálogo</a>`:''}
+          </div>
+        </article>
+      `;
+    }
+    function testiCard(t){
+      const stars = '★'.repeat(Math.max(3, Math.min(5, t.stars||5))) + '☆'.repeat(5-Math.max(3, Math.min(5, t.stars||5)));
+      return `<div class="quote"><div class="stars">${stars}</div>“${t.quote||''}”<b>${t.author||'Cliente'}</b></div>`;
+    }
+    function faqItem(f){
+      return `<details class="faq"><summary>${f.q||'Pergunta'}</summary><div class="muted" style="margin-top:8px">${f.a||''}</div></details>`;
+    }
+
+    function renderDeals(list){
+      dealGrid.innerHTML = '';
+      if(!list?.length){ dealEmpty.style.display='block'; return; }
+      dealEmpty.style.display='none';
+      list.forEach(d=> dealGrid.insertAdjacentHTML('beforeend', dealCard(d)));
+    }
+    function renderBanners(list){
+      bannerStrip.innerHTML = '';
+      GAL = (list||[]).map(imgUrlFrom).filter(Boolean);
+      GAL.forEach((src, i)=>{
+        const el = document.createElement('img');
+        el.src = src; el.alt = 'Banner de campanha '+(i+1);
+        el.onclick = ()=> openGal(i);
+        bannerStrip.appendChild(el);
+      });
+    }
+    function renderTesti(list){
+      testiGrid.innerHTML=''; testiEmpty.style.display = list?.length ? 'none' : 'block';
+      (list||[]).forEach(t=> testiGrid.insertAdjacentHTML('beforeend', testiCard(t)));
+    }
+    function renderFaq(list){
+      faqList.innerHTML=''; (list||[]).forEach(f=> faqList.insertAdjacentHTML('beforeend', faqItem(f)));
+    }
+
+    // ===== Load do Supabase + fallback =====
+    async function loadCampaign(){
+      try{
+        const { data, error } = await supabase
+          .from('campaigns')
+          .select(`
+            id, slug, title, subtitle, badge, tag_text, accent_color, coupon_code, coupon_note,
+            start_at, end_at, shipping_text, is_active,
+            campaign_banners ( url, path, alt, is_primary, sort_order ),
+            campaign_products ( slug, title, subtitle, sku, price_cents, compare_at_cents, badge, product_url, image_url, image_path, sort_order, is_active ),
+            campaign_testimonials ( author, quote, stars, sort_order, is_active ),
+            campaign_faqs ( q, a, sort_order, is_active )
+          `)
+          .eq('slug', CAMPAIGN_SLUG)
+          .eq('is_active', true)
+          .maybeSingle();
+
+        if(error) throw error;
+
+        if(!data){
+          applyCampaign(fallbackCampaign(CAMPAIGN_SLUG));
+          return;
+        }
+
+        // Tema / hero
+        const banners = (data.campaign_banners||[]).sort((a,b)=>{
+          if((b.is_primary|0)!==(a.is_primary|0)) return (b.is_primary?1:0)-(a.is_primary?1:0);
+          return (a.sort_order||100)-(b.sort_order||100);
+        });
+        const hero = imgUrlFrom(banners[0]) || $('heroImg').src;
+        heroImg.src = hero;
+        if(data.title) heroTitle.textContent = data.title;
+        if(data.subtitle) heroLead.textContent = data.subtitle;
+        if(data.badge) heroBadge.textContent = data.badge;
+        if(data.tag_text) heroTag.textContent = data.tag_text;
+        if(data.accent_color) setAccent(data.accent_color);
+        if(data.coupon_code){
+          heroCoupon.style.display = '';
+          heroCoupon.textContent = `Cupom: ${data.coupon_code}`;
+          if(data.coupon_note) heroCoupon.title = data.coupon_note;
+        }
+        if(data.shipping_text) offersDesc.textContent = data.shipping_text;
+
+        // Countdown
+        startCountdown(data.end_at);
+
+        // Deals
+        const deals = (data.campaign_products||[])
+          .filter(x=>x.is_active!==false)
+          .sort((a,b)=>(a.sort_order||100)-(b.sort_order||100));
+        renderDeals(deals);
+
+        // Banners/galleria
+        renderBanners(banners);
+
+        // Testimonials
+        const ts = (data.campaign_testimonials||[]).filter(x=>x.is_active!==false).sort((a,b)=>(a.sort_order||100)-(b.sort_order||100));
+        renderTesti(ts);
+
+        // FAQ
+        const fq = (data.campaign_faqs||[]).filter(x=>x.is_active!==false).sort((a,b)=>(a.sort_order||100)-(b.sort_order||100));
+        renderFaq(fq);
+
+      }catch(err){
+        console.warn('Falha ao carregar campanha:', err?.message);
+        applyCampaign(fallbackCampaign(CAMPAIGN_SLUG));
+      }
+    }
+
+    function applyCampaign(c){
+      // tema
+      if(c.accent_color) setAccent(c.accent_color);
+      heroTitle.textContent = c.title;
+      heroLead.textContent = c.subtitle;
+      heroBadge.textContent = c.badge || 'Campanha';
+      heroTag.textContent = c.tag_text || 'Por tempo limitado';
+      if(c.coupon_code){ heroCoupon.style.display=''; heroCoupon.textContent = `Cupom: ${c.coupon_code}`; }
+      if(c.hero) heroImg.src = c.hero;
+      offersDesc.textContent = c.shipping_text || offersDesc.textContent;
+      startCountdown(c.end_at);
+
+      renderDeals(c.deals||[]);
+      renderBanners((c.banners||[]).map(u=>({url:u})));
+      renderTesti(c.testimonials||[]);
+      renderFaq(c.faqs||[]);
+    }
+
+    // ===== Fallbacks =====
+    function fallbackCampaign(slug){
+      const baseBanners = [
+        "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=1600&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1520975916090-3105956dac38?q=80&w=1600&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1600&auto=format&fit=crop"
+      ];
+      const mkDeal = (idx)=> ({
+        slug: 'deal-'+idx, title: ['Camisa Oxford','Calça Chino','Polo Minimal'][idx%3],
+        subtitle: ['Caimento impecável','Conforto e versatilidade','Tecido respirável'][idx%3],
+        sku: ['VS-CMOX-001','VS-CHIN-002','VS-POLO-003'][idx%3],
+        price_cents: [9990, 12990, 10990][idx%3],
+        compare_at_cents: [13990, 16990, 14990][idx%3],
+        badge: 'Oferta', product_url: 'index.html#colecao', image_url: baseBanners[idx%baseBanners.length]
+      });
+      const now = new Date();
+      const end = new Date(now.getTime() + 3*24*60*60*1000 + 2*60*60*1000); // +3 dias e 2h
+      const common = {
+        banners: baseBanners,
+        deals: [mkDeal(0), mkDeal(1), mkDeal(2), mkDeal(3), mkDeal(4), mkDeal(5)],
+        testimonials: [
+          { author:'Henrique T.', quote:'“Preço bom e entrega rápida.”', stars:5 },
+          { author:'Levi S.', quote:'“Qualidade que surpreende.”', stars:5 },
+          { author:'Samuel A.', quote:'“Aproveitei o cupom, valeu muito.”', stars:4 },
+        ],
+        faqs: [
+          { q:'Prazo do desconto?', a:'Válido até o fim do contador ou enquanto durarem os estoques.' },
+          { q:'Trocas e devoluções?', a:'Primeira troca gratuita em até 7 dias após o recebimento.' },
+          { q:'Como uso o cupom?', a:'Peça pelo WhatsApp informando o cupom da campanha.' },
+        ],
+        shipping_text: 'Envio imediato para a maioria dos pedidos.'
+      };
+
+      if(/natal/i.test(slug)){
+        return {
+          slug, title:'Natal Vita Septem', subtitle:'Presentes certeiros com elegância discreta.',
+          badge:'Natal', tag_text:'Edição Especial', coupon_code:'NATAL10', accent_color:'#0f8a5f',
+          hero: baseBanners[0], end_at: end.toISOString(), ...common
+        };
+      }
+      if(/pais/i.test(slug)){
+        return {
+          slug, title:'Dia dos Pais', subtitle:'Seja lembrado pelo bom gosto.',
+          badge:'Dia dos Pais', tag_text:'Só esta semana', coupon_code:'PAIS15', accent_color:'#1f4e79',
+          hero: baseBanners[1], end_at: end.toISOString(), ...common
+        };
+      }
+      // Black Friday (default)
+      return {
+        slug, title:'Black Friday Vita', subtitle:'Descontos reais em essenciais do guarda-roupa.',
+        badge:'Black Friday', tag_text:'Últimas horas', coupon_code:'VITABF', accent_color:'#caa64a',
+        hero: baseBanners[2], end_at: end.toISOString(), ...common
+      };
+    }
+
+    // start
+    loadCampaign();
+  </script>
+</body>
+</html>
