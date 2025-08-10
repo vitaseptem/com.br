@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Estoque | Vita Septem</title>
+  <link rel="icon" href="/assets/logo-mark.svg">
+  <link rel="stylesheet" href="/css/theme.css">
+  <script>
+    window.ENV = window.ENV || {
+      SUPABASE_URL: "https://dwqkuwqmlhvplmgwksas.supabase.co",
+      SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cWt1d3FtbGh2cGxtZ3drc2FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODM4NjksImV4cCI6MjA3MDM1OTg2OX0._pFblnBzx5cf0SUfAC_w-kmcdFbidZsh23XKXJR98ng"
+    };
+  </script>
+  <script type="module" src="/js/main.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+  <div id="toasts"></div>
+
+  <!-- Modal Ajuste de Estoque -->
+  <div class="modal" id="mdlAdjust" aria-hidden="true">
+    <div class="box">
+      <div class="head">
+        <strong>Ajuste de Estoque</strong>
+        <button class="btn ghost" onclick="document.getElementById('mdlAdjust').classList.remove('open')">Fechar</button>
+      </div>
+      <div class="body">
+        <form id="frmAdjust">
+          <input type="hidden" id="adj_product_id">
+          <div class="form-row">
+            <div class="col-6">
+              <label for="adj_delta">Quantidade (+ ou -)</label>
+              <input id="adj_delta" class="input" type="number" step="1">
+            </div>
+            <div class="col-6">
+              <label for="adj_reason">Motivo</label>
+              <select id="adj_reason" class="input">
+                <option value="manual_adjustment">Ajuste manual</option>
+                <option value="purchase_receipt">Entrada (compra)</option>
+                <option value="order_fulfillment">Saída (venda)</option>
+                <option value="return">Retorno/Troca</option>
+                <option value="loss">Perda/Danificado</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col-12">
+              <label for="adj_notes">Observações</label>
+              <textarea id="adj_notes" rows="3" class="input"></textarea>
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; justify-content:flex-end">
+            <button type="button" class="btn secondary" id="btnCancelAdj">Cancelar</button>
+            <button type="submit" class="btn" id="btnDoAdjust">Aplicar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Importar CSV -->
+  <div class="modal" id="mdlImportInv" aria-hidden="true">
+    <div class="box">
+      <div class="head">
+        <strong>Importar CSV de Estoque</strong>
+        <button class="btn ghost" onclick="document.getElementById('mdlImportInv').classList.remove('open')">Fechar</button>
+      </div>
+      <div class="body">
+        <p class="small">Cabeçalho: <b>sku,qty,min_qty</b>. Faz upsert por SKU.</p>
+        <input type="file" id="invCSV" accept=".csv" class="input">
+        <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:12px">
+          <button class="btn secondary" onclick="document.getElementById('mdlImportInv').classList.remove('open')">Cancelar</button>
+          <button class="btn" id="btnDoImportInv">Importar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { requireAuth } from "/js/lib/auth.js";
+    import { mountLayout } from "/js/lib/layout.js";
+    import "/js/modules/inventory.js";
+
+    const session = await requireAuth();
+    if (!session) return;
+
+    mountLayout("inventory");
+    document.getElementById("pageContent").innerHTML = `
+      <h1 class="section-title" style="margin-top:6px">Estoque</h1>
+
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+          <input class="input" id="q" placeholder="Buscar por título ou SKU" style="flex:1; min-width:220px">
+          <select class="input" id="crit"><option value="">Todos</option><option value="crit">Estoque crítico</option></select>
+          <button class="btn" id="btnImport">Importar Estoque (CSV)</button>
+          <button class="btn ghost" id="btnExport">Exportar Estoque</button>
+        </div>
+      </div>
+
+      <div class="grid cols-2">
+        <div class="card">
+          <div class="small" style="margin-bottom:8px">Itens de estoque</div>
+          <table class="table">
+            <thead><tr><th>SKU</th><th>Produto</th><th class="text-right">Qtd</th><th class="text-right">Mín.</th><th class="text-right">Ações</th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="small" style="margin-bottom:8px">Movimentações recentes</div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:8px">
+            <input class="input" id="mvSku" placeholder="Filtrar por SKU">
+          </div>
+          <table class="table">
+            <thead><tr><th>Data</th><th>SKU</th><th>Motivo</th><th class="text-right">Δ</th><th>Obs</th></tr></thead>
+            <tbody id="mvRows"></tbody>
+          </table>
+        </div>
+      </div>
+    `;
+
+    window.VS_INVENTORY.init();
+  </script>
+</body>
+</html>
