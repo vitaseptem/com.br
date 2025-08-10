@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Dashboard • Vita Points | Vita Septem</title>
+  <meta name="theme-color" content="#880c21"/>
+  <link rel="icon" href="icon.ico" type="image/x-icon"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --wine:#880c21; --wine-600:#a11837; --black:#0e0e0f; --gray-900:#17171a; --gray-800:#1a1a1e; --gray-700:#232327; --gray-600:#2a2a2f; --gray-500:#6b6b72; --white:#fff; --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.35);
+      --ok:#21d07a; --warn:#e2b93b; --danger:#ff5d5d;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; color:var(--white); background:linear-gradient(180deg,var(--black),var(--gray-900) 35%, #0b0b0c)}
+    a{color:inherit; text-decoration:none}
+
+    header{position:sticky; top:0; z-index:40; backdrop-filter:saturate(140%) blur(8px); background:rgba(13,13,15,.7); border-bottom:1px solid rgba(255,255,255,.06)}
+    .topbar{max-width:1280px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; gap:12px}
+    .brand{display:flex; align-items:center; gap:10px}
+    .brand img{height:40px}
+    .brand b{font-family:"Playfair Display",serif; font-size:1.1rem}
+    .topbar .grow{flex:1}
+    .search{display:flex; gap:8px; align-items:center; background:#131316; border:1px solid rgba(255,255,255,.08); padding:8px 10px; border-radius:12px; min-width:260px}
+    .search input{background:transparent; border:none; outline:0; color:#fff; width:100%}
+    .btn{display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:12px; font-weight:600; border:1px solid rgba(255,255,255,.14); background:#19191d; cursor:pointer}
+    .btn.primary{background:var(--wine); border-color:rgba(255,255,255,.12)}
+    .btn:hover{filter:brightness(1.06)}
+
+    .layout{max-width:1280px; margin:20px auto; padding:0 20px; display:grid; grid-template-columns:320px 1fr; gap:18px}
+    .panel{background:linear-gradient(180deg,#141416,#101013); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); overflow:hidden}
+    .panel .p{padding:16px}
+    .headline{font-family:"Playfair Display",serif; font-size:1.3rem; margin:0 0 10px}
+    .muted{color:#cfcfd6}
+
+    .list{max-height:70vh; overflow:auto; border-top:1px solid rgba(255,255,255,.06)}
+    .row{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 14px; border-bottom:1px solid rgba(255,255,255,.06); cursor:pointer}
+    .row:hover{background:#15151a}
+    .row.active{background:#1a1a20}
+    .tag{background:rgba(136,12,33,.22); border:1px solid rgba(136,12,33,.55); padding:3px 8px; border-radius:999px; font-size:.78rem}
+
+    .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+    .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+
+    .field{display:flex; flex-direction:column; gap:6px}
+    .field label{font-size:.9rem; color:#e9e9ea}
+    .input, select{width:100%; padding:10px 12px; border-radius:12px; background:#121214; color:#fff; border:1px solid rgba(255,255,255,.12); outline:none}
+    .input:focus, select:focus{border-color:rgba(255,255,255,.26)}
+
+    table{width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:14px; border:1px solid rgba(255,255,255,.08)}
+    th,td{padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.06); text-align:left}
+    th{background:#161618; font-weight:600}
+    tr:last-child td{border-bottom:none}
+    .ok{color:var(--ok)} .warn{color:var(--warn)} .danger{color:var(--danger)}
+
+    .statgrid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px}
+    .stat{background:#15151a; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:12px}
+    .stat b{display:block; font-size:1.2rem}
+
+    @media (max-width:1000px){ .layout{grid-template-columns:1fr} .list{max-height:none} .statgrid{grid-template-columns:repeat(2,1fr)} }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div class="brand"><img src="icon.png" alt=""><b>Vita Points – Admin</b></div>
+      <div class="grow">
+        <div class="search">
+          <input id="q" placeholder="Buscar por nome ou nº do cartão (01–300)">
+          <button id="btnBuscar" class="btn">Buscar</button>
+          <button id="btnClear" class="btn">Limpar</button>
+        </div>
+      </div>
+      <button id="btnOverview" class="btn">Atualizar</button>
+      <button id="btnExport" class="btn">Exportar CSV</button>
+      <button id="btnSair" class="btn">Sair</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="panel" id="panelList">
+      <div class="p">
+        <h3 class="headline">Clientes</h3>
+        <div class="muted" id="listHint">—</div>
+      </div>
+      <div class="list" id="list"></div>
+    </aside>
+
+    <section class="panel" id="panelMain">
+      <div class="p">
+        <h3 class="headline">Resumo</h3>
+        <div class="statgrid" id="stats">
+          <div class="stat"><small>Total de clientes</small><b id="stMembers">0</b></div>
+          <div class="stat"><small>Pontos totais</small><b id="stPoints">0</b></div>
+          <div class="stat"><small>Ganhos (todos os tempos)</small><b id="stEarned">0</b></div>
+          <div class="stat"><small>Resgatados</small><b id="stSpent">0</b></div>
+        </div>
+      </div>
+      <div class="p">
+        <h3 class="headline">Detalhes do cliente</h3>
+        <div class="grid-3">
+          <div class="field"><label>Nome</label><input id="mName" class="input" placeholder="—"></div>
+          <div class="field"><label>Nº do cartão</label><input id="mNo" class="input" disabled></div>
+          <div class="field"><label>Pontos</label><input id="mPoints" class="input" disabled></div>
+        </div>
+        <div class="grid-3" style="margin-top:10px">
+          <div class="field"><label>VIP</label>
+            <select id="mVip" class="input"><option value="false">Cliente</option><option value="true">VIP</option></select>
+          </div>
+          <div class="field"><label>Data de nascimento</label><input id="mBirth" type="date" class="input"></div>
+          <div class="field"><label>Telefone</label><input id="mPhone" class="input" placeholder="(98) 9 XXXX-XXXX"></div>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap">
+          <button id="btnSalvarPerfil" class="btn primary">Salvar perfil</button>
+          <span id="msgPerfil" class="muted"></span>
+        </div>
+      </div>
+
+      <div class="p">
+        <h3 class="headline">Operações</h3>
+        <div class="grid-3">
+          <div class="field">
+            <label>Creditar por compra (R$)</label>
+            <input id="opCompraValor" class="input" inputmode="decimal" placeholder="0,00">
+            <button id="btnCompra" class="btn primary" style="margin-top:8px">Aplicar regra (1 ponto a cada R$10)</button>
+          </div>
+          <div class="field">
+            <label>Adicionar/Estornar pontos</label>
+            <input id="opDelta" class="input" inputmode="numeric" placeholder="Ex.: 10 ou -5">
+            <button id="btnDelta" class="btn" style="margin-top:8px">Lançar delta</button>
+          </div>
+          <div class="field">
+            <label>Ajustar para valor exato</label>
+            <input id="opSet" class="input" inputmode="numeric" placeholder="Ex.: 120">
+            <button id="btnSet" class="btn" style="margin-top:8px">Ajustar saldo</button>
+          </div>
+        </div>
+        <div class="grid-3" style="margin-top:12px">
+          <div class="field">
+            <label>Resgatar recompensa</label>
+            <select id="opReward" class="input">
+              <option value="R050|50">R050 • 10% OFF (50 pts)</option>
+              <option value="R100|100">R100 • Camiseta básica (100 pts)</option>
+              <option value="R150|150">R150 • Polo/Calça 20% OFF (150 pts)</option>
+              <option value="R200|200">R200 • Camisa premium (200 pts)</option>
+              <option value="R300|300">R300 • Vale R$200 (300 pts)</option>
+            </select>
+            <input id="opRewardNote" class="input" placeholder="Obs. do resgate" style="margin-top:8px">
+            <button id="btnResgatar" class="btn" style="margin-top:8px">Resgatar</button>
+          </div>
+          <div class="field">
+            <label>Motivo/Descrição</label>
+            <input id="opMotivo" class="input" placeholder="Ex.: Compra balcão #123">
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <div id="opMsg" class="muted" style="padding:10px 0">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p">
+        <h3 class="headline">Histórico de pontos</h3>
+        <table>
+          <thead><tr><th>Quando</th><th>Δ Pontos</th><th>Motivo</th><th>Valor R$</th><th>Mult.</th><th>Por</th></tr></thead>
+          <tbody id="log"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://dwqkuwqmlhvplmgwksas.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cWt1d3FtbGh2cGxtZ3drc2FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODM4NjksImV4cCI6MjA3MDM1OTg2OX0._pFblnBzx5cf0SUfAC_w-kmcdFbidZsh23XKXJR98ng";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const el = (id)=>document.getElementById(id);
+    const fmtBRL = (n)=> (n==null?"": Number(n).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}));
+    const fmtInt = (v)=>Number(v||0).toLocaleString('pt-BR');
+
+    let overview = [];
+    let current = null;
+
+    async function requireSession(){
+      const { data:{ session } } = await supabase.auth.getSession();
+      if(!session){
+        const email = prompt('E-mail do administrador:');
+        const pass = prompt('Senha:');
+        if(!email || !pass) return alert('Login cancelado.');
+        const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+        if(error){ alert('Falhou o login.'); return requireSession(); }
+      }
+      return true;
+    }
+
+    async function loadOverview(){
+      const { data, error } = await supabase.rpc('admin_get_members_overview');
+      if(error){ console.error(error); alert('Sem permissão. Confirme que seu usuário está na tabela STAFF como admin.'); return; }
+      overview = data||[];
+      renderList(overview);
+      const totalMembers = overview.length;
+      const sumPoints = overview.reduce((a,b)=>a+(b.points||0),0);
+      const earned = overview.reduce((a,b)=>a+(b.total_earned||0),0);
+      const spent = overview.reduce((a,b)=>a+(b.total_spent||0),0);
+      el('stMembers').textContent = fmtInt(totalMembers);
+      el('stPoints').textContent = fmtInt(sumPoints);
+      el('stEarned').textContent = fmtInt(earned);
+      el('stSpent').textContent = fmtInt(spent);
+      el('listHint').textContent = `${fmtInt(totalMembers)} cliente(s)`;
+    }
+
+    function renderList(list){
+      const box = el('list');
+      box.innerHTML = '';
+      list.sort((a,b)=> (a.member_no||0)-(b.member_no||0));
+      list.forEach(m=>{
+        const row = document.createElement('div');
+        row.className = 'row';
+        row.dataset.id = m.id;
+        row.innerHTML = `<div><b>${String(m.member_no).padStart(2,'0')}</b> — ${m.name||'—'}</div><div class="tag">${m.points||0} pts</div>`;
+        row.onclick = ()=>selectMember(m.id);
+        box.appendChild(row);
+      });
+    }
+
+    function markActive(id){
+      document.querySelectorAll('.row').forEach(r=> r.classList.toggle('active', r.dataset.id===id));
+    }
+
+    async function selectMember(id){
+      markActive(id);
+      const { data:mem, error } = await supabase.from('members').select('*').eq('id', id).maybeSingle();
+      if(error||!mem){ alert('Não foi possível carregar o cliente.'); return; }
+      current = mem;
+      el('mName').value = mem.name||'';
+      el('mNo').value = String(mem.member_no).padStart(2,'0');
+      el('mPoints').value = mem.points||0;
+      el('mVip').value = mem.is_vip? 'true':'false';
+      el('mBirth').value = mem.birthdate? new Date(mem.birthdate).toISOString().slice(0,10): '';
+      el('mPhone').value = mem.phone||'';
+      await loadLog(id);
+    }
+
+    async function loadLog(member_id){
+      const { data, error } = await supabase.from('points_log')
+        .select('created_at, delta, reason, value_brl, bonus_mult, performed_by')
+        .eq('member_id', member_id)
+        .order('created_at', { ascending:false })
+        .limit(50);
+      if(error){ console.error(error); return; }
+      const tbody = el('log');
+      tbody.innerHTML = '';
+      (data||[]).forEach(r=>{
+        const tr = document.createElement('tr');
+        const d = new Date(r.created_at);
+        tr.innerHTML = `<td>${d.toLocaleString('pt-BR')}</td>
+                        <td class="${r.delta>=0?'ok':'danger'}">${r.delta>0?'+':''}${r.delta}</td>
+                        <td>${r.reason||''}</td>
+                        <td>${r.value_brl? fmtBRL(r.value_brl): ''}</td>
+                        <td>${r.bonus_mult||1}</td>
+                        <td>${r.performed_by? String(r.performed_by).slice(0,8): ''}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function salvarPerfil(){
+      if(!current) return;
+      const upd = {
+        name: el('mName').value.trim(),
+        phone: el('mPhone').value.trim() || null,
+        is_vip: el('mVip').value === 'true',
+        birthdate: el('mBirth').value? el('mBirth').value: null
+      };
+      const { error } = await supabase.from('members').update(upd).eq('id', current.id);
+      if(error){ el('msgPerfil').textContent = 'Erro ao salvar.'; el('msgPerfil').style.color = '#ff8080'; return; }
+      el('msgPerfil').textContent = 'Perfil salvo.'; el('msgPerfil').style.color = '#a2f3c9';
+      await selectMember(current.id);
+      await loadOverview();
+    }
+
+    function parseMoneyBR(v){
+      if(!v) return 0;
+      const n = String(v).replace(/\./g,'').replace(',', '.').replace(/[^0-9.-]/g,'');
+      const num = Number(n);
+      return isNaN(num)?0:num;
+    }
+
+    async function opCompra(){
+      if(!current) return;
+      const val = parseMoneyBR(el('opCompraValor').value);
+      if(val<=0){ el('opMsg').textContent = 'Informe um valor positivo.'; return; }
+      const motivo = el('opMotivo').value || 'Compra';
+      const { data, error } = await supabase.rpc('admin_add_purchase_points', { p_member_id: current.id, p_amount_brl: val, p_reason: motivo });
+      if(error){ el('opMsg').textContent = 'Erro: sem permissão ou RPC indisponível.'; el('opMsg').style.color = '#ff8080'; return; }
+      el('opMsg').textContent = `OK: +${data||0} ponto(s).`;
+      el('opMsg').style.color = '#a2f3c9';
+      await selectMember(current.id); await loadOverview();
+    }
+
+    async function opDelta(){
+      if(!current) return;
+      const delta = parseInt(el('opDelta').value,10);
+      if(isNaN(delta) || delta===0){ el('opMsg').textContent = 'Informe um número (ex.: 10 ou -5).'; return; }
+      const motivo = el('opMotivo').value || (delta>0? 'Crédito manual':'Estorno manual');
+      const { error } = await supabase.rpc('admin_add_points', { p_member_id: current.id, p_delta: delta, p_reason: motivo, p_value_brl: 0, p_bonus_mult: 1 });
+      if(error){ el('opMsg').textContent = 'Erro ao lançar delta.'; el('opMsg').style.color = '#ff8080'; return; }
+      el('opMsg').textContent = `OK: ${delta>0?'+':''}${delta} ponto(s).`;
+      el('opMsg').style.color = '#a2f3c9';
+      await selectMember(current.id); await loadOverview();
+    }
+
+    async function opSet(){
+      if(!current) return;
+      const alvo = parseInt(el('opSet').value,10);
+      if(isNaN(alvo) || alvo<0){ el('opMsg').textContent = 'Informe um inteiro ≥ 0.'; return; }
+      const motivo = el('opMotivo').value || 'Ajuste manual';
+      const { data, error } = await supabase.rpc('admin_set_points', { p_member_id: current.id, p_new_points: alvo, p_reason: motivo });
+      if(error){ el('opMsg').textContent = 'Erro ao ajustar.'; el('opMsg').style.color = '#ff8080'; return; }
+      el('opMsg').textContent = `OK: diferença aplicada ${data>0?'+':''}${data}`;
+      el('opMsg').style.color = '#a2f3c9';
+      await selectMember(current.id); await loadOverview();
+    }
+
+    async function opResgatar(){
+      if(!current) return;
+      const parts = (el('opReward').value||'').split('|');
+      const code = parts[0];
+      const cost = parseInt(parts[1]||'0',10);
+      const note = el('opRewardNote').value || '';
+      const { error } = await supabase.rpc('admin_redeem_reward', { p_member_id: current.id, p_reward_code: code, p_points_cost: cost, p_note: note });
+      if(error){ el('opMsg').textContent = 'Erro ao resgatar (pontos insuficientes ou permissão).'; el('opMsg').style.color = '#ff8080'; return; }
+      el('opMsg').textContent = `OK: resgate ${code} (-${cost} pts).`;
+      el('opMsg').style.color = '#a2f3c9';
+      await selectMember(current.id); await loadOverview();
+    }
+
+    function exportCSV(){
+      if(!overview.length){ alert('Nada para exportar.'); return; }
+      const cols = ['id','name','phone','member_no','points','is_vip','birthdate','created_at','total_earned','total_spent','last_activity'];
+      const lines = [cols.join(';')];
+      overview.forEach(r=>{
+        const row = cols.map(k=> (r[k]??'')).join(';');
+        lines.push(row);
+      });
+      const blob = new Blob(["\ufeff"+lines.join('\n')], {type:'text/csv;charset=utf-8'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `vita-points-overview-${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    async function doSearch(){
+      const q = el('q').value.trim();
+      if(!q){ renderList(overview); el('listHint').textContent = `${fmtInt(overview.length)} cliente(s)`; return; }
+      const { data, error } = await supabase.rpc('admin_search_members', { q });
+      if(error){ console.error(error); return; }
+      const merged = (data||[]).map(m=> ({...m, total_earned:0, total_spent:0}));
+      el('listHint').textContent = `${fmtInt(merged.length)} resultado(s)`;
+      renderList(merged);
+    }
+
+    async function init(){
+      await requireSession();
+      await loadOverview();
+      el('btnOverview').onclick = loadOverview;
+      el('btnExport').onclick = exportCSV;
+      el('btnBuscar').onclick = doSearch;
+      el('btnClear').onclick = ()=>{ el('q').value=''; renderList(overview); el('listHint').textContent = `${fmtInt(overview.length)} cliente(s)`; };
+      el('btnSair').onclick = async ()=>{ await supabase.auth.signOut(); location.reload(); };
+
+      el('btnCompra').onclick = opCompra;
+      el('btnDelta').onclick = opDelta;
+      el('btnSet').onclick = opSet;
+      el('btnResgatar').onclick = opResgatar;
+      el('btnSalvarPerfil').onclick = salvarPerfil;
+
+      el('q').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ doSearch(); } });
+    }
+
+    init();
+  </script>
+</body>
+</html>
