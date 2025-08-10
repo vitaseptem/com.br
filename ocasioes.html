@@ -1,1 +1,564 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vita Septem – Estilo para Cada Ocasião</title>
+  <meta name="description" content="Trabalho, Casual, Noite e Eventos Especiais. Looks completos e combinações prontas com compra rápida pelo WhatsApp." />
+  <meta name="theme-color" content="#880c21" />
+  <!-- Open Graph -->
+  <meta property="og:title" content="Vita Septem – Estilo para Cada Ocasião" />
+  <meta property="og:description" content="Looks prontos para cada momento. Escolha a ocasião e compre já." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="icon.png" />
+  <meta property="og:locale" content="pt_BR" />
+  <!-- Fonts & Favicon -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="icon.ico">
 
+  <style>
+    :root{
+      --wine:#880c21; --wine-600:#a11837; --black:#0e0e0f; --gray-900:#17171a;
+      --gray-800:#1c1c20; --gray-700:#232327; --gray-600:#34343a; --gray-500:#8c8c94; --white:#ffffff;
+      --radius:18px; --shadow:0 10px 30px rgba(0,0,0,.35); --success:#25D366;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--white); background:linear-gradient(180deg,var(--black),var(--gray-900) 35%, #0b0b0c);
+      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    }
+    a{color:inherit; text-decoration:none}
+    .container{max-width:1200px; margin:0 auto; padding:0 20px}
+
+    /* Header */
+    header{position:sticky; top:0; z-index:70; backdrop-filter:saturate(140%) blur(8px);
+      background:rgba(13,13,15,.7); border-bottom:1px solid rgba(255,255,255,.06)}
+    .nav{display:flex; align-items:center; justify-content:center; padding:18px 0}
+    .brand{display:flex; align-items:center; gap:12px}
+    .brand img{height:110px; width:auto; object-fit:contain}
+
+    /* Hero */
+    .hero{position:relative; overflow:hidden; isolation:isolate}
+    .hero::before{
+      content:""; position:absolute; inset:-20%;
+      background:
+        radial-gradient(80% 60% at 70% 20%, rgba(136,12,33,.35), transparent 60%),
+        radial-gradient(60% 40% at 10% 10%, rgba(255,255,255,.08), transparent 60%);
+      z-index:-1; filter:blur(10px)
+    }
+    .hero-grid{display:grid; grid-template-columns:1.1fr .9fr; gap:36px; align-items:center; padding:64px 0}
+    .kicker{color:#e9e9ea; letter-spacing:.14em; text-transform:uppercase; font-size:.82rem}
+    h1{margin:.35rem 0 1rem; font-family:"Playfair Display",serif; font-weight:700;
+       font-size:clamp(2.1rem, 3.2vw + 1rem, 3.6rem); line-height:1.05;}
+    .lead{color:#d9d9dd; font-size:1.05rem; max-width:52ch}
+    .btn{display:inline-flex; align-items:center; gap:10px; padding:12px 18px; border-radius:14px; font-weight:600;
+         background:var(--wine); border:1px solid rgba(255,255,255,.1); box-shadow:var(--shadow);
+         transition:transform .15s ease, background .2s ease;}
+    .btn:hover{background:var(--wine-600); transform:translateY(-1px)}
+    .btn.secondary{background:transparent; border-color:rgba(255,255,255,.18)}
+    .btn.ghost{background:#1a1a1e; border:1px solid rgba(255,255,255,.12)}
+    .hero-visual{background:linear-gradient(180deg,#141416,#0d0d0f);
+      border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); min-height:360px;
+      display:grid; place-items:center; position:relative; overflow:hidden}
+    .hero-visual img{width:100%; height:100%; object-fit:cover}
+    .tag{position:absolute; top:14px; right:14px; padding:6px 10px; border-radius:999px;
+      background:rgba(136,12,33,.18); border:1px solid rgba(136,12,33,.5); font-size:.78rem}
+
+    /* Tabs */
+    .tabs{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
+    .tab{padding:10px 14px; border:1px solid rgba(255,255,255,.14); border-radius:12px; background:#121214; cursor:pointer; font-weight:600}
+    .tab[aria-selected="true"]{background:var(--wine); border-color:rgba(255,255,255,.22)}
+
+    /* Seções & Cards */
+    section{padding:56px 0}
+    .section-title{font-family:"Playfair Display",serif; font-weight:700; font-size:2rem; margin:0 0 14px}
+    .muted{color:#cfcfd6; margin:0 0 26px}
+    .grid{display:grid; gap:18px; grid-template-columns:repeat(12,1fr)}
+    .card{grid-column:span 6; background:linear-gradient(180deg,#141416,#101013);
+      border:1px solid rgba(255,255,255,.08); border-radius:16px; overflow:hidden; transition:transform .15s ease; position:relative}
+    .card:hover{transform:translateY(-3px)}
+    .card .media{display:grid; grid-template-columns:1fr 1fr}
+    .card img{width:100%; height:100%; max-height:340px; object-fit:cover; background:#0f0f11}
+    .card .p{padding:16px}
+    .badge{background:rgba(136,12,33,.22); border:1px solid rgba(136,12,33,.55); padding:4px 10px; border-radius:999px; font-size:.78rem}
+    .items{margin:8px 0 0; color:#dcdce3}
+    .items li{margin:6px 0}
+    .price{display:flex; align-items:center; gap:12px; margin-top:10px; font-variant-numeric:tabular-nums}
+    .price s{color:#9a9aa3}
+    .price strong{font-size:1.2rem}
+    .buy{margin-top:12px; width:100%; text-align:center; padding:12px 14px; border-radius:12px; background:#1a1a1e; border:1px solid rgba(255,255,255,.12); font-weight:600}
+    .buy:hover{border-color:rgba(255,255,255,.22)}
+
+    /* Modal Lookbook */
+    .modal{position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.7); z-index:120}
+    .modal.open{display:grid}
+    .modal .box{max-width:980px; width:92vw; background:#101013; border:1px solid rgba(255,255,255,.12);
+                border-radius:16px; overflow:hidden}
+    .modal .slides{position:relative}
+    .modal img{width:100%; height:70vh; object-fit:cover; background:#0b0b0c}
+    .modal .ctrl{position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,.5);
+                 border:1px solid rgba(255,255,255,.2); padding:12px; border-radius:12px; cursor:pointer}
+    .modal .prev{left:12px} .modal .next{right:12px}
+    .modal .close{position:absolute; top:12px; right:12px; background:#000; border:1px solid rgba(255,255,255,.25); padding:8px 10px; border-radius:10px; cursor:pointer}
+
+    /* Modal Tamanhos */
+    .box.sm{max-width:720px}
+    .content{padding:16px}
+    .selRow{display:grid; grid-template-columns:1.2fr 1fr; gap:10px; align-items:center; margin-bottom:10px}
+    .selRow select{
+      width:100%; padding:10px 12px; border-radius:12px; background:#121214; color:#fff;
+      border:1px solid rgba(255,255,255,.12)
+    }
+    .cta{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap}
+    .note{font-size:.86rem; color:#cfcfd6}
+
+    /* WhatsApp FAB */
+    .fab{position:fixed; right:18px; bottom:18px; background:var(--success); color:#000; font-weight:700;
+      padding:12px 14px; border-radius:999px; box-shadow:var(--shadow); z-index:130}
+
+    /* Footer */
+    footer{border-top:1px solid rgba(255,255,255,.08); padding:28px 0 60px; color:#cfcfd6}
+    .brand-small{display:flex; gap:10px; align-items:center}
+    .brand-small img{width:28px; height:28px}
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .hero-grid{grid-template-columns:1fr; padding:44px 0}
+      .grid .card{grid-column:span 12}
+      .brand img{height:76px}
+      .card .media{grid-template-columns:1fr}
+    }
+    @media (max-width: 640px){
+      .brand img{height:64px}
+    }
+  </style>
+</head>
+<body>
+  <!-- FAB WhatsApp -->
+  <a href="https://wa.me/5599981543912?text=Quero%20um%20look%20Vita%20Septem" class="fab" aria-label="Falar no WhatsApp">WhatsApp</a>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <a class="brand" href="index.html#hero" aria-label="Ir para o início">
+        <img src="icon2.png" alt="Logo Vita Septem">
+      </a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section id="hero" class="hero" aria-label="Estilo para Cada Ocasião">
+    <div class="container hero-grid">
+      <div>
+        <div class="kicker">Guia de Estilo • Combinações prontas</div>
+        <h1 id="heroTitle">Estilo para Cada Ocasião</h1>
+        <p class="lead" id="heroLead">Trabalho, Casual, Noite e Eventos Especiais. Escolha a ocasião e veja sugestões com compra rápida pelo WhatsApp.</p>
+        <div class="tabs" id="tabs"></div>
+      </div>
+      <div class="hero-visual" role="img" aria-label="Preview de ocasião">
+        <span class="tag" id="heroBadge">Selecione uma ocasião</span>
+        <img id="heroImg" src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1600&auto=format&fit=crop" alt="Ocasiões Vita Septem">
+      </div>
+    </div>
+  </section>
+
+  <!-- LOOKS DA OCASIÃO -->
+  <section id="looks" aria-labelledby="ttl-looks">
+    <div class="container">
+      <h2 class="section-title" id="ttl-looks">Sugestões de looks</h2>
+      <p class="muted" id="looksDesc">Combinações pensadas para cada momento.</p>
+
+      <div class="grid" id="gridLooks"></div>
+      <div id="emptyLooks" class="muted" style="display:none">Nenhum look cadastrado para esta ocasião.</div>
+    </div>
+  </section>
+
+  <!-- CONTATO/LOCAL -->
+  <section aria-label="Informações de contato e localização">
+    <div class="container" style="display:grid; grid-template-columns:1.2fr .8fr; gap:22px">
+      <div>
+        <h3 class="section-title" style="margin-top:0">Visite a loja</h3>
+        <p class="muted">Rua Nova, Centro – São João do Caru / MA<br/>Seg–Sáb: 9h às 19h</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap">
+          <a class="btn ghost" href="https://wa.me/5599981543912?text=Quero%20um%20atendimento%20Vita%20Septem">WhatsApp</a>
+          <a class="btn ghost" href="https://www.instagram.com/vitaseptem" target="_blank" rel="noopener">Instagram</a>
+        </div>
+      </div>
+      <div aria-hidden="true">
+        <iframe title="Mapa da loja" width="100%" height="220" style="border:0; border-radius:14px"
+          loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          src="https://www.google.com/maps?q=São%20João%20do%20Caru%20MA&output=embed"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap">
+      <div class="brand-small">
+        <img src="icon.png" alt="" aria-hidden="true">
+        <span>© <span id="year"></span> Vita Septem – Men’s Fashion</span>
+      </div>
+      <small>Desenvolvido para performance e conversão.</small>
+    </div>
+  </footer>
+
+  <!-- Modal Lookbook -->
+  <div class="modal" id="lookModal" aria-hidden="true" role="dialog" aria-label="Galeria de lookbook">
+    <div class="box">
+      <button class="close" onclick="closeLookbook()" aria-label="Fechar lookbook">Fechar ✕</button>
+      <div class="slides">
+        <button class="ctrl prev" onclick="prevLook()" aria-label="Imagem anterior">‹</button>
+        <img id="lookImg" src="" alt="Lookbook Vita Septem">
+        <button class="ctrl next" onclick="nextLook()" aria-label="Próxima imagem">›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Tamanhos -->
+  <div class="modal" id="sizeModal" aria-hidden="true" role="dialog" aria-label="Selecionar tamanhos do look">
+    <div class="box sm">
+      <button class="close" onclick="closeSize()" aria-label="Fechar">Fechar ✕</button>
+      <div class="content">
+        <h3 class="section-title" style="margin:0 0 6px" id="mTitle">Selecionar tamanhos</h3>
+        <div id="mItems"></div>
+        <div class="cta">
+          <button class="btn" id="mBuy">Comprar pelo WhatsApp</button>
+          <button class="btn ghost" onclick="closeSize()">Cancelar</button>
+        </div>
+        <p class="note" id="mNote"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // ====== Config ======
+    const SUPABASE_URL = "https://dwqkuwqmlhvplmgwksas.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cWt1d3FtbGh2cGxtZ3drc2FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODM4NjksImV4cCI6MjA3MDM1OTg2OX0._pFblnBzx5cf0SUfAC_w-kmcdFbidZsh23XKXJR98ng";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth:{ persistSession:false }});
+
+    const BUCKET = "occasions"; // bucket público para imagens de ocasiões/looks
+    const WHATSAPP = "5599981543912";
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ===== Helpers =====
+    const fmtBRL = (cents)=> (cents/100).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+    function wa(text){
+      const url = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
+      window.open(url,'_blank'); return false;
+    }
+    function storageUrl(path){
+      try{
+        const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+        return data.publicUrl || "";
+      }catch{ return ""; }
+    }
+    function imgUrlFrom(img){
+      if(!img) return "";
+      if(img.url) return img.url;
+      if(img.path) return storageUrl(img.path);
+      return "";
+    }
+
+    // ===== State / DOM =====
+    const tabsEl = document.getElementById('tabs');
+    const heroTitle = document.getElementById('heroTitle');
+    const heroLead = document.getElementById('heroLead');
+    const heroBadge = document.getElementById('heroBadge');
+    const heroImg = document.getElementById('heroImg');
+
+    const grid = document.getElementById('gridLooks');
+    const empty = document.getElementById('emptyLooks');
+    const looksDesc = document.getElementById('looksDesc');
+
+    let OCCS = [];           // {id, slug, title, subtitle, badge, sort_order, is_active}
+    let CURRENT = null;      // ocasião selecionada
+
+    // Lookbook modal
+    const lookModal = document.getElementById('lookModal');
+    const lookImg = document.getElementById('lookImg');
+    let lookArr = []; let lookIdx = 0;
+    function openLookbook(arr, i=0){
+      lookArr = arr || [];
+      if(!lookArr.length) return;
+      lookIdx = i;
+      lookImg.src = lookArr[lookIdx];
+      lookModal.classList.add('open');
+      lookModal.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLookbook(){ lookModal.classList.remove('open'); lookModal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+    function prevLook(){ if(!lookArr.length) return; lookIdx=(lookIdx-1+lookArr.length)%lookArr.length; lookImg.src=lookArr[lookIdx]; }
+    function nextLook(){ if(!lookArr.length) return; lookIdx=(lookIdx+1)%lookArr.length; lookImg.src=lookArr[lookIdx]; }
+    window.closeLookbook=closeLookbook; window.prevLook=prevLook; window.nextLook=nextLook;
+    lookModal.addEventListener('click', (e)=>{ if(e.target===lookModal) closeLookbook(); });
+    window.addEventListener('keydown', (e)=>{ if(!lookModal.classList.contains('open')) return; if(e.key==='Escape') closeLookbook(); if(e.key==='ArrowLeft') prevLook(); if(e.key==='ArrowRight') nextLook(); });
+
+    // Size modal
+    const sizeModal = document.getElementById('sizeModal');
+    const mTitle = document.getElementById('mTitle');
+    const mItems = document.getElementById('mItems');
+    const mBuy = document.getElementById('mBuy');
+    const mNote = document.getElementById('mNote');
+    let CURRENT_LOOK = null;
+
+    function openSize(look){
+      CURRENT_LOOK = look;
+      mTitle.textContent = look.title || 'Selecionar tamanhos';
+      mItems.innerHTML = '';
+      (look.occasion_items || []).forEach((it, idx)=>{
+        const sizes = (it.size_labels || []).filter(Boolean);
+        const id = `sel-${idx}`;
+        const row = document.createElement('div');
+        row.className='selRow';
+        row.innerHTML = `
+          <div><strong>${it.title||'Item'}</strong><div class="note">${it.sku?('SKU: '+it.sku):''}</div></div>
+          <div>${sizes.length ? `
+            <select id="${id}" aria-label="Selecionar tamanho para ${it.title||'item'}">
+              <option value="">Tamanho (opcional)</option>
+              ${sizes.map(s=>`<option value="${s}">${s}</option>`).join('')}
+            </select>` : `<span class="note">Tamanho único</span>`}
+          </div>
+        `;
+        mItems.appendChild(row);
+      });
+
+      mNote.textContent = `Look por ${fmtBRL(look.price_cents||0)}${look.compare_at_cents? ' (de '+fmtBRL(look.compare_at_cents)+')':''}.`;
+      mBuy.onclick = ()=>{
+        const selections = (look.occasion_items || []).map((it, idx)=>{
+          const sel = document.getElementById(`sel-${idx}`);
+          const size = sel && sel.value ? ` | Tam: ${sel.value}` : '';
+          return `- ${it.title||'Item'}${size}${it.sku?` | SKU: ${it.sku}`:''}`;
+        }).join('\n');
+        const link = `${location.href.split('#')[0]}#${look.slug||''}`;
+        const msg = `Ocasião: ${CURRENT?.title || ''}\nLook: ${look.title||'Vita Septem'} por ${fmtBRL(look.price_cents||0)}\nItens:\n${selections}\nLink: ${link}`;
+        wa(msg);
+      };
+
+      sizeModal.classList.add('open');
+      sizeModal.setAttribute('aria-hidden','false');
+      document.body.style.overflow='hidden';
+    }
+    function closeSize(){ sizeModal.classList.remove('open'); sizeModal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+    window.closeSize=closeSize;
+
+    // Render
+    function tabTemplate(o, active=false){
+      return `<button class="tab" role="tab" aria-selected="${active}" data-slug="${o.slug}">${o.title}</button>`;
+    }
+
+    function lookCardTemplate(l){
+      const images = (l.occasion_images||[]).sort((a,b)=>{
+        if((b.is_primary|0)!==(a.is_primary|0)) return (b.is_primary?1:0)-(a.is_primary?1:0);
+        return (a.sort_order||100)-(b.sort_order||100);
+      });
+      const cover = imgUrlFrom(images[0]) || "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=1600&auto=format&fit=crop";
+      const gal = images.map(imgUrlFrom).filter(Boolean);
+      const compare = l.compare_at_cents || 0;
+      const price = l.price_cents || 0;
+
+      const items = (l.occasion_items || []);
+      const itemsList = items.map(it=>`<li>${it.title||'Item'}${it.variant?` – ${it.variant}`:''}</li>`).join('');
+
+      // prepara objeto limpo para modal
+      const safe = {
+        slug:l.slug, title:l.title, price_cents:l.price_cents, compare_at_cents:l.compare_at_cents,
+        occasion_items: items.map(it=>({ title:it.title, sku:it.sku, size_labels:it.size_labels || [] }))
+      };
+      const safeJson = encodeURIComponent(JSON.stringify(safe));
+
+      return `
+        <article class="card" id="${l.slug||''}">
+          <div class="media">
+            <img src="${cover}" alt="${l.title||'Look Vita Septem'}" />
+            <div class="p">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:10px">
+                <h3 style="margin:0">${l.title||'Look Vita Septem'}</h3>
+                ${l.badge ? `<span class="badge">${l.badge}</span>` : ``}
+              </div>
+              ${l.subtitle ? `<p class="muted" style="margin:6px 0 0">${l.subtitle}</p>` : ``}
+              <ul class="items">${itemsList}</ul>
+              <div class="price">
+                <div>${compare>price ? `<s>${fmtBRL(compare)}</s>` : ``}</div>
+                <strong>${fmtBRL(price)}</strong>
+              </div>
+              <div class="cta">
+                <button class="btn ghost" onclick='(function(arr){ openLookbook(arr,0); })(JSON.parse(decodeURIComponent("${encodeURIComponent(JSON.stringify(gal))}")))' aria-label="Abrir lookbook">Ver Lookbook</button>
+                <button class="btn" onclick='openSize(JSON.parse(decodeURIComponent("${safeJson}")))' aria-label="Escolher tamanhos e comprar">Escolher tamanhos e Comprar</button>
+              </div>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderTabs(list, activeSlug){
+      tabsEl.innerHTML = '';
+      list.forEach((o,i)=>{
+        tabsEl.insertAdjacentHTML('beforeend', tabTemplate(o, (o.slug===activeSlug) || (!activeSlug && i===0)));
+      });
+      tabsEl.querySelectorAll('.tab').forEach(btn=>{
+        btn.onclick = ()=> selectOccasion(btn.getAttribute('data-slug'));
+      });
+    }
+
+    function renderLooks(list){
+      grid.innerHTML = '';
+      if(!list?.length){ empty.style.display='block'; return; }
+      empty.style.display='none';
+      list.forEach(l => grid.insertAdjacentHTML('beforeend', lookCardTemplate(l)));
+    }
+
+    function applyOccasion(o, looks){
+      CURRENT = o;
+      heroTitle.textContent = o.title || 'Estilo para Cada Ocasião';
+      heroLead.textContent = o.subtitle || 'Combinações pensadas para cada momento.';
+      heroBadge.textContent = o.badge || 'Ocasião';
+      // herói pega a 1ª imagem do 1º look
+      let hero = "";
+      if(looks?.[0]?.occasion_images?.length){
+        const sorted = [...looks[0].occasion_images].sort((a,b)=>{
+          if((b.is_primary|0)!==(a.is_primary|0)) return (b.is_primary?1:0)-(a.is_primary?1:0);
+          return (a.sort_order||100)-(b.sort_order||100);
+        });
+        hero = imgUrlFrom(sorted[0]);
+      }
+      heroImg.src = hero || heroImg.src;
+      looksDesc.textContent = `Sugestões para ${o.title || 'a ocasião selecionada'}.`;
+      renderLooks(looks || []);
+    }
+
+    // ===== Load do Supabase + fallbacks =====
+    async function loadOccasions(){
+      try{
+        // occasions { id, slug, title, subtitle, badge, sort_order, is_active }
+        const { data, error } = await supabase
+          .from('occasions')
+          .select('id, slug, title, subtitle, badge, sort_order, is_active')
+          .eq('is_active', true)
+          .order('sort_order', { ascending:true });
+
+        if(error) throw error;
+
+        if(!data?.length){
+          const occs = fallbackOccasions();
+          OCCS = occs;
+          renderTabs(occs);
+          selectOccasion(occs[0].slug, true);
+        }else{
+          OCCS = data;
+          renderTabs(OCCS);
+          selectOccasion(OCCS[0].slug, true);
+        }
+      }catch(err){
+        console.warn('Falha ao carregar ocasiões:', err?.message);
+        const occs = fallbackOccasions();
+        OCCS = occs;
+        renderTabs(occs);
+        selectOccasion(occs[0].slug, true);
+      }
+    }
+
+    async function selectOccasion(slug, first=false){
+      // marca tab ativa
+      tabsEl.querySelectorAll('.tab').forEach(btn=>{
+        btn.setAttribute('aria-selected', String(btn.getAttribute('data-slug')===slug));
+      });
+
+      const occ = OCCS.find(o=>o.slug===slug);
+      if(!occ){
+        // fallback
+        const f = fallbackData()[slug];
+        applyOccasion({ title:f.title, subtitle:f.subtitle, badge:f.badge }, f.looks);
+        return;
+      }
+
+      try{
+        // occasion_looks + nested occasion_images & occasion_items
+        const { data, error } = await supabase
+          .from('occasion_looks')
+          .select(`
+            id, slug, title, subtitle, badge, price_cents, compare_at_cents, sort_order, is_active,
+            occasion_images ( url, path, alt, is_primary, sort_order ),
+            occasion_items  ( title, sku, size_labels, sort_order )
+          `)
+          .eq('occasion_id', occ.id)
+          .eq('is_active', true)
+          .order('sort_order', { ascending:true });
+
+        if(error) throw error;
+
+        if(!data?.length){
+          const f = fallbackData()[slug];
+          applyOccasion(occ, f.looks);
+        }else{
+          // map images path/url -> public url
+          const normalized = data.map(l=>{
+            const imgs = (l.occasion_images||[]).map(x=> ({...x, _u: imgUrlFrom(x)}));
+            return { ...l,
+              occasion_images: imgs.map(({_u, ...rest})=> ({...rest, url: _u || rest.url}))
+            };
+          });
+          applyOccasion(occ, normalized);
+        }
+      }catch(err){
+        console.warn('Falha ao carregar looks:', err?.message);
+        const f = fallbackData()[slug];
+        applyOccasion(occ, f.looks);
+      }
+    }
+
+    // ===== Fallbacks =====
+    function fallbackOccasions(){
+      return [
+        { slug:'trabalho', title:'Trabalho', subtitle:'Conforto e presença para o expediente.', badge:'Office', sort_order:10 },
+        { slug:'casual', title:'Casual', subtitle:'Praticidade e leveza no dia a dia.', badge:'Dia a Dia', sort_order:20 },
+        { slug:'noite', title:'Noite', subtitle:'Sutileza e impacto para a noite.', badge:'Night', sort_order:30 },
+        { slug:'eventos', title:'Eventos Especiais', subtitle:'Elegância que não grita.', badge:'Formal', sort_order:40 }
+      ];
+    }
+
+    function fallbackData(){
+      const commonImgs = [
+        "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=1600&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1520975916090-3105956dac38?q=80&w=1600&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1600&auto=format&fit=crop"
+      ];
+      const look = (slug, title, price)=> ({
+        slug, title, subtitle:null, badge:'Look',
+        price_cents:price, compare_at_cents:0,
+        occasion_images: commonImgs.map((u,i)=>({ url:u, is_primary:i===0, sort_order:i+1 })),
+        occasion_items:[
+          { title:'Camisa Oxford Essential', sku:'VS-CMOX-001', size_labels:['P','M','G','GG'] },
+          { title:'Calça Chino Comfort', sku:'VS-CHIN-002', size_labels:['38','40','42','44'] },
+          { title:'Cinto Clean', sku:'VS-CIN-010', size_labels:[] }
+        ]
+      });
+      return {
+        trabalho:{
+          title:'Trabalho', subtitle:'Conforto e presença para o expediente.', badge:'Office',
+          looks:[ look('look-office-1','Office Clean',19990), look('look-office-2','Executivo Discreto',26990) ]
+        },
+        casual:{
+          title:'Casual', subtitle:'Praticidade e leveza no dia a dia.', badge:'Dia a Dia',
+          looks:[ look('look-casual-1','Casual Minimal',14990), look('look-casual-2','Street Sutil',15990) ]
+        },
+        noite:{
+          title:'Noite', subtitle:'Sutileza e impacto para a noite.', badge:'Night',
+          looks:[ look('look-night-1','Noite Neutra',21990), look('look-night-2','Urbano Noturno',23990) ]
+        },
+        eventos:{
+          title:'Eventos Especiais', subtitle:'Elegância que não grita.', badge:'Formal',
+          looks:[ look('look-formal-1','Cerimônia Essencial',29990), look('look-formal-2','Gala Minimal',34990) ]
+        }
+      };
+    }
+
+    // start
+    loadOccasions();
+  </script>
+</body>
+</html>
