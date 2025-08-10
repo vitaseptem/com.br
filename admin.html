@@ -253,26 +253,35 @@
       e.preventDefault();
       const email = el('loginEmail').value.trim();
       const password = el('loginPass').value.trim();
+      if(!email || !password){ setInfo(el('loginMsg'), "Preencha e-mail e senha.", "error"); return; }
       setInfo(el('loginMsg'), "Entrando…");
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error){ setInfo(el('loginMsg'), "E-mail ou senha inválidos.", "error"); return; }
       setInfo(el('loginMsg'), "OK! Carregando…", "ok");
       hideLogin();
       await safeLoadOverview();
     });
 
-    el('btnSair').onclick = async ()=>{ await supabase.auth.signOut(); showLogin("Sessão encerrada."); };
+    el('btnSair').onclick = async ()=>{
+      await supabase.auth.signOut();
+      // limpa UI básica para evitar ações sem sessão
+      el('list').innerHTML = ""; el('log').innerHTML = "";
+      el('stMembers').textContent = "0"; el('stPoints').textContent = "0";
+      el('stEarned').textContent = "0"; el('stSpent').textContent = "0";
+      current = null; overview = [];
+      showLogin("Sessão encerrada.");
+    };
 
     async function safeLoadOverview(){
       try{
         await loadOverview();
       }catch(err){
         console.error(err);
-        showLogin("Sem permissão. Confirme que seu usuário está em staff como admin.");
+        showLogin("Sem permissão. Confirme que seu usuário está na tabela STAFF como admin.");
       }
     }
 
-    // ====== Dashboard logic (igual ao antigo) ======
+    // ====== Dashboard logic ======
     async function loadOverview(){
       const { data, error } = await supabase.rpc('admin_get_members_overview');
       if(error) throw error;
@@ -316,6 +325,7 @@
       el('mVip').value = mem.is_vip? 'true':'false';
       el('mBirth').value = mem.birthdate? new Date(mem.birthdate).toISOString().slice(0,10): '';
       el('mPhone').value = mem.phone||'';
+      el('opMsg').textContent = '—'; el('opMsg').style.color = '#cfcfd6';
       await loadLog(id);
     }
 
@@ -352,7 +362,8 @@
       const { error } = await supabase.from('members').update(upd).eq('id', current.id);
       if(error){ el('msgPerfil').textContent = 'Erro ao salvar.'; el('msgPerfil').style.color = '#ff8080'; return; }
       el('msgPerfil').textContent = 'Perfil salvo.'; el('msgPerfil').style.color = '#a2f3c9';
-      await selectMember(current.id); await loadOverview();
+      await selectMember(current.id);
+      await loadOverview();
     }
 
     function parseMoneyBR(v){
@@ -362,11 +373,20 @@
       return isNaN(num)?0:num;
     }
 
+    function requireCurrent(){
+      if(!current){
+        const s = el('opMsg'); s.textContent = 'Selecione um cliente primeiro.'; s.style.color = '#ff8080';
+        return false;
+      }
+      return true;
+    }
+
     async function opCompra(){
-      if(!current) return;
+      if(!requireCurrent()) return;
       const val = parseMoneyBR(el('opCompraValor').value);
-      if(val<=0){ el('opMsg').textContent = 'Informe um valor positivo.'; return; }
+      if(val<=0){ el('opMsg').textContent = 'Informe um valor positivo.'; el('opMsg').style.color = '#ff8080'; return; }
       const motivo = el('opMotivo').value || 'Compra';
+      el('opMsg').textContent = 'Processando…'; el('opMsg').style.color = '#cfcfd6';
       const { data, error } = await supabase.rpc('admin_add_purchase_points', { p_member_id: current.id, p_amount_brl: val, p_reason: motivo });
       if(error){ el('opMsg').textContent = 'Erro: sem permissão ou RPC indisponível.'; el('opMsg').style.color = '#ff8080'; return; }
       el('opMsg').textContent = `OK: +${data||0} ponto(s).`; el('opMsg').style.color = '#a2f3c9';
@@ -374,10 +394,11 @@
     }
 
     async function opDelta(){
-      if(!current) return;
+      if(!requireCurrent()) return;
       const delta = parseInt(el('opDelta').value,10);
-      if(isNaN(delta) || delta===0){ el('opMsg').textContent = 'Informe um número (ex.: 10 ou -5).'; return; }
+      if(isNaN(delta) || delta===0){ el('opMsg').textContent = 'Informe um número (ex.: 10 ou -5).'; el('opMsg').style.color = '#ff8080'; return; }
       const motivo = el('opMotivo').value || (delta>0? 'Crédito manual':'Estorno manual');
+      el('opMsg').textContent = 'Processando…'; el('opMsg').style.color = '#cfcfd6';
       const { error } = await supabase.rpc('admin_add_points', { p_member_id: current.id, p_delta: delta, p_reason: motivo, p_value_brl: 0, p_bonus_mult: 1 });
       if(error){ el('opMsg').textContent = 'Erro ao lançar delta.'; el('opMsg').style.color = '#ff8080'; return; }
       el('opMsg').textContent = `OK: ${delta>0?'+':''}${delta} ponto(s).`; el('opMsg').style.color = '#a2f3c9';
@@ -385,10 +406,11 @@
     }
 
     async function opSet(){
-      if(!current) return;
+      if(!requireCurrent()) return;
       const alvo = parseInt(el('opSet').value,10);
-      if(isNaN(alvo) || alvo<0){ el('opMsg').textContent = 'Informe um inteiro ≥ 0.'; return; }
+      if(isNaN(alvo) || alvo<0){ el('opMsg').textContent = 'Informe um inteiro ≥ 0.'; el('opMsg').style.color = '#ff8080'; return; }
       const motivo = el('opMotivo').value || 'Ajuste manual';
+      el('opMsg').textContent = 'Processando…'; el('opMsg').style.color = '#cfcfd6';
       const { data, error } = await supabase.rpc('admin_set_points', { p_member_id: current.id, p_new_points: alvo, p_reason: motivo });
       if(error){ el('opMsg').textContent = 'Erro ao ajustar.'; el('opMsg').style.color = '#ff8080'; return; }
       el('opMsg').textContent = `OK: diferença aplicada ${data>0?'+':''}${data}`; el('opMsg').style.color = '#a2f3c9';
@@ -396,10 +418,11 @@
     }
 
     async function opResgatar(){
-      if(!current) return;
+      if(!requireCurrent()) return;
       const parts = (el('opReward').value||'').split('|');
       const code = parts[0]; const cost = parseInt(parts[1]||'0',10);
       const note = el('opRewardNote').value || '';
+      el('opMsg').textContent = 'Processando…'; el('opMsg').style.color = '#cfcfd6';
       const { error } = await supabase.rpc('admin_redeem_reward', { p_member_id: current.id, p_reward_code: code, p_points_cost: cost, p_note: note });
       if(error){ el('opMsg').textContent = 'Erro ao resgatar (pontos insuficientes ou permissão).'; el('opMsg').style.color = '#ff8080'; return; }
       el('opMsg').textContent = `OK: resgate ${code} (-${cost} pts).`; el('opMsg').style.color = '#a2f3c9';
@@ -425,12 +448,18 @@
       el('listHint').textContent = `${fmtInt(merged.length)} resultado(s)`; renderList(merged);
     }
 
-    // Bindings
+    // ====== Bindings (todos os botões) ======
     el('btnOverview').onclick = loadOverview;
     el('btnExport').onclick = exportCSV;
     el('btnBuscar').onclick = doSearch;
     el('btnClear').onclick = ()=>{ el('q').value=''; renderList(overview); el('listHint').textContent = `${fmtInt(overview.length)} cliente(s)`; };
     el('q').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ doSearch(); } });
+
+    el('btnCompra').onclick = opCompra;
+    el('btnDelta').onclick = opDelta;
+    el('btnSet').onclick   = opSet;
+    el('btnResgatar').onclick = opResgatar;
+    el('btnSalvarPerfil').onclick = salvarPerfil;
 
     // Start
     boot();
