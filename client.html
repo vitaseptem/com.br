@@ -131,7 +131,7 @@
         <div>
           <div class="kicker">Vita Septem • Fidelidade</div>
           <h1>Vita Points – Estilo que Ganha</h1>
-          <p class="lead">Junte pontos em cada compra e troque por recompensas. Clientes veem o saldo; a loja credita os pontos. Números de cartão de <b>01 até 300</b>.</p>
+          <p class="lead">Junte pontos em cada compra e troque por recompensas. Clientes veem o saldo; a loja credita os pontos. Números de cartão de <b>01 até 32.767</b>.</p>
           <div class="actions">
             <a href="#acesso" class="btn">Acessar meus pontos</a>
             <a href="#recompensas" class="btn secondary">Ver recompensas</a>
@@ -192,7 +192,7 @@
                 <button class="btn" type="submit" style="grid-column:span 2">Entrar</button>
                 <div id="loginMsg" class="helper" style="grid-column:span 2"></div>
               </form>
-              <div class="helper" style="margin-top:8px">Não tem conta? Use o cadastro ao lado. Se já tiver número de cartão, mantenha-o; se não, escolha um livre entre 01 e 300.</div>
+              <div class="helper" style="margin-top:8px">Não tem conta? Use o cadastro ao lado. Se já tiver número de cartão, mantenha-o; se não, escolha um livre entre 01 e 32.767.</div>
             </div>
 
             <!-- Cadastro -->
@@ -209,7 +209,7 @@
                     <input id="cadTelefone" class="input" placeholder="(98) 9 XXXX-XXXX" inputmode="tel">
                   </div>
                   <div class="field">
-                    <label for="cadMemberNo">Nº do cartão (01–300)</label>
+                    <label for="cadMemberNo">Nº do cartão (01–32.767)</label>
                     <input id="cadMemberNo" class="input" placeholder="01" inputmode="numeric" pattern="[0-9]*" maxlength="3" required>
                   </div>
                 </div>
@@ -226,7 +226,7 @@
                 <button class="btn" type="submit" style="grid-column:span 2">Criar conta</button>
                 <div id="cadMsg" class="helper" style="grid-column:span 2"></div>
               </form>
-              <div class="helper">Se o número escolhido já estiver em uso, o sistema avisa para escolher outro. (A loja autoriza até 300 cartões.)</div>
+              <div class="helper">Se o número escolhido já estiver em uso, o sistema avisa para escolher outro. (A loja autoriza 32.767 cartões.)</div>
             </div>
           </div>
         </article>
@@ -547,3 +547,4 @@
 </body>
 
 </html>
+
