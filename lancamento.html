@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vita Septem – Lançamento Exclusivo</title>
+  <meta name="description" content="Lançamento exclusivo da Vita Septem. Entre na lista VIP e garanta acesso antecipado." />
+  <meta name="theme-color" content="#880c21" />
+  <!-- Open Graph -->
+  <meta property="og:title" content="Vita Septem – Lançamento Exclusivo" />
+  <meta property="og:description" content="Acesse primeiro. Lista VIP + contagem para o lançamento." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="icon.png" />
+  <meta property="og:locale" content="pt_BR" />
+  <!-- Fonts & Favicon -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="icon.ico">
+
+  <style>
+    :root{
+      --wine:#880c21; --wine-600:#a11837; --black:#0e0e0f; --gray-900:#17171a;
+      --gray-800:#1c1c20; --gray-700:#232327; --gray-500:#8c8c94; --white:#ffffff;
+      --radius:18px; --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--white); background:linear-gradient(180deg,var(--black),var(--gray-900) 35%, #0b0b0c);
+      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    }
+    a{color:inherit; text-decoration:none}
+    .container{max-width:1200px; margin:0 auto; padding:0 20px}
+
+    /* Header */
+    header{position:sticky; top:0; z-index:70; backdrop-filter:saturate(140%) blur(8px);
+      background:rgba(13,13,15,.7); border-bottom:1px solid rgba(255,255,255,.06)}
+    .nav{display:flex; align-items:center; justify-content:center; padding:18px 0}
+    .brand{display:flex; align-items:center; gap:12px}
+    .brand img{height:110px; width:auto; object-fit:contain}
+
+    /* Hero */
+    .hero{position:relative; overflow:hidden; isolation:isolate}
+    .hero::before{
+      content:""; position:absolute; inset:-20%;
+      background:
+        radial-gradient(80% 60% at 70% 20%, rgba(136,12,33,.35), transparent 60%),
+        radial-gradient(60% 40% at 10% 10%, rgba(255,255,255,.08), transparent 60%);
+      z-index:-1; filter:blur(10px)
+    }
+    .hero-grid{display:grid; grid-template-columns:1.1fr .9fr; gap:36px; align-items:center; padding:64px 0}
+    .kicker{color:#e9e9ea; letter-spacing:.14em; text-transform:uppercase; font-size:.82rem}
+    h1{margin:.35rem 0 1rem; font-family:"Playfair Display",serif; font-weight:700;
+       font-size:clamp(2.1rem, 3.2vw + 1rem, 3.6rem); line-height:1.05;}
+    .lead{color:#d9d9dd; font-size:1.05rem; max-width:52ch}
+    .btn{display:inline-flex; align-items:center; gap:10px; padding:12px 18px; border-radius:14px; font-weight:600;
+         background:var(--wine); border:1px solid rgba(255,255,255,.1); box-shadow:var(--shadow);
+         transition:transform .15s ease, background .2s ease;}
+    .btn:hover{background:var(--wine-600); transform:translateY(-1px)}
+    .btn.secondary{background:transparent; border-color:rgba(255,255,255,.18)}
+    .btn.ghost{background:#1a1a1e; border:1px solid rgba(255,255,255,.12)}
+    .hero-visual{background:linear-gradient(180deg,#141416,#0d0d0f);
+      border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); min-height:360px;
+      display:grid; place-items:center; position:relative; overflow:hidden}
+    .hero-visual img{width:100%; height:100%; object-fit:cover}
+    .tag{position:absolute; top:14px; right:14px; padding:6px 10px; border-radius:999px;
+      background:rgba(136,12,33,.18); border:1px solid rgba(136,12,33,.5); font-size:.78rem}
+
+    /* Seções */
+    section{padding:56px 0}
+    .section-title{font-family:"Playfair Display",serif; font-weight:700; font-size:2rem; margin:0 0 14px}
+    .muted{color:#cfcfd6; margin:0 0 26px}
+
+    /* Feature / Produto */
+    .feature{display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:center;
+      background:linear-gradient(180deg,#151517,#131317);
+      border:1px solid rgba(255,255,255,.08); border-radius:20px; padding:20px}
+    .feature img{width:100%; height:100%; max-height:480px; object-fit:cover; border-radius:16px}
+    .price{display:flex; align-items:center; gap:10px; margin-top:6px; font-variant-numeric:tabular-nums}
+    .price s{color:#9a9aa3}
+    .price strong{font-size:1.2rem}
+
+    /* Countdown */
+    .countdown{display:flex; gap:12px; margin:10px 0 0; font-variant-numeric:tabular-nums}
+    .pill{padding:8px 10px; border:1px solid rgba(255,255,255,.12); border-radius:12px; background:#121214; text-align:center}
+    .pill b{display:block; font-size:1.05rem}
+
+    /* Form VIP */
+    .form{display:grid; gap:10px; grid-template-columns:1fr 1fr}
+    .form input, .form select{
+      width:100%; padding:12px 14px; border-radius:12px; background:#121214; color:#fff;
+      border:1px solid rgba(255,255,255,.12)
+    }
+    .form .full{grid-column:span 2}
+    .note{font-size:.86rem; color:#cfcfd6}
+
+    /* Galeria (modal) */
+    .modal{position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.7); z-index:120}
+    .modal.open{display:grid}
+    .modal .box{max-width:980px; width:92vw; background:#101013; border:1px solid rgba(255,255,255,.12);
+                border-radius:16px; overflow:hidden}
+    .modal .slides{position:relative}
+    .modal img{width:100%; height:70vh; object-fit:cover; background:#0b0b0c}
+    .modal .ctrl{position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,.5);
+                 border:1px solid rgba(255,255,255,.2); padding:12px; border-radius:12px; cursor:pointer}
+    .modal .prev{left:12px} .modal .next{right:12px}
+    .modal .close{position:absolute; top:12px; right:12px; background:#000; border:1px solid rgba(255,255,255,.25); padding:8px 10px; border-radius:10px; cursor:pointer}
+
+    /* WhatsApp FAB */
+    .fab{position:fixed; right:18px; bottom:18px; background:#25D366; color:#000; font-weight:700;
+      padding:12px 14px; border-radius:999px; box-shadow:var(--shadow); z-index:130}
+
+    /* Footer */
+    footer{border-top:1px solid rgba(255,255,255,.08); padding:28px 0 60px; color:#cfcfd6}
+    .brand-small{display:flex; gap:10px; align-items:center}
+    .brand-small img{width:28px; height:28px}
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .hero-grid{grid-template-columns:1fr; padding:44px 0}
+      .feature{grid-template-columns:1fr}
+      .brand img{height:76px}
+      .form{grid-template-columns:1fr}
+      .form .full{grid-column:span 1}
+    }
+    @media (max-width: 640px){
+      .brand img{height:64px}
+    }
+  </style>
+</head>
+<body>
+  <!-- FAB WhatsApp -->
+  <a href="https://wa.me/5599981543912?text=Quero%20meu%20look%20Vita%20Septem" class="fab" aria-label="Falar no WhatsApp">WhatsApp</a>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <a class="brand" href="index.html#hero" aria-label="Ir para o início">
+        <img src="icon2.png" alt="Logo Vita Septem">
+      </a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section id="hero" class="hero" aria-label="Lançamento Exclusivo">
+    <div class="container hero-grid">
+      <div>
+        <div class="kicker">Lançamento • Edição Limitada</div>
+        <h1 id="prodTitle">Calça de Alfaiataria Aegis</h1>
+        <p class="lead" id="prodSubtitle">Peça premium com caimento impecável. Seja o primeiro a garantir.</p>
+        <div class="price">
+          <s id="prodCompare" style="display:none"></s>
+          <strong id="prodPrice">R$ 229,90</strong>
+        </div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:16px">
+          <a href="#vip" class="btn">Entrar na Lista VIP</a>
+          <button id="buyBtnTop" class="btn ghost" disabled>Comprar Agora (abre no lançamento)</button>
+        </div>
+      </div>
+      <div class="hero-visual" role="img" aria-label="Imagem do produto">
+        <span class="tag" id="badge">Exclusivo</span>
+        <img id="heroImg" src="https://images.unsplash.com/photo-1520975922284-54243f13c6d1?q=80&w=1600&auto=format&fit=crop" alt="Produto Vita Septem">
+      </div>
+    </div>
+  </section>
+
+  <!-- BLOCO DO PRODUTO / CONTAGEM / VIP -->
+  <section id="vip">
+    <div class="container">
+      <div class="feature">
+        <div>
+          <img id="galleryCover" src="https://images.unsplash.com/photo-1516826957135-700dedea698c?q=80&w=1600&auto=format&fit=crop" alt="Detalhe do produto" />
+          <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap" id="thumbs">
+            <!-- thumbs dinâmicas -->
+          </div>
+        </div>
+        <div>
+          <h3 class="section-title" style="margin-top:0">Início das vendas em:</h3>
+          <div class="countdown">
+            <div class="pill"><b id="dd">00</b>d</div>
+            <div class="pill"><b id="hh">00</b>h</div>
+            <div class="pill"><b id="mm">00</b>min</div>
+            <div class="pill"><b id="ss">00</b>s</div>
+          </div>
+          <p class="muted" id="launchNote">Inscreva-se e receba o link 10 minutos antes da abertura.</p>
+
+          <form class="form" id="vipForm">
+            <input name="name" placeholder="Seu nome" required>
+            <input name="email" type="email" placeholder="Seu e-mail" required>
+            <input class="full" name="phone" placeholder="WhatsApp (com DDD)" required>
+            <button class="btn full" type="submit">Entrar para a Lista VIP</button>
+          </form>
+
+          <button id="buyBtn" class="btn ghost full" style="margin-top:10px" disabled>Comprar Agora (abre no lançamento)</button>
+          <p class="note" id="priceNote">Preço de lançamento previsto: R$ 229,90</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTATO/LOCAL -->
+  <section aria-label="Informações de contato e localização">
+    <div class="container" style="display:grid; grid-template-columns:1.2fr .8fr; gap:22px">
+      <div>
+        <h3 class="section-title" style="margin-top:0">Visite a loja</h3>
+        <p class="muted">Rua Nova, Centro – São João do Caru / MA<br/>Seg–Sáb: 9h às 19h</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap">
+          <a class="btn ghost" href="https://wa.me/5599981543912?text=Quero%20um%20atendimento%20Vita%20Septem">WhatsApp</a>
+          <a class="btn ghost" href="https://www.instagram.com/vitaseptem" target="_blank" rel="noopener">Instagram</a>
+        </div>
+      </div>
+      <div aria-hidden="true">
+        <iframe title="Mapa da loja" width="100%" height="220" style="border:0; border-radius:14px"
+          loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          src="https://www.google.com/maps?q=São%20João%20do%20Caru%20MA&output=embed"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap">
+      <div class="brand-small">
+        <img src="icon.png" alt="" aria-hidden="true">
+        <span>© <span id="year"></span> Vita Septem – Men’s Fashion</span>
+      </div>
+      <small>Desenvolvido para performance e conversão.</small>
+    </div>
+  </footer>
+
+  <!-- Modal Galeria -->
+  <div class="modal" id="galModal" aria-hidden="true" role="dialog" aria-label="Galeria de imagens do produto">
+    <div class="box">
+      <button class="close" onclick="closeGal()" aria-label="Fechar galeria">Fechar ✕</button>
+      <div class="slides">
+        <button class="ctrl prev" onclick="prevGal()" aria-label="Imagem anterior">‹</button>
+        <img id="galImg" src="" alt="Imagem do produto">
+        <button class="ctrl next" onclick="nextGal()" aria-label="Próxima imagem">›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // ====== Config ======
+    const SUPABASE_URL = "https://dwqkuwqmlhvplmgwksas.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cWt1d3FtbGh2cGxtZ3drc2FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODM4NjksImV4cCI6MjA3MDM1OTg2OX0._pFblnBzx5cf0SUfAC_w-kmcdFbidZsh23XKXJR98ng";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth:{ persistSession:false }});
+
+    const BUCKET = "launches"; // bucket para imagens do lançamento (deixe público)
+    const LEADS_TABLE = "leads"; // salvaremos os VIPs aqui
+    const WHATSAPP = "5599981543912";
+
+    // Util
+    document.getElementById('year').textContent = new Date().getFullYear();
+    const qs = new URLSearchParams(location.search);
+    const SLUG = qs.get('slug') || 'calca-aegis'; // você pode mudar no Dashboard/URL
+
+    const fmtBRL = (n) => (n/100).toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+
+    function wa(text){
+      const url = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
+      return false;
+    }
+    function storageUrl(path){
+      try{
+        const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+        return data.publicUrl || "";
+      }catch{ return ""; }
+    }
+    function imgUrlFrom(img){
+      if(!img) return "";
+      if(img.url) return img.url;
+      if(img.path) return storageUrl(img.path);
+      return "";
+    }
+
+    // DOM refs
+    const elTitle = document.getElementById('prodTitle');
+    const elSubtitle = document.getElementById('prodSubtitle');
+    const elPrice = document.getElementById('prodPrice');
+    const elCompare = document.getElementById('prodCompare');
+    const elHero = document.getElementById('heroImg');
+    const elBadge = document.getElementById('badge');
+    const elCover = document.getElementById('galleryCover');
+    const elThumbs = document.getElementById('thumbs');
+    const elNote = document.getElementById('priceNote');
+    const elLaunchNote = document.getElementById('launchNote');
+    const buyBtn = document.getElementById('buyBtn');
+    const buyBtnTop = document.getElementById('buyBtnTop');
+
+    // Contagem regressiva
+    const dD=document.getElementById('dd'), dH=document.getElementById('hh'), dM=document.getElementById('mm'), dS=document.getElementById('ss');
+    let targetDate = null; // virá do banco ou fallback
+
+    function setCountdown(target){
+      targetDate = target;
+      tickCountdown(); // atualiza já
+      setInterval(tickCountdown, 1000);
+    }
+    function tickCountdown(){
+      const now = new Date();
+      const diff = Math.max(0, targetDate - now);
+      const d = Math.floor(diff/(1000*60*60*24));
+      const h = Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+      const m = Math.floor((diff%(1000*60*60))/(1000*60));
+      const s = Math.floor((diff%(1000*60))/1000);
+      dD.textContent = String(d).padStart(2,'0');
+      dH.textContent = String(h).padStart(2,'0');
+      dM.textContent = String(m).padStart(2,'0');
+      dS.textContent = String(s).padStart(2,'0');
+
+      const launchReached = diff === 0;
+      if(launchReached){
+        enableBuy();
+      }
+    }
+    function enableBuy(){
+      [buyBtn, buyBtnTop].forEach(btn=>{
+        if(!btn) return;
+        btn.disabled = false;
+        btn.classList.remove('ghost');
+        btn.textContent = 'Comprar Agora';
+      });
+    }
+
+    // Galeria (modal)
+    const galModal = document.getElementById('galModal');
+    const galImg = document.getElementById('galImg');
+    let galArr = [], galIdx = 0;
+
+    function openGal(i=0){
+      if(!galArr.length) return;
+      galIdx = i;
+      galImg.src = galArr[galIdx];
+      galModal.classList.add('open');
+      galModal.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeGal(){
+      galModal.classList.remove('open');
+      galModal.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+    }
+    function prevGal(){ if(!galArr.length) return; galIdx=(galIdx-1+galArr.length)%galArr.length; galImg.src=galArr[galIdx]; }
+    function nextGal(){ if(!galArr.length) return; galIdx=(galIdx+1)%galArr.length; galImg.src=galArr[galIdx]; }
+    window.prevGal=prevGal; window.nextGal=nextGal; window.closeGal=closeGal;
+    galModal.addEventListener('click', (e)=>{ if(e.target===galModal) closeGal(); });
+    window.addEventListener('keydown', (e)=>{
+      if(!galModal.classList.contains('open')) return;
+      if(e.key==='Escape') closeGal();
+      if(e.key==='ArrowLeft') prevGal();
+      if(e.key==='ArrowRight') nextGal();
+    });
+
+    // VIP form
+    const vipForm = document.getElementById('vipForm');
+    vipForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(vipForm).entries());
+      data.tag = 'lancamento_vip';
+      data.launch_slug = SLUG;
+
+      try{
+        const { error } = await supabase.from(LEADS_TABLE).insert(data);
+        if(error) throw error;
+        alert('Recebido! Você está na lista VIP.');
+        vipForm.reset();
+      }catch(err){
+        // fallback: abrir WhatsApp
+        wa(`Quero entrar na Lista VIP (${SLUG}): ${JSON.stringify(data)}`);
+      }
+    });
+
+    function setBuyHandlers(title, priceCents){
+      const msg = `Olá! Quero comprar: ${title} | Preço: ${(priceCents/100).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})} | Lançamento: ${SLUG}`;
+      [buyBtn, buyBtnTop].forEach(btn=>{
+        if(!btn) return;
+        btn.onclick = ()=> wa(msg);
+      });
+    }
+
+    // ===== Load do Supabase + fallback =====
+    async function loadLaunch(){
+      try{
+        // Estrutura esperada:
+        // launches { id, slug, title, subtitle, description, badge, price_cents, compare_at_cents, launch_at, hero_url, hero_path, sort_order, is_active }
+        // launch_images { launch_id (FK), url, path, alt, is_primary, sort_order }
+        const { data, error } = await supabase
+          .from('launches')
+          .select(`
+            id, slug, title, subtitle, description, badge,
+            price_cents, compare_at_cents, launch_at,
+            hero_url, hero_path, sort_order, is_active,
+            launch_images ( url, path, alt, is_primary, sort_order )
+          `)
+          .eq('slug', SLUG)
+          .limit(1)
+          .maybeSingle();
+
+        if(error) throw error;
+        if(!data){ applyFallback(); return; }
+        applyLaunch(data);
+      }catch(err){
+        console.warn('Falha ao carregar lançamento:', err?.message);
+        applyFallback();
+      }
+    }
+
+    function applyLaunch(l){
+      // Título, textos, preços
+      elTitle.textContent = l.title || 'Lançamento Vita Septem';
+      elSubtitle.textContent = l.subtitle || 'Peça premium.';
+      elBadge.textContent = l.badge || 'Exclusivo';
+
+      if(l.price_cents>0){
+        elPrice.textContent = fmtBRL(l.price_cents);
+        setBuyHandlers(l.title || 'Produto Vita Septem', l.price_cents);
+        elNote.textContent = `Preço de lançamento: ${fmtBRL(l.price_cents)}`;
+      }
+      if(l.compare_at_cents>0){
+        elCompare.style.display = '';
+        elCompare.textContent = fmtBRL(l.compare_at_cents);
+      }
+
+      // Datas
+      const dt = l.launch_at ? new Date(l.launch_at) : defaultLaunchDate();
+      setCountdown(dt);
+      elLaunchNote.textContent = `Lançamento em ${dt.toLocaleString('pt-BR')}. Cadastre-se para receber o link com antecedência.`;
+
+      // Imagens (hero + galeria)
+      const hero = l.hero_url ? l.hero_url : (l.hero_path ? storageUrl(l.hero_path) : "");
+      if(hero) elHero.src = hero;
+
+      const imgs = (l.launch_images||[]).sort((a,b)=>{
+        if((b.is_primary|0)!==(a.is_primary|0)) return (b.is_primary?1:0)-(a.is_primary?1:0);
+        return (a.sort_order||100)-(b.sort_order||100);
+      });
+      const cover = imgUrlFrom(imgs[0]) || hero || elHero.src;
+      if(cover) elCover.src = cover;
+
+      galArr = imgs.map(imgUrlFrom).filter(Boolean);
+      if(!galArr.length && hero) galArr = [hero];
+
+      renderThumbs(galArr);
+      // se a data já passou, libera compra
+      if(new Date() >= dt) enableBuy();
+    }
+
+    function renderThumbs(arr){
+      elThumbs.innerHTML = '';
+      arr.forEach((src, i)=>{
+        const a = document.createElement('a');
+        a.href = '#';
+        a.style = 'display:inline-block; width:88px; height:88px; border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,.12)';
+        a.onclick = (ev)=>{ ev.preventDefault(); elCover.src = src; openGal(i); };
+        const img = document.createElement('img');
+        img.src = src; img.alt = 'thumb'; img.style = 'width:100%; height:100%; object-fit:cover';
+        a.appendChild(img);
+        elThumbs.appendChild(a);
+      });
+    }
+
+    function applyFallback(){
+      // Conteúdo padrão caso não haja registro no DB
+      const fallback = {
+        title:'Calça de Alfaiataria Aegis',
+        subtitle:'Peça premium com caimento impecável. Edição limitada.',
+        badge:'Exclusivo',
+        price_cents:22990,
+        compare_at_cents:0,
+        launch_at: defaultLaunchDate(),
+        hero_url:"https://images.unsplash.com/photo-1520975922284-54243f13c6d1?q=80&w=1600&auto=format&fit=crop",
+        launch_images:[
+          {url:"https://images.unsplash.com/photo-1516826957135-700dedea698c?q=80&w=1600&auto=format&fit=crop", is_primary:true, sort_order:1},
+          {url:"https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=1600&auto=format&fit=crop", sort_order:2},
+          {url:"https://images.unsplash.com/photo-1516822003754-cca485356ecb?q=80&w=1600&auto=format&fit=crop", sort_order:3}
+        ]
+      };
+      applyLaunch({
+        ...fallback,
+        launch_images: fallback.launch_images
+      });
+    }
+
+    function defaultLaunchDate(){
+      // padrão: daqui a 2 dias às 09:00 (horário local do visitante)
+      const d = new Date();
+      d.setDate(d.getDate()+2);
+      d.setHours(9,0,0,0);
+      return d;
+    }
+
+    // Handlers de compra (serão ligados no applyLaunch)
+    buyBtn.onclick = ()=> false;
+    buyBtnTop.onclick = ()=> false;
+
+    // Start
+    loadLaunch();
+  </script>
+</body>
+</html>
