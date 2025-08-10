@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vita Septem – Guia do Homem Elegante</title>
+  <meta name="description" content="Guia do Homem Elegante: dicas de moda masculina, combinações e um e-book gratuito. Vídeos, capítulos e exemplos práticos." />
+  <meta name="theme-color" content="#880c21" />
+  <!-- Open Graph -->
+  <meta property="og:title" content="Vita Septem – Guia do Homem Elegante" />
+  <meta property="og:description" content="Conteúdo educativo com capítulos, vídeos e e-book gratuito." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="icon.png" />
+  <meta property="og:locale" content="pt_BR" />
+  <!-- Fonts & Favicon -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="icon.ico">
+
+  <style>
+    :root{
+      --wine:#880c21; --wine-600:#a11837; --black:#0e0e0f; --gray-900:#17171a;
+      --gray-800:#1c1c20; --gray-700:#232327; --gray-600:#34343a; --gray-500:#8c8c94; --white:#ffffff;
+      --radius:18px; --shadow:0 10px 30px rgba(0,0,0,.35); --success:#25D366; --muted:#cfcfd6;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--white); background:linear-gradient(180deg,var(--black),var(--gray-900) 35%, #0b0b0c);
+      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    }
+    a{color:inherit; text-decoration:none}
+    .container{max-width:1200px; margin:0 auto; padding:0 20px}
+
+    /* Header */
+    header{position:sticky; top:0; z-index:70; backdrop-filter:saturate(140%) blur(8px);
+      background:rgba(13,13,15,.7); border-bottom:1px solid rgba(255,255,255,.06)}
+    .nav{display:flex; align-items:center; justify-content:center; padding:18px 0}
+    .brand{display:flex; align-items:center; gap:12px}
+    .brand img{height:110px; width:auto; object-fit:contain}
+
+    /* Hero */
+    .hero{position:relative; overflow:hidden; isolation:isolate}
+    .hero::before{
+      content:""; position:absolute; inset:-20%;
+      background:
+        radial-gradient(80% 60% at 70% 20%, rgba(136,12,33,.35), transparent 60%),
+        radial-gradient(60% 40% at 10% 10%, rgba(255,255,255,.08), transparent 60%);
+      z-index:-1; filter:blur(10px)
+    }
+    .hero-grid{display:grid; grid-template-columns:1.1fr .9fr; gap:36px; align-items:center; padding:64px 0}
+    .kicker{color:#e9e9ea; letter-spacing:.14em; text-transform:uppercase; font-size:.82rem}
+    h1{margin:.35rem 0 1rem; font-family:"Playfair Display",serif; font-weight:700;
+       font-size:clamp(2.1rem, 3.2vw + 1rem, 3.6rem); line-height:1.05;}
+    .lead{color:#d9d9dd; font-size:1.05rem; max-width:52ch}
+    .btn{display:inline-flex; align-items:center; gap:10px; padding:12px 18px; border-radius:14px; font-weight:600;
+         background:var(--wine); border:1px solid rgba(255,255,255,.1); box-shadow:var(--shadow);
+         transition:transform .15s ease, background .2s ease;}
+    .btn:hover{background:var(--wine-600); transform:translateY(-1px)}
+    .btn.secondary{background:transparent; border-color:rgba(255,255,255,.18)}
+    .btn.ghost{background:#1a1a1e; border:1px solid rgba(255,255,255,.12)}
+    .hero-visual{background:linear-gradient(180deg,#141416,#0d0d0f);
+      border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); min-height:360px;
+      display:grid; place-items:center; position:relative; overflow:hidden}
+    .hero-visual img{width:100%; height:100%; object-fit:cover}
+    .tag{position:absolute; top:14px; right:14px; padding:6px 10px; border-radius:999px;
+      background:rgba(136,12,33,.18); border:1px solid rgba(136,12,33,.5); font-size:.78rem}
+
+    /* Sections */
+    section{padding:56px 0}
+    .section-title{font-family:"Playfair Display",serif; font-weight:700; font-size:2rem; margin:0 0 14px}
+    .muted{color:var(--muted); margin:0 0 26px}
+    .grid{display:grid; gap:18px; grid-template-columns:repeat(12,1fr)}
+
+    /* Cards */
+    .card{grid-column:span 4; background:linear-gradient(180deg,#141416,#101013);
+      border:1px solid rgba(255,255,255,.08); border-radius:16px; overflow:hidden; transition:transform .15s ease;}
+    .card:hover{transform:translateY(-3px)}
+    .card .media{height:200px; background:#0f0f11}
+    .card .media img{width:100%; height:100%; object-fit:cover}
+    .card .p{padding:14px}
+    .badge{background:rgba(136,12,33,.22); border:1px solid rgba(136,12,33,.55); padding:4px 10px; border-radius:999px; font-size:.78rem}
+
+    /* Video card */
+    .vcard{grid-column:span 6}
+    @media (max-width:980px){ .card{grid-column:span 12} .vcard{grid-column:span 12} }
+
+    /* Ebook box */
+    .ebook{display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:center;
+      background:linear-gradient(180deg,#151517,#121214); border:1px solid rgba(255,255,255,.08); border-radius:18px; padding:18px}
+    .ebook img{width:100%; height:100%; max-height:320px; object-fit:cover; border-radius:14px}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    .row input{
+      width:100%; padding:10px 12px; border-radius:12px; background:#121214; color:#fff;
+      border:1px solid rgba(255,255,255,.12)
+    }
+    .agree{display:flex; gap:8px; align-items:flex-start; margin-top:10px; font-size:.92rem; color:#dcdce3}
+    .alert{margin-top:10px; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.12); display:none}
+    .alert.ok{display:block; background:rgba(48,209,88,.1); border-color:rgba(48,209,88,.4)}
+    .alert.err{display:block; background:rgba(255,69,58,.10); border-color:rgba(255,69,58,.45)}
+
+    /* Modals */
+    .modal{position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.7); z-index:120}
+    .modal.open{display:grid}
+    .modal .box{max-width:980px; width:92vw; background:#101013; border:1px solid rgba(255,255,255,.12);
+                border-radius:16px; overflow:hidden}
+    .modal header{position:relative; background:#121214; border-bottom:1px solid rgba(255,255,255,.08); padding:14px 16px}
+    .modal .close{position:absolute; right:12px; top:10px; background:#000; border:1px solid rgba(255,255,255,.25); padding:6px 10px; border-radius:10px; cursor:pointer}
+    .content{padding:16px}
+
+    /* WhatsApp FAB */
+    .fab{position:fixed; right:18px; bottom:18px; background:var(--success); color:#000; font-weight:700;
+      padding:12px 14px; border-radius:999px; box-shadow:var(--shadow); z-index:130}
+
+    /* Footer */
+    footer{border-top:1px solid rgba(255,255,255,.08); padding:28px 0 60px; color:var(--muted)}
+    .brand-small{display:flex; gap:10px; align-items:center}
+    .brand-small img{width:28px; height:28px}
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .hero-grid{grid-template-columns:1fr; padding:44px 0}
+      .brand img{height:76px}
+      .ebook{grid-template-columns:1fr}
+    }
+    @media (max-width: 640px){
+      .brand img{height:64px}
+      .row{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <!-- FAB WhatsApp -->
+  <a href="https://wa.me/5599981543912?text=Quero%20dicas%20do%20Guia%20Vita%20Septem" class="fab" aria-label="Falar no WhatsApp">WhatsApp</a>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <a class="brand" href="index.html#hero" aria-label="Ir para o início">
+        <img src="icon2.png" alt="Logo Vita Septem">
+      </a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section id="hero" class="hero" aria-label="Guia do Homem Elegante">
+    <div class="container hero-grid">
+      <div>
+        <div class="kicker">Guia • Conteúdo Educativo</div>
+        <h1 id="heroTitle">Guia do Homem Elegante</h1>
+        <p class="lead" id="heroLead">Fit, paleta de cores, combinações e boas práticas. Aprenda o essencial e leve seu estilo para o próximo nível.</p>
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:22px">
+          <a href="#capitulos" class="btn">Ver capítulos</a>
+          <a href="#ebook" class="btn secondary">Baixar e-book</a>
+        </div>
+      </div>
+      <div class="hero-visual" role="img" aria-label="Preview do Guia">
+        <span class="tag" id="heroBadge">Edição 2026</span>
+        <img id="heroImg" src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1600&auto=format&fit=crop" alt="Guia do Homem Elegante">
+      </div>
+    </div>
+  </section>
+
+  <!-- CAPÍTULOS -->
+  <section id="capitulos" aria-labelledby="ttl-caps">
+    <div class="container">
+      <h2 class="section-title" id="ttl-caps">Capítulos</h2>
+      <p class="muted">Leitura rápida, exemplos práticos e fotos.</p>
+      <div class="grid" id="chapGrid"></div>
+      <div class="muted" id="chapEmpty" style="display:none">Sem capítulos cadastrados por enquanto.</div>
+    </div>
+  </section>
+
+  <!-- VÍDEOS -->
+  <section id="videos" aria-labelledby="ttl-videos">
+    <div class="container">
+      <h2 class="section-title" id="ttl-videos">Vídeos</h2>
+      <p class="muted">Aulas curtas com dicas essenciais.</p>
+      <div class="grid" id="vidGrid"></div>
+      <div class="muted" id="vidEmpty" style="display:none">Sem vídeos por enquanto.</div>
+    </div>
+  </section>
+
+  <!-- E-BOOK -->
+  <section id="ebook" aria-labelledby="ttl-ebook">
+    <div class="container">
+      <h2 class="section-title" id="ttl-ebook">E-book gratuito</h2>
+      <p class="muted">Baixe o PDF do Guia do Homem Elegante em troca do seu e-mail. Conteúdo direto ao ponto.</p>
+      <div class="ebook">
+        <img id="ebookCover" src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=1600&auto=format&fit=crop" alt="Capa do e-book Guia do Homem Elegante">
+        <div>
+          <div class="row">
+            <input id="ebName" type="text" placeholder="Seu nome *" autocomplete="name">
+            <input id="ebEmail" type="email" placeholder="Seu e-mail *" autocomplete="email">
+          </div>
+          <label class="agree">
+            <input id="ebAgree" type="checkbox">
+            <span>Quero receber o e-book e comunicações do Guia.</span>
+          </label>
+          <div class="alert" id="ebAlert"></div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px">
+            <button class="btn" id="ebSubmit">Gerar link de download</button>
+            <a class="btn ghost" id="ebDownload" href="#" style="display:none" target="_blank" rel="noopener">Baixar PDF</a>
+          </div>
+          <p class="muted" id="ebNote" style="margin-top:8px">PDF ~10–20 páginas. Leitura rápida.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTATO/LOCAL -->
+  <section aria-label="Informações de contato e localização">
+    <div class="container" style="display:grid; grid-template-columns:1.2fr .8fr; gap:22px">
+      <div>
+        <h3 class="section-title" style="margin-top:0">Visite a loja</h3>
+        <p class="muted">Rua Nova, Centro – São João do Caru / MA<br/>Seg–Sáb: 9h às 19h</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap">
+          <a class="btn ghost" href="https://wa.me/5599981543912?text=Quero%20dicas%20do%20Guia%20Vita%20Septem">WhatsApp</a>
+          <a class="btn ghost" href="https://www.instagram.com/vitaseptem" target="_blank" rel="noopener">Instagram</a>
+        </div>
+      </div>
+      <div aria-hidden="true">
+        <iframe title="Mapa da loja" width="100%" height="220" style="border:0; border-radius:14px"
+          loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          src="https://www.google.com/maps?q=São%20João%20do%20Caru%20MA&output=embed"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap">
+      <div class="brand-small">
+        <img src="icon.png" alt="" aria-hidden="true">
+        <span>© <span id="year"></span> Vita Septem – Men’s Fashion</span>
+      </div>
+      <small>Desenvolvido para performance e conversão.</small>
+    </div>
+  </footer>
+
+  <!-- MODAL: Capítulo -->
+  <div class="modal" id="capModal" aria-hidden="true" role="dialog" aria-label="Leitura do capítulo">
+    <div class="box">
+      <header>
+        <strong id="capTitle">Capítulo</strong>
+        <button class="close" onclick="closeCap()" aria-label="Fechar">✕</button>
+      </header>
+      <div class="content">
+        <div id="capContent" class="muted" style="white-space:pre-wrap"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Vídeo -->
+  <div class="modal" id="vidModal" aria-hidden="true" role="dialog" aria-label="Assistir vídeo">
+    <div class="box">
+      <header>
+        <strong id="vidTitle">Vídeo</strong>
+        <button class="close" onclick="closeVid()" aria-label="Fechar">✕</button>
+      </header>
+      <div class="content" style="aspect-ratio:16/9">
+        <iframe id="vidFrame" width="100%" height="100%" src="" title="Player" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // ====== Config ======
+    const SUPABASE_URL = "https://dwqkuwqmlhvplmgwksas.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cWt1d3FtbGh2cGxtZ3drc2FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODM4NjksImV4cCI6MjA3MDM1OTg2OX0._pFblnBzx5cf0SUfAC_w-kmcdFbidZsh23XKXJR98ng";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth:{ persistSession:false }});
+
+    const GUIDE_SLUG = "guia-homem-elegante";
+    const BUCKET = "guides"; // bucket público p/ imagens/capas/ebook
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ===== Helpers =====
+    function storageUrl(path){
+      try{
+        const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+        return data.publicUrl || "";
+      }catch{ return ""; }
+    }
+    function imgUrlFrom(obj){
+      if(!obj) return "";
+      if(obj.url) return obj.url;
+      if(obj.path) return storageUrl(obj.path);
+      return "";
+    }
+    function validEmail(s){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((s||"").trim()); }
+    function show(el, on=true){ el.style.display = on ? "" : "none"; }
+
+    // ===== DOM =====
+    const chapGrid = document.getElementById('chapGrid');
+    const chapEmpty = document.getElementById('chapEmpty');
+    const vidGrid  = document.getElementById('vidGrid');
+    const vidEmpty = document.getElementById('vidEmpty');
+
+    const heroImg = document.getElementById('heroImg');
+    const heroTitle = document.getElementById('heroTitle');
+    const heroLead = document.getElementById('heroLead');
+    const heroBadge = document.getElementById('heroBadge');
+    const ebookCover = document.getElementById('ebookCover');
+
+    // Capítulo modal
+    const capModal = document.getElementById('capModal');
+    const capTitle = document.getElementById('capTitle');
+    const capContent = document.getElementById('capContent');
+    function openCap(ch){ capTitle.textContent = ch.title || 'Capítulo'; capContent.innerHTML = ch.content_html || (ch.excerpt || ''); capModal.classList.add('open'); capModal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+    function closeCap(){ capModal.classList.remove('open'); capModal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+    window.closeCap = closeCap;
+    capModal.addEventListener('click', (e)=>{ if(e.target===capModal) closeCap(); });
+    window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && capModal.classList.contains('open')) closeCap(); });
+
+    // Vídeo modal
+    const vidModal = document.getElementById('vidModal');
+    const vidTitle = document.getElementById('vidTitle');
+    const vidFrame = document.getElementById('vidFrame');
+    function ytSrc(id){ return `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1&autoplay=1`; }
+    function vmSrc(id){ return `https://player.vimeo.com/video/${id}?autoplay=1`; }
+    function openVid(v){
+      vidTitle.textContent = v.title || 'Vídeo';
+      const src = (v.platform==='vimeo') ? vmSrc(v.video_id) : ytSrc(v.video_id);
+      vidFrame.src = src;
+      vidModal.classList.add('open'); vidModal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
+    }
+    function closeVid(){ vidFrame.src=''; vidModal.classList.remove('open'); vidModal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+    window.closeVid = closeVid;
+    vidModal.addEventListener('click', (e)=>{ if(e.target===vidModal) closeVid(); });
+    window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && vidModal.classList.contains('open')) closeVid(); });
+
+    // Ebook form
+    const ebName = document.getElementById('ebName');
+    const ebEmail = document.getElementById('ebEmail');
+    const ebAgree = document.getElementById('ebAgree');
+    const ebAlert = document.getElementById('ebAlert');
+    const ebSubmit = document.getElementById('ebSubmit');
+    const ebDownload = document.getElementById('ebDownload');
+    const ebNote = document.getElementById('ebNote');
+
+    function alertBox(ok, msg){
+      ebAlert.className = 'alert ' + (ok ? 'ok' : 'err');
+      ebAlert.textContent = msg;
+    }
+
+    let EBOOK_URL = ""; // preenchido pelo Supabase (guide_resources)
+    ebSubmit.onclick = async ()=>{
+      const name = ebName.value.trim();
+      const email = ebEmail.value.trim();
+      const agree = ebAgree.checked;
+      if(!name){ alertBox(false,'Informe seu nome.'); return; }
+      if(!validEmail(email)){ alertBox(false,'Informe um e-mail válido.'); return; }
+      if(!agree){ alertBox(false,'É necessário concordar para prosseguir.'); return; }
+
+      try{
+        // registra no leads
+        const { error } = await supabase.from('leads').insert([{
+          name, email, phone: null, tag: 'guia_elegante', launch_slug: 'ebook', source:'web'
+        }]);
+        if(error) throw error;
+
+        if(EBOOK_URL){
+          ebDownload.href = EBOOK_URL;
+          show(ebDownload, true);
+          alertBox(true,'Link gerado! Clique em "Baixar PDF".');
+        }else{
+          // fallback se não houver resource no banco
+          ebDownload.href = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+          show(ebDownload, true);
+          alertBox(true,'Pronto! Baixe o PDF.');
+        }
+      }catch(err){
+        console.warn('Lead erro:', err?.message);
+        alertBox(false,'Não foi possível gerar agora. Tente novamente.');
+      }
+    };
+
+    // ===== Render =====
+    function chapterCard(ch){
+      const cover = imgUrlFrom(ch) || "https://images.unsplash.com/photo-1520975922284-54243f13c6d1?q=80&w=1600&auto=format&fit=crop";
+      const safe = { title: ch.title, content_html: ch.content_html, excerpt: ch.excerpt };
+      const data = encodeURIComponent(JSON.stringify(safe));
+      return `
+        <article class="card">
+          <div class="media"><img src="${cover}" alt="${ch.title||'Capítulo'}"></div>
+          <div class="p">
+            <div style="display:flex; justify-content:space-between; align-items:center">
+              <h3 style="margin:0">${ch.title||'Capítulo'}</h3>
+              ${ch.badge ? `<span class="badge">${ch.badge}</span>`:''}
+            </div>
+            ${ch.excerpt ? `<p class="muted" style="margin:6px 0 0">${ch.excerpt}</p>`:''}
+            <div style="display:flex; gap:10px; margin-top:10px">
+              <button class="btn" onclick='openCap(JSON.parse(decodeURIComponent("${data}")))'>Ler capítulo</button>
+              <a class="btn ghost" href="index.html#colecao">Ver peças</a>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function videoCard(v){
+      const cover = v.cover_url ? v.cover_url : (v.cover_path ? storageUrl(v.cover_path) : "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=1600&auto=format&fit=crop");
+      const safe = { title: v.title, platform: v.platform||'youtube', video_id: v.video_id };
+      const data = encodeURIComponent(JSON.stringify(safe));
+      return `
+        <article class="card vcard">
+          <div class="media"><img src="${cover}" alt="${v.title||'Vídeo'}"></div>
+          <div class="p">
+            <div style="display:flex; justify-content:space-between; align-items:center">
+              <h3 style="margin:0">${v.title||'Vídeo'}</h3>
+              ${v.badge ? `<span class="badge">${v.badge}</span>`:''}
+            </div>
+            ${v.description ? `<p class="muted" style="margin:6px 0 0">${v.description}</p>`:''}
+            <div style="display:flex; gap:10px; margin-top:10px">
+              <button class="btn" onclick='openVid(JSON.parse(decodeURIComponent("${data}")))'>Assistir</button>
+              <a class="btn ghost" href="#capitulos">Acompanhar leitura</a>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderChapters(list){
+      chapGrid.innerHTML = "";
+      if(!list?.length){ show(chapEmpty, true); return; }
+      show(chapEmpty, false);
+      list.forEach(ch => chapGrid.insertAdjacentHTML('beforeend', chapterCard(ch)));
+    }
+    function renderVideos(list){
+      vidGrid.innerHTML = "";
+      if(!list?.length){ show(vidEmpty, true); return; }
+      show(vidEmpty, false);
+      list.forEach(v => vidGrid.insertAdjacentHTML('beforeend', videoCard(v)));
+    }
+
+    // ===== Load from Supabase + fallback =====
+    async function loadGuide(){
+      try{
+        const { data, error } = await supabase
+          .from('guides')
+          .select(`
+            id, slug, title, subtitle, badge, sort_order, is_active,
+            guide_images ( url, path, alt, is_primary, sort_order ),
+            guide_chapters ( id, slug, title, excerpt, content_html, badge, cover_url, cover_path, sort_order, is_active ),
+            guide_videos   ( id, title, description, badge, platform, video_id, cover_url, cover_path, sort_order, is_active ),
+            guide_resources( id, rtype, title, url, path, file_size_bytes, pages, is_primary, is_active )
+          `)
+          .eq('slug', GUIDE_SLUG)
+          .eq('is_active', true)
+          .single();
+
+        if(error) throw error;
+
+        // Hero
+        const imgs = (data.guide_images||[]).sort((a,b)=>{
+          if((b.is_primary|0)!==(a.is_primary|0)) return (b.is_primary?1:0)-(a.is_primary?1:0);
+          return (a.sort_order||100)-(b.sort_order||100);
+        });
+        const hero = imgUrlFrom(imgs[0]);
+        if(hero) heroImg.src = hero;
+        if(data.title)  heroTitle.textContent = data.title;
+        if(data.subtitle) heroLead.textContent = data.subtitle;
+        if(data.badge) heroBadge.textContent = data.badge;
+
+        // Chapters
+        const chapters = (data.guide_chapters||[])
+          .filter(c=>c.is_active!==false)
+          .sort((a,b)=>(a.sort_order||100)-(b.sort_order||100))
+          .map(c=> ({ ...c, // normaliza cover
+            url: c.cover_url || null, path: c.cover_path || null
+          }));
+        renderChapters(chapters);
+
+        // Videos
+        const videos = (data.guide_videos||[])
+          .filter(v=>v.is_active!==false)
+          .sort((a,b)=>(a.sort_order||100)-(b.sort_order||100));
+        renderVideos(videos);
+
+        // Ebook
+        const ebook = (data.guide_resources||[]).find(r=>r.is_primary || r.rtype==='ebook');
+        if(ebook){
+          EBOOK_URL = ebook.url || (ebook.path ? storageUrl(ebook.path) : "");
+          if(ebook.title) ebNote.textContent = ebook.title + (ebook.pages? ` • ${ebook.pages} páginas` : '');
+          if(ebook.cover_url || ebook.cover_path){
+            const cov = ebook.cover_url || storageUrl(ebook.cover_path);
+            if(cov) ebookCover.src = cov;
+          }
+        }
+      }catch(err){
+        console.warn('Falha ao carregar guia:', err?.message);
+        fallbackContent();
+      }
+    }
+
+    function fallbackContent(){
+      // Hero default já está
+      const ch = [
+        { title:'1) Como acertar o caimento', excerpt:'A peça ideal encosta no corpo sem apertar.', content_html:'• Ombros alinhados\n• Barras na altura certa\n• Ajuste na cintura sem sobras', badge:'Fit', url:'https://images.unsplash.com/photo-1520975922284-54243f13c6d1?q=80&w=1600&auto=format&fit=crop' },
+        { title:'2) Paleta neutra inteligente', excerpt:'Comece pelo preto, off-white, cinza e cáqui.', content_html:'• Base neutra facilita combinações\n• Adicione cor nos acessórios', badge:'Cor', url:'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1600&auto=format&fit=crop' },
+        { title:'3) Combos prontos para o dia a dia', excerpt:'Simplifique: camisa + chino + tênis limpo.', content_html:'• Menos estampa, mais presença\n• Ajuste do cinto e bainha faz diferença', badge:'Combo', url:'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1600&auto=format&fit=crop' }
+      ];
+      renderChapters(ch);
+
+      const vids = [
+        { title:'Ajuste e proporção', platform:'youtube', video_id:'dQw4w9WgXcQ', cover_url:'https://images.unsplash.com/photo-1520975916090-3105956dac38?q=80&w=1600&auto=format&fit=crop' },
+        { title:'Cores que funcionam sempre', platform:'youtube', video_id:'5NV6Rdv1a3I', cover_url:'https://images.unsplash.com/photo-1516251193007-45ef944ab0c6?q=80&w=1600&auto=format&fit=crop' }
+      ];
+      renderVideos(vids);
+
+      EBOOK_URL = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+      ebNote.textContent = "Guia do Homem Elegante • 12 páginas";
+    }
+
+    // Start
+    loadGuide();
+  </script>
+</body>
+</html>
