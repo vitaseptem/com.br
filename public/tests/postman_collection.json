@@ -1,8 +1,0 @@
-{
-  "info": { "name": "Vita Septem API", "_postman_id": "vs-collection", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
-  "item": [
-    { "name":"Stripe Webhook", "request":{ "method":"POST","header":[{"key":"Content-Type","value":"application/json"}], "url":"{{base}}/api/webhooks/stripe", "body":{"mode":"raw","raw":"{\"type\":\"payment_intent.succeeded\",\"data\":{\"object\":{\"id\":\"pi_test\",\"amount_received\":12345}}}"}} },
-    { "name":"PIX Webhook", "request":{ "method":"POST","header":[{"key":"x-pix-signature","value":"{{pix_sig}}"},{"key":"Content-Type","value":"application/json"}], "url":"{{base}}/api/webhooks/pix","body":{"mode":"raw","raw":"{\"txid\":\"abc\",\"status\":\"CONFIRMED\",\"amount_cents\":9900}"}} },
-    { "name":"GA4 Track", "request":{ "method":"POST","header":[{"key":"Content-Type","value":"application/json"}], "url":"{{base}}/api/track/ga4", "body":{"mode":"raw","raw":"{\"client_id\":\"555.555\",\"events\":[{\"name\":\"purchase\"}]}"}} }
-  ]
-}
