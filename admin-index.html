@@ -97,7 +97,7 @@
         setLoading(btnLogin, true);
         await signInEmailPassword(email, password);
         toast("Login realizado com sucesso!", "success");
-        window.location.href = "/dashboard.html";
+        window.location.href = "com.br/dashboard.html";
       }catch(err){
         console.error(err);
         toast(err.message || "Falha no login.", "error");
@@ -124,3 +124,4 @@
   </script>
 </body>
 </html>
+
