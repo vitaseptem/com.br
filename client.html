@@ -210,7 +210,7 @@
                   </div>
                   <div class="field">
                     <label for="cadMemberNo">Nº do cartão (01–32.767)</label>
-                    <input id="cadMemberNo" class="input" placeholder="01" inputmode="numeric" pattern="[0-9]*" maxlength="3" required>
+                    <input id="cadMemberNo" class="input" placeholder="00001" inputmode="numeric" pattern="[0-9]*" maxlength="5" required>
                   </div>
                 </div>
                 <div class="split" style="grid-column:span 2">
@@ -295,17 +295,12 @@
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   
   <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // ====== SUPABASE ======
   const SUPABASE_URL = "https://dwqkuwqmlhvplmgwksas.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cWt1d3FtbGh2cGxtZ3drc2FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODM4NjksImV4cCI6MjA3MDM1OTg2OX0._pFblnBzx5cf0SUfAC_w-kmcdFbidZsh23XKXJR98ng";
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
-  });
+  const supabase = (window.supabase && SUPABASE_URL) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-  // ====== UI helpers ======
-  const $ = (id)=>document.getElementById(id);
-  const pad = (n)=> String(n).padStart(5,'0'); // 00001…32767
+  const $ = (id) => document.getElementById(id);
+  const pad5 = (n) => String(n).padStart(5, "0"); // << cinco dígitos
 
   const thresholds = [
     { p: 50,  label: "10% OFF próxima compra" },
@@ -330,24 +325,20 @@ document.addEventListener('DOMContentLoaded', () => {
     tRewards:  $('tRewards'),
     btnSair:   $('btnSair'),
     btnCardQR: $('btnCardQR'),
-    qrCanvas:  $('qrCanvas'), // opcional
-    qrBox:     $('qrBox')     // opcional (div para QR)
+    qrBox:     $('qrBox'),
   };
 
   let currentUser = null;
   let currentMember = null;
 
-  function setInfo(el, msg, tone="") {
-    if(!el) return;
-    el.textContent = msg || "";
-    el.style.color = tone==="error" ? "#ff8080" : tone==="ok" ? "#a2f3c9" : "#cfcfd6";
-  }
+  function setInfo(el, msg, tone=""){ if(!el) return; el.textContent = msg || ""; el.style.color = tone==="error"?"#ff8080": tone==="ok"?"#a2f3c9":"#cfcfd6"; }
 
+  // <<< agora valida 1..32767
   function validateMemberNo(raw){
     const n = parseInt(String(raw).replace(/\D/g,""), 10);
-    if (isNaN(n)) return { ok:false, reason:"Informe um número entre 1 e 32767" };
-    if (n < 1 || n > 32767) return { ok:false, reason:"O número deve ser de 01 até 32767" };
-    return { ok:true, value:n };
+    if (isNaN(n)) return {ok:false, reason:"Informe um número entre 1 e 32767"};
+    if (n<1 || n>32767) return {ok:false, reason:"O número deve ser de 01 até 32767"};
+    return {ok:true, value:n};
   }
 
   function rewardRows(points){
@@ -360,7 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function progressMsg(points){
-    const next = thresholds.find(t => points < t.p);
+    const next = thresholds.find(t=> points < t.p);
     if (!next) return "Você atingiu a faixa máxima de recompensas! 🙌";
     const falta = next.p - points;
     return `Faltam ${falta} ponto(s) para ${next.label}.`;
@@ -369,209 +360,137 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateUIWithMember(m){
     currentMember = m;
     ui.uNome.textContent = m.name || "Cliente";
-    ui.uCard.textContent = pad(m.member_no);
+    ui.uCard.textContent = pad5(m.member_no);   // <<< mostra com 5 dígitos
     ui.uStatus.textContent = m.is_vip ? "VIP" : "Cliente";
-
     const pts = m.points ?? 0;
     ui.uPontos.textContent = pts;
-    const next = thresholds.find(t=> pts < t.p) || thresholds.at(-1);
+
+    const next = thresholds.find(t=> pts < t.p) || thresholds[thresholds.length-1];
     const denom = next ? next.p : 300;
     ui.bar.style.width = Math.max(0, Math.min(100, Math.round((pts/denom)*100))) + "%";
 
     ui.uMensagem.textContent = progressMsg(pts);
     ui.tRewards.innerHTML = rewardRows(pts);
     ui.painel.style.display = "block";
+    if(location.hash !== '#painel') location.hash = '#painel';
   }
 
   function hidePainel(){
     ui.painel.style.display = "none";
     ui.tRewards.innerHTML = "";
-    if (ui.qrCanvas) ui.qrCanvas.style.display = "none";
-    if (ui.qrBox) { ui.qrBox.style.display = "none"; ui.qrBox.innerHTML = ""; }
+    if (ui.qrBox){ ui.qrBox.style.display = "none"; ui.qrBox.innerHTML = ""; }
   }
 
-  // ====== Sessão (rápida) ======
   async function loadSession(){
-    // pega da memória local (rápido)
-    const { data:{ session } } = await supabase.auth.getSession();
-    if (session?.user){
-      currentUser = session.user;
-      await ensureMemberOrPrompt();
-    } else {
-      currentUser = null;
-      hidePainel();
-    }
+    if(!supabase) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    if(session?.user){ currentUser = session.user; await loadMemberProfile(); }
+    else { currentUser = null; hidePainel(); }
   }
 
-  async function ensureMemberOrPrompt(){
+  async function loadMemberProfile(){
+    if(!supabase || !currentUser) return;
     const { data, error } = await supabase
       .from('members')
       .select('id,name,phone,member_no,points,is_vip,created_at')
       .eq('id', currentUser.id)
       .maybeSingle();
 
-    if (error){ console.error(error); hidePainel(); return; }
-
-    if (!data){
-      // logado mas sem linha na members
-      setInfo(ui.loginMsg, 'Conta criada. Finalize o cadastro informando seu nº do cartão.', 'error');
-      const cadEmail = $('cadEmail');
-      if (cadEmail) cadEmail.value = currentUser.email || '';
-      location.hash = '#acesso';
-      hidePainel();
-      return;
-    }
-
+    if(error){ console.error(error); hidePainel(); return; }
+    if(!data){ await supabase.auth.signOut(); hidePainel(); return; }
     updateUIWithMember(data);
-    if (location.hash !== '#painel') location.hash = '#painel';
   }
 
-  supabase.auth.onAuthStateChange(async (_event, session)=>{
-    if (session?.user){ currentUser = session.user; await ensureMemberOrPrompt(); }
-    else { currentUser = null; hidePainel(); }
-  });
-
-  // ====== Login ======
   ui.loginForm?.addEventListener('submit', async (e)=>{
     e.preventDefault();
     setInfo(ui.loginMsg, "Entrando...");
     const email = $('loginEmail').value.trim();
     const password = $('loginPass').value.trim();
-
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error){
-      const msg = /Email not confirmed/i.test(error.message)
-        ? "Confirme seu e-mail antes de entrar."
-        : "E-mail ou senha inválidos.";
-      setInfo(ui.loginMsg, msg, "error");
-      return;
-    }
+    if(error){ setInfo(ui.loginMsg, "E-mail ou senha inválidos.", "error"); return; }
     setInfo(ui.loginMsg, "Login realizado.", "ok");
     currentUser = data.user;
-    await ensureMemberOrPrompt();
+    await loadMemberProfile();
   });
 
-  // ====== Cadastro ======
   ui.cadForm?.addEventListener('submit', async (e)=>{
     e.preventDefault();
     setInfo(ui.cadMsg, "Cadastrando...");
-
     const name = $('cadNome').value.trim();
     const phone = $('cadTelefone').value.trim();
     const email = $('cadEmail').value.trim();
     const password = $('cadPass').value.trim();
     const rawNo = $('cadMemberNo').value.trim();
 
-    if (!name || !email || (!currentUser && !password)){
-      setInfo(ui.cadMsg, "Preencha nome, e-mail e senha.", "error");
-      return;
-    }
+    if(!name || !email || !password){ setInfo(ui.cadMsg, "Preencha nome, e-mail e senha.", "error"); return; }
 
     const v = validateMemberNo(rawNo);
-    if (!v.ok){ setInfo(ui.cadMsg, v.reason, "error"); return; }
+    if(!v.ok){ setInfo(ui.cadMsg, v.reason, "error"); return; }
     const member_no = v.value;
 
-    // se já está logado e só faltava a linha em members
-    let userId = currentUser?.id;
-    if (!userId){
-      const { data:sign, error:signErr } = await supabase.auth.signUp({ email, password });
-      if (signErr){
-        setInfo(ui.cadMsg,
-          signErr.message?.includes("User already registered") ? "Este e-mail já está cadastrado." : "Erro ao criar conta.",
-          "error"
-        );
-        return;
-      }
-      userId = sign.user?.id;
-      if (!userId){
-        setInfo(ui.cadMsg, "Conta criada. Verifique seu e-mail para confirmar e depois faça login.", "ok");
-        return;
-      }
-    }
-
-    const { error:insErr } = await supabase.from('members').insert([{
-      id: userId, name, phone: phone || null, member_no, points: 0, is_vip: false
-    }]);
-
-    if (insErr){
-      if (String(insErr.code) === "23505"){
-        setInfo(ui.cadMsg, "Este número de cartão já está em uso. Escolha outro entre 01 e 32767.", "error");
-      } else if (String(insErr.code) === "23514"){
-        setInfo(ui.cadMsg, "Número fora do intervalo permitido (01–32767).", "error");
-      } else {
-        setInfo(ui.cadMsg, "Não foi possível finalizar o cadastro.", "error");
-      }
+    const { data:sign, error:signErr } = await supabase.auth.signUp({ email, password });
+    if(signErr){
+      setInfo(ui.cadMsg, signErr.message?.includes("User already registered") ? "Este e-mail já está cadastrado." : "Erro ao criar conta.", "error");
       return;
     }
 
-    setInfo(ui.cadMsg, "Cadastro concluído!", "ok");
+    const userId = sign.user?.id;
+    if(!userId){ setInfo(ui.cadMsg, "Conta criada. Verifique seu e-mail para confirmar e depois faça login.", "ok"); return; }
+
+    const { error:insErr } = await supabase.from('members').insert([{ id:userId, name, phone:phone||null, member_no, points:0, is_vip:false }]);
+    if(insErr){
+      if(String(insErr.code) === "23505"){ setInfo(ui.cadMsg, "Este número de cartão já está em uso. Escolha outro entre 01 e 32767.", "error"); }
+      else if(String(insErr.code) === "23514"){ setInfo(ui.cadMsg, "Número fora do intervalo permitido (01–32767).", "error"); }
+      else { setInfo(ui.cadMsg, "Não foi possível finalizar o cadastro.", "error"); }
+      return;
+    }
+
+    setInfo(ui.cadMsg, "Conta criada com sucesso!", "ok");
     await loadSession();
   });
 
-  // ====== Sair (corrigido) ======
   ui.btnSair?.addEventListener('click', async ()=>{
-    try { await supabase.auth.signOut(); } catch {}
+    await supabase.auth.signOut();
     currentUser = null;
     hidePainel();
-    // garante reset visual e âncora
     location.hash = '#acesso';
-    // força limpar qualquer cache da sessão
-    location.reload();
   });
 
-  // ====== QR do cartão (usando qrcode@1.5.3) ======
-  function ensureCanvas(){
-    if (ui.qrCanvas) return ui.qrCanvas;
-    // cria se não existir
-    const c = document.createElement('canvas');
-    c.id = 'qrCanvas';
-    c.style.background = '#fff';
-    c.style.borderRadius = '12px';
-    c.style.padding = '8px';
-    const container = ui.qrBox || ui.painel || document.body;
-    container.appendChild(c);
-    ui.qrCanvas = c;
-    return c;
-  }
-
-  async function showQR(text){
-    const canvas = ensureCanvas();
-    canvas.style.display = 'block';
-    try {
-      await QRCode.toCanvas(canvas, text, { width: 200, margin: 1 });
-    } catch (e) {
-      console.error('QR error', e);
-      alert('Não foi possível gerar o QR. Recarregue a página.');
-    }
-  }
-
+  // QR com 5 dígitos no parâmetro mn
   ui.btnCardQR?.addEventListener('click', ()=>{
-    if (!currentMember) return;
-    const url = `${location.origin}${location.pathname}?mn=${pad(currentMember.member_no)}#acesso`;
-    showQR(url);
+    if(!currentMember) return;
+    const url = `${location.origin}${location.pathname}?mn=${pad5(currentMember.member_no)}#acesso`;
+    if(!ui.qrBox){ alert('Elemento #qrBox não encontrado.'); return; }
+    ui.qrBox.style.display = 'block';
+    ui.qrBox.innerHTML = '';
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 180;
+    ui.qrBox.appendChild(canvas);
+    if(window.QRCode && typeof window.QRCode.toCanvas === 'function'){
+      window.QRCode.toCanvas(canvas, url, { width: 180 }, err => { if(err) console.error(err); });
+    } else {
+      ui.qrBox.innerHTML = '<small style="color:#900">Biblioteca de QRCode não carregada.</small>';
+    }
   });
 
-  // ====== Pré-preenche via ?mn=00001 ======
+  // prefill aceita até 5 dígitos
   (function prefill(){
     const params = new URLSearchParams(location.search);
     const mn = params.get("mn");
-    if (mn){
+    if(mn){
       const el = $('cadMemberNo');
       if (el) el.value = mn.replace(/\D/g,"").slice(0,5);
     }
   })();
 
-  // rodapé
-  if ($('year')) $('year').textContent = new Date().getFullYear();
-
-  // start rápido
+  $('year').textContent = new Date().getFullYear();
   loadSession();
-});
 </script>
 
 </body>
 
 </html>
+
 
 
 
