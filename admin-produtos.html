@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Vita Points • Produtos (Admin)</title>
+  <meta name="theme-color" content="#880c21"/>
+  <link rel="icon" href="icon.ico" type="image/x-icon"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --wine:#880c21; --wine-600:#a11837; --black:#0e0e0f; --gray-900:#17171a; --gray-800:#1a1a1e;
+      --gray-700:#232327; --gray-600:#2a2a2f; --gray-500:#6b6b72; --white:#fff; --radius:16px;
+      --shadow:0 10px 30px rgba(0,0,0,.35); --ok:#21d07a; --warn:#e2b93b; --danger:#ff5d5d;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; color:var(--white); background:linear-gradient(180deg,var(--black),var(--gray-900) 35%, #0b0b0c)}
+    a{color:inherit; text-decoration:none}
+    small.muted{color:#cfcfd6}
+
+    header{position:sticky; top:0; z-index:40; backdrop-filter:saturate(140%) blur(8px); background:rgba(13,13,15,.7); border-bottom:1px solid rgba(255,255,255,.06)}
+    .topbar{max-width:1280px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; gap:12px}
+    .brand{display:flex; align-items:center; gap:10px}
+    .brand img{height:40px}
+    .brand b{font-family:"Playfair Display",serif; font-size:1.1rem}
+    .topbar .grow{flex:1}
+    .search{display:flex; gap:8px; align-items:center; background:#131316; border:1px solid rgba(255,255,255,.08); padding:8px 10px; border-radius:12px; min-width:260px}
+    .search input, .search select{background:transparent; border:none; outline:0; color:#fff; width:100%}
+    .btn{display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:12px; font-weight:600; border:1px solid rgba(255,255,255,.14); background:#19191d; cursor:pointer}
+    .btn.primary{background:var(--wine); border-color:rgba(255,255,255,.12)}
+    .btn.danger{background:#3a1717; border-color:#612}
+    .btn:hover{filter:brightness(1.06)}
+
+    .layout{max-width:1280px; margin:20px auto; padding:0 20px; display:grid; grid-template-columns:360px 1fr; gap:18px}
+    .panel{background:linear-gradient(180deg,#141416,#101013); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); overflow:hidden}
+    .panel .p{padding:16px}
+    .headline{font-family:"Playfair Display",serif; font-size:1.3rem; margin:0 0 10px}
+    .muted{color:#cfcfd6}
+
+    .list{max-height:72vh; overflow:auto; border-top:1px solid rgba(255,255,255,.06)}
+    .row{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 14px; border-bottom:1px solid rgba(255,255,255,.06); cursor:pointer}
+    .row:hover{background:#15151a}
+    .row.active{background:#1a1a20}
+    .tag{background:rgba(136,12,33,.22); border:1px solid rgba(136,12,33,.55); padding:3px 8px; border-radius:999px; font-size:.78rem}
+
+    .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+    .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+    .grid-auto{display:grid; grid-template-columns:2fr 1fr 1fr; gap:12px}
+
+    .field{display:flex; flex-direction:column; gap:6px}
+    .field label{font-size:.9rem; color:#e9e9ea}
+    .input, select, textarea{width:100%; padding:10px 12px; border-radius:12px; background:#121214; color:#fff; border:1px solid rgba(255,255,255,.12); outline:none}
+    .input:focus, select:focus, textarea:focus{border-color:rgba(255,255,255,.26)}
+    textarea{min-height:100px; resize:vertical}
+
+    table{width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:14px; border:1px solid rgba(255,255,255,.08)}
+    th,td{padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.06); text-align:left; vertical-align:middle}
+    th{background:#161618; font-weight:600}
+    tr:last-child td{border-bottom:none}
+    .ok{color:var(--ok)} .warn{color:var(--warn)} .danger{color:var(--danger)}
+
+    .toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .inline{display:flex; gap:8px; align-items:center}
+
+    /* Login */
+    #loginWrap{position:fixed; inset:0; display:none; align-items:center; justify-content:center; padding:24px;
+      background:radial-gradient(100% 100% at 50% 0%, rgba(136,12,33,.18), transparent 50%), linear-gradient(180deg,#0b0b0c,#0f0f12);
+      z-index:100; transition:opacity .2s ease;}
+    #loginCard{width:100%; max-width:520px; background:linear-gradient(180deg,#151518,#0f0f11);
+      border:1px solid rgba(255,255,255,.08); border-radius:16px; box-shadow:var(--shadow); padding:22px;}
+    #loginHead{display:flex; gap:12px; align-items:center; margin-bottom:10px}
+    #loginHead img{width:36px; height:36px}
+    #loginHead b{font-family:"Playfair Display",serif; font-size:1.3rem}
+    #loginMsg{margin-top:6px; color:#cfcfd6}
+    .pill{display:inline-block; padding:4px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:#16161a; font-size:.82rem}
+
+    @media (max-width:1050px){
+      .layout{grid-template-columns:1fr}
+      .list{max-height:none}
+    }
+  </style>
+</head>
+<body>
+  <!-- LOGIN -->
+  <section id="loginWrap">
+    <div id="loginCard">
+      <div id="loginHead">
+        <img src="icon.png" alt="Vita Septem"/>
+        <div>
+          <b>Vita – Produtos (Admin)</b>
+          <div class="muted" style="font-size:.9rem">Acesse sua conta para gerenciar produtos, imagens e tamanhos.</div>
+        </div>
+      </div>
+      <form id="formLogin" class="grid-2" autocomplete="on" novalidate>
+        <div class="field" style="grid-column:span 2">
+          <label for="loginEmail">E-mail</label>
+          <input id="loginEmail" type="email" class="input" placeholder="seu@email.com" required>
+        </div>
+        <div class="field" style="grid-column:span 2">
+          <label for="loginPass">Senha</label>
+          <input id="loginPass" type="password" class="input" placeholder="••••••••" required>
+        </div>
+        <div class="toolbar" style="grid-column:span 2; margin-top:4px">
+          <button class="btn primary" type="submit">Entrar</button>
+          <span id="loginMsg" class="pill">—</span>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <header>
+    <div class="topbar">
+      <div class="brand"><img src="icon.png" alt=""><b>Vita – Produtos</b></div>
+      <div class="grow">
+        <div class="search">
+          <input id="q" placeholder="Buscar por título ou SKU">
+          <select id="fCat" style="max-width:180px">
+            <option value="">Todas as categorias</option>
+            <option value="principal">Principal</option>
+            <option value="alfaiataria">Alfaiataria</option>
+            <option value="acessorios">Acessórios</option>
+          </select>
+          <button id="btnBuscar" class="btn">Buscar</button>
+          <button id="btnClear" class="btn">Limpar</button>
+        </div>
+      </div>
+      <button id="btnNovo" class="btn">Novo produto</button>
+      <button id="btnRefresh" class="btn">Atualizar</button>
+      <button id="btnSair" class="btn">Sair</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- Lista -->
+    <aside class="panel">
+      <div class="p">
+        <h3 class="headline">Produtos</h3>
+        <div class="muted" id="listHint">—</div>
+      </div>
+      <div class="list" id="list"></div>
+    </aside>
+
+    <!-- Editor -->
+    <section class="panel">
+      <div class="p">
+        <h3 class="headline">Detalhes do produto</h3>
+        <div class="grid-3">
+          <div class="field"><label>Título</label><input id="pTitle" class="input" placeholder="Nome do produto"></div>
+          <div class="field"><label>SKU</label><input id="pSku" class="input" placeholder="VS-XXX-000"></div>
+          <div class="field"><label>Categoria</label>
+            <select id="pCat" class="input">
+              <option value="principal">Principal</option>
+              <option value="alfaiataria">Alfaiataria</option>
+              <option value="acessorios">Acessórios</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-3" style="margin-top:10px">
+          <div class="field"><label>Slug</label><input id="pSlug" class="input" placeholder="ex.: camisa-classic"></div>
+          <div class="field"><label>Preço</label><input id="pPrice" class="input" inputmode="decimal" placeholder="0,00"></div>
+          <div class="field"><label>Preço antes (opcional)</label><input id="pCompare" class="input" inputmode="decimal" placeholder="0,00"></div>
+        </div>
+
+        <div class="grid-3" style="margin-top:10px">
+          <div class="field"><label>Badge (rótulo)</label><input id="pBadge" class="input" placeholder="Novo, Best seller, Edição 2026..."></div>
+          <div class="field"><label>Ordenação</label><input id="pSort" class="input" inputmode="numeric" placeholder="0"></div>
+          <div class="field"><label>Status</label>
+            <div class="inline"><input type="checkbox" id="pActive"><label for="pActive">Ativo (visível na loja)</label></div>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:10px">
+          <label>Descrição</label>
+          <textarea id="pDesc" class="input" placeholder="Detalhes, tecido, caimento..."></textarea>
+        </div>
+
+        <div class="toolbar" style="margin-top:12px">
+          <button id="btnSalvarTudo" class="btn primary">Salvar tudo</button>
+          <button id="btnDuplicar" class="btn">Duplicar</button>
+          <button id="btnExcluir" class="btn danger">Excluir</button>
+          <span id="formMsg" class="muted">—</span>
+        </div>
+      </div>
+
+      <div class="p">
+        <h3 class="headline">Imagens</h3>
+        <small class="muted">Use URLs (ex.: do Supabase Storage ou CDN). Marque uma como principal.</small>
+        <table>
+          <thead>
+            <tr><th style="width:45%">URL</th><th>ALT</th><th>Principal</th><th>Ordem</th><th></th></tr>
+          </thead>
+          <tbody id="tbImgs"></tbody>
+        </table>
+        <div class="toolbar" style="margin-top:10px">
+          <button id="btnAddImg" class="btn">Adicionar imagem</button>
+        </div>
+      </div>
+
+      <div class="p">
+        <h3 class="headline">Tamanhos</h3>
+        <small class="muted">Ex.: P, M, G, GG, 38, 40...</small>
+        <table>
+          <thead>
+            <tr><th>Label</th><th>Ordem</th><th></th></tr>
+          </thead>
+          <tbody id="tbSizes"></tbody>
+        </table>
+        <div class="toolbar" style="margin-top:10px">
+          <button id="btnAddSize" class="btn">Adicionar tamanho</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // ====== Supabase config ======
+    const SUPABASE_URL = "https://dwqkuwqmlhvplmgwksas.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cWt1d3FtbGh2cGxtZ3drc2FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODM4NjksImV4cCI6MjA3MDM1OTg2OX0._pFblnBzx5cf0SUfAC_w-kmcdFbidZsh23XKXJR98ng";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:false } });
+
+    // ====== Helpers ======
+    const el = (id)=>document.getElementById(id);
+    const setInfo = (t, msg, tone="")=>{ t.textContent = msg; t.style.color = tone==="error"?"#ff8080": tone==="ok"?"#a2f3c9":"#cfcfd6"; };
+    const toCents = (str)=> {
+      if(!str) return 0;
+      const n = String(str).replace(/\./g,'').replace(',', '.').replace(/[^0-9.-]/g,'');
+      const num = Number(n);
+      if(isNaN(num)) return 0;
+      return Math.round(num*100);
+    };
+    const fromCents = (c)=> (Number(c||0)/100).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+    const slugify = (s)=> s.toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'') // remove acentos
+      .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80);
+
+    // ====== State ======
+    let products = [];
+    let current = null; // produto selecionado (obj inteiro)
+    let imgs = [];      // imagens em edição (array de objetos)
+    let sizes = [];     // tamanhos em edição (array de objetos)
+
+    // ====== Login overlay ======
+    function showLogin(msg){ el('loginWrap').style.display='flex'; setInfo(el('loginMsg'), msg||"—"); }
+    function hideLogin(){ el('loginWrap').style.display='none'; }
+
+    async function boot(){
+      const { data:{ session } } = await supabase.auth.getSession();
+      if(!session){ showLogin('—'); return; }
+      hideLogin(); await loadList();
+    }
+
+    el('formLogin').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const email = el('loginEmail').value.trim();
+      const password = el('loginPass').value.trim();
+      setInfo(el('loginMsg'), 'Entrando…');
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if(error){ setInfo(el('loginMsg'), 'E-mail ou senha inválidos.', 'error'); return; }
+      setInfo(el('loginMsg'), 'OK! Carregando…', 'ok');
+      hideLogin(); await loadList();
+    });
+
+    el('btnSair').onclick = async ()=>{ await supabase.auth.signOut(); showLogin('Sessão encerrada.'); };
+
+    // ====== Listagem ======
+    function renderList(list){
+      const box = el('list'); box.innerHTML = '';
+      if(!list.length){ el('listHint').textContent = 'Sem produtos'; return; }
+      el('listHint').textContent = `${list.length} produto(s)`;
+      list.sort((a,b)=> (a.sort_order||0)-(b.sort_order||0) || a.title.localeCompare(b.title));
+      list.forEach(p=>{
+        const row = document.createElement('div');
+        row.className = 'row'; row.dataset.id = p.id;
+        row.innerHTML = `
+          <div style="display:flex; flex-direction:column">
+            <b>${p.title||'—'}</b>
+            <small class="muted">SKU ${p.sku||'—'} • ${p.category||'—'}</small>
+          </div>
+          <div class="tag">${fromCents(p.price_cents)}</div>`;
+        row.onclick = ()=> selectProduct(p.id);
+        box.appendChild(row);
+      });
+      markActive(current?.id);
+    }
+
+    function markActive(id){
+      document.querySelectorAll('.row').forEach(r=> r.classList.toggle('active', r.dataset.id===id));
+    }
+
+    async function loadList(){
+      const q = el('q').value.trim();
+      const fCat = el('fCat').value;
+      let query = supabase.from('products')
+        .select('id, sku, title, category, price_cents, sort_order, is_active')
+        .order('sort_order',{ascending:true});
+      if(q){
+        query = query.or(`title.ilike.%${q}%,sku.ilike.%${q}%`);
+      }
+      if(fCat){
+        query = query.eq('category', fCat);
+      }
+      const { data, error } = await query;
+      if(error){ console.error(error); alert('Erro ao carregar.'); return; }
+      products = data||[];
+      renderList(products);
+      if(current){
+        // atualiza detalhes do selecionado (se ainda existir)
+        const still = products.find(p=> p.id === current.id);
+        if(still) selectProduct(current.id); else clearForm();
+      }
+    }
+
+    // ====== Editor (carregar/limpar) ======
+    function clearForm(){
+      current = null;
+      el('pTitle').value = '';
+      el('pSku').value = '';
+      el('pCat').value = 'principal';
+      el('pSlug').value = '';
+      el('pPrice').value = '';
+      el('pCompare').value = '';
+      el('pBadge').value = '';
+      el('pSort').value = '0';
+      el('pActive').checked = true;
+      el('pDesc').value = '';
+      imgs = []; sizes = [];
+      renderImgs(); renderSizes();
+      setInfo(el('formMsg'), 'Novo produto', '');
+      markActive(null);
+    }
+
+    function fillForm(p){
+      current = p;
+      el('pTitle').value = p.title||'';
+      el('pSku').value = p.sku||'';
+      el('pCat').value = p.category||'principal';
+      el('pSlug').value = p.slug||'';
+      el('pPrice').value = (Number(p.price_cents||0)/100).toLocaleString('pt-BR',{minimumFractionDigits:2});
+      el('pCompare').value = (Number(p.compare_at_cents||0)/100 || 0).toLocaleString('pt-BR',{minimumFractionDigits:2});
+      el('pBadge').value = p.badge||'';
+      el('pSort').value = p.sort_order||0;
+      el('pActive').checked = !!p.is_active;
+      el('pDesc').value = p.description||'';
+    }
+
+    async function selectProduct(id){
+      markActive(id);
+      setInfo(el('formMsg'), 'Carregando…');
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          id, sku, title, category, slug, description, price_cents, compare_at_cents, badge, sort_order, is_active,
+          product_images ( url, alt, is_primary, sort_order ),
+          product_sizes ( label, sort_order )
+        `)
+        .eq('id', id).maybeSingle();
+      if(error || !data){ alert('Não foi possível carregar.'); return; }
+      fillForm(data);
+      imgs = (data.product_images||[]).map(o=> ({...o}));
+      sizes = (data.product_sizes||[]).map(o=> ({...o}));
+      renderImgs(); renderSizes();
+      setInfo(el('formMsg'), 'Pronto', 'ok');
+    }
+
+    // ====== Imagens (UI) ======
+    function renderImgs(){
+      const tb = el('tbImgs'); tb.innerHTML = '';
+      if(!imgs.length){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="5" class="muted">Nenhuma imagem</td>`;
+        tb.appendChild(tr); return;
+      }
+      imgs.sort((a,b)=> (a.sort_order||0)-(b.sort_order||0));
+      imgs.forEach((im, idx)=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><input class="input" value="${im.url||''}" data-k="url"></td>
+          <td><input class="input" value="${im.alt||''}" data-k="alt"></td>
+          <td style="text-align:center">
+            <input type="radio" name="primary" ${im.is_primary?'checked':''} data-k="is_primary">
+          </td>
+          <td style="width:100px"><input class="input" inputmode="numeric" value="${im.sort_order??idx}" data-k="sort_order"></td>
+          <td style="width:46px"><button class="btn" data-act="rem">Remover</button></td>`;
+        // events por linha
+        tr.addEventListener('input', (e)=>{
+          const k = e.target.dataset.k; if(!k) return;
+          if(k==='is_primary'){
+            imgs.forEach(x=> x.is_primary=false);
+            im.is_primary = true;
+            // re-render radios
+            renderImgs(); return;
+          }
+          if(k==='sort_order'){ im[k] = parseInt(e.target.value||'0',10) || 0; }
+          else{ im[k] = e.target.value; }
+        });
+        tr.addEventListener('click',(e)=>{
+          if(e.target.dataset.act==='rem'){
+            imgs = imgs.filter(x=> x!==im);
+            renderImgs();
+          }
+        });
+        tb.appendChild(tr);
+      });
+    }
+    el('btnAddImg').onclick = ()=>{
+      imgs.push({ url:'', alt:'', is_primary: imgs.length===0, sort_order: imgs.length });
+      renderImgs();
+    };
+
+    // ====== Tamanhos (UI) ======
+    function renderSizes(){
+      const tb = el('tbSizes'); tb.innerHTML = '';
+      if(!sizes.length){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="3" class="muted">Nenhum tamanho</td>`;
+        tb.appendChild(tr); return;
+      }
+      sizes.sort((a,b)=> (a.sort_order||0)-(b.sort_order||0));
+      sizes.forEach((s, idx)=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><input class="input" value="${s.label||''}" data-k="label"></td>
+          <td style="width:120px"><input class="input" inputmode="numeric" value="${s.sort_order??idx}" data-k="sort_order"></td>
+          <td style="width:46px"><button class="btn" data-act="rem">Remover</button></td>`;
+        tr.addEventListener('input',(e)=>{
+          const k = e.target.dataset.k; if(!k) return;
+          if(k==='sort_order'){ s[k] = parseInt(e.target.value||'0',10) || 0; }
+          else{ s[k] = e.target.value; }
+        });
+        tr.addEventListener('click',(e)=>{
+          if(e.target.dataset.act==='rem'){
+            sizes = sizes.filter(x=> x!==s);
+            renderSizes();
+          }
+        });
+        tb.appendChild(tr);
+      });
+    }
+    el('btnAddSize').onclick = ()=>{
+      sizes.push({ label:'', sort_order: sizes.length });
+      renderSizes();
+    };
+
+    // ====== Ler/validar form ======
+    function readForm(){
+      const title = el('pTitle').value.trim();
+      const sku = el('pSku').value.trim();
+      const category = el('pCat').value;
+      let slug = el('pSlug').value.trim();
+      if(!slug && title) slug = slugify(title);
+      const price_cents = toCents(el('pPrice').value);
+      const compare_at_cents = toCents(el('pCompare').value);
+      const badge = el('pBadge').value.trim() || null;
+      const sort_order = parseInt(el('pSort').value||'0',10) || 0;
+      const is_active = el('pActive').checked;
+      const description = el('pDesc').value.trim() || null;
+
+      if(!title){ throw new Error('Informe o título.'); }
+      if(!sku){ throw new Error('Informe o SKU.'); }
+      if(!price_cents || price_cents<0){ throw new Error('Preço inválido.'); }
+
+      return { title, sku, category, slug, price_cents, compare_at_cents, badge, sort_order, is_active, description };
+    }
+
+    // ====== Salvar tudo (produto + imagens + tamanhos) ======
+    async function saveAll(){
+      setInfo(el('formMsg'), 'Salvando…');
+      // valida imagens/tamanhos mínimos se quiser
+      // normaliza imagens vazias
+      imgs = imgs.filter(i=> (i.url||'').trim()!=='').map(i=> ({
+        url: (i.url||'').trim(), alt:(i.alt||'').trim()||null,
+        is_primary: !!i.is_primary, sort_order: parseInt(i.sort_order||0,10)||0
+      }));
+      // normaliza sizes
+      sizes = sizes.filter(s=> (s.label||'').trim()!=='').map(s=> ({
+        label:(s.label||'').trim(), sort_order: parseInt(s.sort_order||0,10)||0
+      }));
+
+      let prod = readForm();
+
+      if(current && current.id){
+        // update
+        const { error: e1 } = await supabase.from('products').update(prod).eq('id', current.id);
+        if(e1) throw e1;
+        const pid = current.id;
+        // imagens: delete + insert
+        const { error: d1 } = await supabase.from('product_images').delete().eq('product_id', pid);
+        if(d1) throw d1;
+        if(imgs.length){
+          const payload = imgs.map(i=> ({ product_id: pid, ...i }));
+          const { error: i1 } = await supabase.from('product_images').insert(payload);
+          if(i1) throw i1;
+        }
+        // sizes: delete + insert
+        const { error: d2 } = await supabase.from('product_sizes').delete().eq('product_id', pid);
+        if(d2) throw d2;
+        if(sizes.length){
+          const payload2 = sizes.map(s=> ({ product_id: pid, ...s }));
+          const { error: s1 } = await supabase.from('product_sizes').insert(payload2);
+          if(s1) throw s1;
+        }
+        setInfo(el('formMsg'), 'Salvo com sucesso.', 'ok');
+      }else{
+        // insert
+        const { data:ins, error:e2 } = await supabase.from('products').insert(prod).select('id').single();
+        if(e2) throw e2;
+        const pid = ins.id;
+        if(imgs.length){
+          const payload = imgs.map(i=> ({ product_id: pid, ...i }));
+          const { error:i2 } = await supabase.from('product_images').insert(payload);
+          if(i2) throw i2;
+        }
+        if(sizes.length){
+          const payload2 = sizes.map(s=> ({ product_id: pid, ...s }));
+          const { error:s2 } = await supabase.from('product_sizes').insert(payload2);
+          if(s2) throw s2;
+        }
+        setInfo(el('formMsg'), 'Criado com sucesso.', 'ok');
+        await loadList();
+        await selectProduct(pid);
+      }
+      await loadList();
+    }
+
+    // ====== Duplicar / Excluir ======
+    async function duplicateProduct(){
+      if(!current) return;
+      const data = readForm();
+      data.title = data.title + ' (cópia)';
+      data.slug = slugify(data.slug + '-copia');
+      const { data:ins, error } = await supabase.from('products').insert(data).select('id').single();
+      if(error){ alert('Falha ao duplicar.'); return; }
+      const pid = ins.id;
+      if(imgs.length){
+        const payload = imgs.map(i=> ({ product_id: pid, url:i.url, alt:i.alt, is_primary:i.is_primary, sort_order:i.sort_order }));
+        await supabase.from('product_images').insert(payload);
+      }
+      if(sizes.length){
+        const payload2 = sizes.map(s=> ({ product_id: pid, label:s.label, sort_order:s.sort_order }));
+        await supabase.from('product_sizes').insert(payload2);
+      }
+      await loadList(); await selectProduct(pid);
+      setInfo(el('formMsg'), 'Cópia criada.', 'ok');
+    }
+
+    async function deleteProduct(){
+      if(!current){ return; }
+      if(!confirm('Excluir este produto? Esta ação não pode ser desfeita.')) return;
+      const pid = current.id;
+      // apaga filhos primeiro
+      await supabase.from('product_images').delete().eq('product_id', pid);
+      await supabase.from('product_sizes').delete().eq('product_id', pid);
+      const { error } = await supabase.from('products').delete().eq('id', pid);
+      if(error){ alert('Falha ao excluir.'); return; }
+      clearForm(); await loadList();
+      setInfo(el('formMsg'), 'Produto excluído.', 'ok');
+    }
+
+    // ====== Eventos gerais ======
+    el('btnRefresh').onclick = loadList;
+    el('btnBuscar').onclick = loadList;
+    el('btnClear').onclick = ()=>{ el('q').value=''; el('fCat').value=''; loadList(); };
+    el('btnNovo').onclick = clearForm;
+    el('btnSalvarTudo').onclick = ()=> saveAll().catch(err=> setInfo(el('formMsg'), 'Erro: '+(err?.message||err), 'error'));
+    el('btnDuplicar').onclick = ()=> duplicateProduct().catch(err=> setInfo(el('formMsg'), 'Erro: '+(err?.message||err), 'error'));
+    el('btnExcluir').onclick = deleteProduct;
+    el('pTitle').addEventListener('input', ()=>{
+      const t = el('pTitle').value.trim();
+      if(!el('pSlug').value.trim()){ el('pSlug').value = slugify(t); }
+    });
+
+    // enter na busca
+    el('q').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ loadList(); } });
+
+    // start
+    boot();
+  </script>
+</body>
+</html>
