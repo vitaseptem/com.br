@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vita Septem – Conheça a Marca</title>
+  <meta name="description" content="História da Vita Septem, inspiração do nome e bastidores da criação das peças. Linha do tempo, valores e equipe." />
+  <meta name="theme-color" content="#880c21" />
+  <!-- Open Graph -->
+  <meta property="og:title" content="Vita Septem – Conheça a Marca" />
+  <meta property="og:description" content="Nossa história, propósito e bastidores. Elegância discreta como estilo de vida." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="icon.png" />
+  <meta property="og:locale" content="pt_BR" />
+  <!-- Fonts & Favicon -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="icon.ico">
+
+  <style>
+    :root{
+      --wine:#880c21; --wine-600:#a11837; --black:#0e0e0f; --gray-900:#17171a; --gray-800:#1c1c20; --gray-700:#232327;
+      --gray-600:#34343a; --gray-500:#8c8c94; --white:#ffffff; --muted:#cfcfd6;
+      --radius:18px; --shadow:0 10px 30px rgba(0,0,0,.35); --success:#25D366;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--white); background:linear-gradient(180deg,var(--black),var(--gray-900) 35%, #0b0b0c);
+      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    }
+    a{color:inherit; text-decoration:none}
+    .container{max-width:1200px; margin:0 auto; padding:0 20px}
+
+    /* Header */
+    header{position:sticky; top:0; z-index:70; backdrop-filter:saturate(140%) blur(8px);
+      background:rgba(13,13,15,.7); border-bottom:1px solid rgba(255,255,255,.06)}
+    .nav{display:flex; align-items:center; justify-content:center; padding:18px 0}
+    .brand{display:flex; align-items:center; gap:12px}
+    .brand img{height:110px; width:auto; object-fit:contain}
+
+    /* Hero */
+    .hero{position:relative; overflow:hidden; isolation:isolate}
+    .hero::before{
+      content:""; position:absolute; inset:-20%;
+      background:
+        radial-gradient(80% 60% at 70% 20%, rgba(136,12,33,.35), transparent 60%),
+        radial-gradient(60% 40% at 10% 10%, rgba(255,255,255,.08), transparent 60%);
+      z-index:-1; filter:blur(10px)
+    }
+    .hero-grid{display:grid; grid-template-columns:1.1fr .9fr; gap:36px; align-items:center; padding:64px 0}
+    .kicker{color:#e9e9ea; letter-spacing:.14em; text-transform:uppercase; font-size:.82rem}
+    h1{margin:.35rem 0 1rem; font-family:"Playfair Display",serif; font-weight:700;
+       font-size:clamp(2.1rem, 3.2vw + 1rem, 3.6rem); line-height:1.05;}
+    .lead{color:#d9d9dd; font-size:1.05rem; max-width:52ch}
+    .btn{display:inline-flex; align-items:center; gap:10px; padding:12px 18px; border-radius:14px; font-weight:600;
+         background:var(--wine); border:1px solid rgba(255,255,255,.1); box-shadow:var(--shadow);
+         transition:transform .15s ease, background .2s ease;}
+    .btn:hover{background:var(--wine-600); transform:translateY(-1px)}
+    .btn.secondary{background:transparent; border-color:rgba(255,255,255,.18)}
+    .btn.ghost{background:#1a1a1e; border:1px solid rgba(255,255,255,.12)}
+    .hero-visual{background:linear-gradient(180deg,#141416,#0d0d0f);
+      border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); min-height:360px;
+      display:grid; place-items:center; position:relative; overflow:hidden}
+    .hero-visual img{width:100%; height:100%; object-fit:cover}
+    .tag{position:absolute; top:14px; right:14px; padding:6px 10px; border-radius:999px;
+      background:rgba(136,12,33,.18); border:1px solid rgba(136,12,33,.5); font-size:.78rem}
+
+    /* Sections */
+    section{padding:56px 0}
+    .section-title{font-family:"Playfair Display",serif; font-weight:700; font-size:2rem; margin:0 0 14px}
+    .muted{color:var(--muted); margin:0 0 26px}
+    .grid{display:grid; gap:18px; grid-template-columns:repeat(12,1fr)}
+
+    /* Story / Manifesto */
+    .panel{background:linear-gradient(180deg,#141416,#101013); border:1px solid rgba(255,255,255,.08);
+      border-radius:18px; padding:18px}
+    .values{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+    .value{background:#121214; border:1px solid rgba(255,255,255,.10); border-radius:14px; padding:14px}
+    .value h4{margin:0 0 6px}
+
+    /* Timeline */
+    .timeline{position:relative; margin-top:8px}
+    .timeline::before{content:""; position:absolute; left:20px; top:0; bottom:0; width:2px; background:rgba(255,255,255,.12)}
+    .event{position:relative; margin-left:50px; margin-bottom:16px; padding:14px; border-radius:14px;
+      background:linear-gradient(180deg,#151517,#121214); border:1px solid rgba(255,255,255,.08)}
+    .event .dot{position:absolute; left:-34px; top:16px; width:12px; height:12px; border-radius:999px; background:var(--wine); box-shadow:var(--shadow)}
+    .event .year{font-weight:700; color:#fff}
+    .event .title{margin:.2rem 0 .4rem; font-weight:600}
+    .event .desc{color:#dcdce3}
+
+    /* Gallery */
+    .gallery{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+    .gallery img{width:100%; height:220px; object-fit:cover; border-radius:14px; border:1px solid rgba(255,255,255,.08); cursor:pointer}
+
+    /* Team */
+    .team{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
+    .member{background:linear-gradient(180deg,#141416,#101013); border:1px solid rgba(255,255,255,.08);
+      border-radius:16px; overflow:hidden}
+    .member .ph{height:220px; background:#0f0f11}
+    .member .ph img{width:100%; height:100%; object-fit:cover}
+    .member .p{padding:14px}
+    .role{color:#cfcfd6; font-size:.95rem}
+
+    /* FAQ */
+    details.faq{background:linear-gradient(180deg,#141416,#101013); border:1px solid rgba(255,255,255,.08);
+      border-radius:16px; padding:14px 16px}
+    details.faq:not(:last-child){margin-bottom:12px}
+    details.faq summary{cursor:pointer; font-weight:600}
+
+    /* Modal (Gallery) */
+    .modal{position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.7); z-index:120}
+    .modal.open{display:grid}
+    .modal .box{max-width:980px; width:92vw; background:#101013; border:1px solid rgba(255,255,255,.12);
+                border-radius:16px; overflow:hidden}
+    .modal .slides{position:relative}
+    .modal img{width:100%; height:70vh; object-fit:cover; background:#0b0b0c}
+    .modal .ctrl{position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,.5);
+                 border:1px solid rgba(255,255,255,.2); padding:12px; border-radius:12px; cursor:pointer}
+    .modal .prev{left:12px} .modal .next{right:12px}
+    .modal .close{position:absolute; top:12px; right:12px; background:#000; border:1px solid rgba(255,255,255,.25); padding:8px 10px; border-radius:10px; cursor:pointer}
+
+    /* WhatsApp FAB */
+    .fab{position:fixed; right:18px; bottom:18px; background:var(--success); color:#000; font-weight:700;
+      padding:12px 14px; border-radius:999px; box-shadow:var(--shadow); z-index:130}
+
+    /* Footer */
+    footer{border-top:1px solid rgba(255,255,255,.08); padding:28px 0 60px; color:var(--muted)}
+    .brand-small{display:flex; gap:10px; align-items:center}
+    .brand-small img{width:28px; height:28px}
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .hero-grid{grid-template-columns:1fr; padding:44px 0}
+      .values{grid-template-columns:1fr 1fr}
+      .team{grid-template-columns:1fr 1fr}
+      .gallery{grid-template-columns:1fr 1fr}
+      .brand img{height:76px}
+    }
+    @media (max-width: 640px){
+      .values{grid-template-columns:1fr}
+      .team{grid-template-columns:1fr}
+      .gallery{grid-template-columns:1fr}
+      .brand img{height:64px}
+    }
+  </style>
+
+  <!-- JSON-LD (Organization) -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Organization",
+    "name":"Vita Septem – Men's Fashion",
+    "url":"https://vitaseptem.github.io/com.br",
+    "logo":"icon.png",
+    "sameAs":["https://www.instagram.com/vitaseptem"],
+    "address":{"@type":"PostalAddress","addressLocality":"São João do Caru","addressRegion":"MA","addressCountry":"BR"}
+  }
+  </script>
+</head>
+<body>
+  <!-- FAB WhatsApp -->
+  <a href="https://wa.me/5599981543912?text=Quero%20conhecer%20mais%20sobre%20a%20Vita%20Septem" class="fab" aria-label="Falar no WhatsApp">WhatsApp</a>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <a class="brand" href="index.html#hero" aria-label="Ir para o início">
+        <img src="icon2.png" alt="Logo Vita Septem">
+      </a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section id="hero" class="hero" aria-label="Conheça a Marca">
+    <div class="container hero-grid">
+      <div>
+        <div class="kicker" id="heroBadge">Sobre a marca</div>
+        <h1 id="heroTitle">Elegância que fala baixo.</h1>
+        <p class="lead" id="heroLead">Vita Septem nasce da ideia de que presença não precisa gritar. É sobre caimento, propósito e respeito.</p>
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:22px">
+          <a href="#historia" class="btn">Nossa história</a>
+          <a href="index.html#colecao" class="btn secondary">Ver coleção</a>
+        </div>
+      </div>
+      <div class="hero-visual" role="img" aria-label="Bastidores Vita Septem">
+        <span class="tag" id="heroTag">Fundada no Maranhão</span>
+        <img id="heroImg" src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1600&auto=format&fit=crop" alt="Conheça a Marca – Vita Septem">
+      </div>
+    </div>
+  </section>
+
+  <!-- HISTÓRIA -->
+  <section id="historia" aria-labelledby="ttl-historia">
+    <div class="container">
+      <h2 class="section-title" id="ttl-historia">Nossa história</h2>
+      <div class="panel">
+        <div id="storyHtml" class="muted" style="white-space:pre-wrap">
+          A Vita Septem começou com uma pergunta simples: como vestir bem sem exagero?
+          De São João do Caru para o mundo, seguimos buscando peças com caimento honesto,
+          materiais que duram e uma estética que respeita o ambiente: culto, trabalho, família.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MANIFESTO / VALORES -->
+  <section id="manifesto" aria-labelledby="ttl-manifesto">
+    <div class="container">
+      <h2 class="section-title" id="ttl-manifesto">Manifesto</h2>
+      <p class="muted">O que defendemos — e como isso aparece nas peças.</p>
+      <div class="values" id="valuesGrid">
+        <!-- valores via Supabase -->
+      </div>
+    </div>
+  </section>
+
+  <!-- LINHA DO TEMPO -->
+  <section id="timeline" aria-labelledby="ttl-time">
+    <div class="container">
+      <h2 class="section-title" id="ttl-time">Linha do tempo</h2>
+      <p class="muted">Marcos importantes da nossa trajetória.</p>
+      <div class="timeline" id="timeList">
+        <!-- events -->
+      </div>
+    </div>
+  </section>
+
+  <!-- BASTIDORES / GALERIA -->
+  <section id="bastidores" aria-labelledby="ttl-gal">
+    <div class="container">
+      <h2 class="section-title" id="ttl-gal">Bastidores</h2>
+      <p class="muted">Cortes, provas e ajustes que tornam cada peça especial.</p>
+      <div class="gallery" id="galGrid"></div>
+    </div>
+  </section>
+
+  <!-- EQUIPE -->
+  <section id="equipe" aria-labelledby="ttl-team">
+    <div class="container">
+      <h2 class="section-title" id="ttl-team">Equipe</h2>
+      <p class="muted">Gente real, trabalho sério.</p>
+      <div class="team" id="teamGrid"></div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section aria-labelledby="ttl-faq">
+    <div class="container">
+      <h2 class="section-title" id="ttl-faq">Perguntas frequentes</h2>
+      <div id="faqList"></div>
+    </div>
+  </section>
+
+  <!-- CONTATO/LOCAL -->
+  <section aria-label="Informações de contato e localização">
+    <div class="container" style="display:grid; grid-template-columns:1.2fr .8fr; gap:22px">
+      <div>
+        <h3 class="section-title" style="margin-top:0">Visite a loja</h3>
+        <p class="muted">Rua Nova, Centro – São João do Caru / MA<br/>Seg–Sáb: 9h às 19h</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap">
+          <a class="btn ghost" href="https://wa.me/5599981543912?text=Quero%20conhecer%20mais%20sobre%20a%20Vita%20Septem">WhatsApp</a>
+          <a class="btn ghost" href="https://www.instagram.com/vitaseptem" target="_blank" rel="noopener">Instagram</a>
+          <a class="btn" href="alfaiataria.html">Ver Alfaiataria</a>
+        </div>
+      </div>
+      <div aria-hidden="true">
+        <iframe title="Mapa da loja" width="100%" height="220" style="border:0; border-radius:14px"
+          loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          src="https://www.google.com/maps?q=São%20João%20do%20Caru%20MA&output=embed"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap">
+      <div class="brand-small">
+        <img src="icon.png" alt="" aria-hidden="true">
+        <span>© <span id="year"></span> Vita Septem – Men’s Fashion</span>
+      </div>
+      <small>Desenvolvido para performance e conversão.</small>
+    </div>
+  </footer>
+
+  <!-- Modal Galeria -->
+  <div class="modal" id="galModal" aria-hidden="true" role="dialog" aria-label="Galeria de bastidores">
+    <div class="box">
+      <button class="close" onclick="closeGal()" aria-label="Fechar">Fechar ✕</button>
+      <div class="slides">
+        <button class="ctrl prev" onclick="prevGal()" aria-label="Imagem anterior">‹</button>
+        <img id="galImg" src="" alt="Imagem de bastidores">
+        <button class="ctrl next" onclick="nextGal()" aria-label="Próxima imagem">›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // ====== Config ======
+    const SUPABASE_URL = "https://dwqkuwqmlhvplmgwksas.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cWt1d3FtbGh2cGxtZ3drc2FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODM4NjksImV4cCI6MjA3MDM1OTg2OX0._pFblnBzx5cf0SUfAC_w-kmcdFbidZsh23XKXJR98ng";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth:{ persistSession:false }});
+
+    const ABOUT_SLUG = "vita-septem";          // registro principal em brand_about
+    const BUCKET = "brand";                    // bucket público para imagens da página "Sobre"
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ===== Helpers =====
+    const $ = (id)=> document.getElementById(id);
+    function storageUrl(path){
+      try{
+        const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+        return data.publicUrl || "";
+      }catch{ return ""; }
+    }
+    function imgUrlFrom(obj){
+      if(!obj) return "";
+      if(obj.url) return obj.url;
+      if(obj.path) return storageUrl(obj.path);
+      return "";
+    }
+
+    // ===== DOM refs =====
+    const heroImg = $('heroImg'), heroTitle = $('heroTitle'), heroLead = $('heroLead'), heroBadge = $('heroBadge'), heroTag = $('heroTag');
+
+    const storyHtml = $('storyHtml');
+    const valuesGrid = $('valuesGrid');
+
+    const timeList = $('timeList');
+
+    const galGrid = $('galGrid');
+    const galModal = $('galModal'), galImg = $('galImg');
+    let GAL = []; let gi = 0;
+
+    const teamGrid = $('teamGrid');
+    const faqList = $('faqList');
+
+    // ===== Gallery modal =====
+    function openGal(i=0){ if(!GAL.length) return; gi=i; galImg.src = GAL[gi]; galModal.classList.add('open'); galModal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+    function closeGal(){ galModal.classList.remove('open'); galModal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+    function prevGal(){ gi=(gi-1+GAL.length)%GAL.length; galImg.src = GAL[gi]; }
+    function nextGal(){ gi=(gi+1)%GAL.length; galImg.src = GAL[gi]; }
+    window.closeGal=closeGal; window.prevGal=prevGal; window.nextGal=nextGal;
+    galModal.addEventListener('click', (e)=>{ if(e.target===galModal) closeGal(); });
+    window.addEventListener('keydown', (e)=>{ if(!galModal.classList.contains('open')) return; if(e.key==='Escape') closeGal(); if(e.key==='ArrowLeft') prevGal(); if(e.key==='ArrowRight') nextGal(); });
+
+    // ===== Templates =====
+    function valueItem(v){
+      return `
+        <div class="value">
+          <h4>${v.title||'Valor'}</h4>
+          <p class="muted" style="margin:0">${v.description||''}</p>
+        </div>
+      `;
+    }
+
+    function eventItem(ev){
+      return `
+        <div class="event">
+          <span class="dot"></span>
+          <div class="year">${ev.year || ''}</div>
+          <div class="title">${ev.title || ''}</div>
+          <div class="desc">${ev.description || ''}</div>
+        </div>
+      `;
+    }
+
+    function memberCard(m){
+      const ph = m.photo_url || (m.photo_path ? storageUrl(m.photo_path) : "https://images.unsplash.com/photo-1520975916090-3105956dac38?q=80&w=1600&auto=format&fit=crop");
+      return `
+        <article class="member">
+          <div class="ph"><img src="${ph}" alt="${m.name||'Membro'}"></div>
+          <div class="p">
+            <h3 style="margin:0">${m.name||'Equipe'}</h3>
+            <div class="role">${m.role||''}</div>
+            ${m.bio ? `<p class="muted" style="margin:8px 0 0">${m.bio}</p>`:''}
+          </div>
+        </article>
+      `;
+    }
+
+    function faqItem(f){
+      return `<details class="faq"><summary>${f.q||'Pergunta'}</summary><div class="muted" style="margin-top:8px">${f.a||''}</div></details>`;
+    }
+
+    // ===== Renderers =====
+    function renderValues(list){
+      valuesGrid.innerHTML = '';
+      (list||[]).forEach(v=> valuesGrid.insertAdjacentHTML('beforeend', valueItem(v)));
+      if(!list?.length){
+        const fb = [
+          { title:'Respeito ao ambiente', description:'Peças que funcionam em lugares que importam: culto, trabalho e família.' },
+          { title:'Caimento acima de tudo', description:'Modelagem limpa, ajuste real. Elegância não precisa de grito.' },
+          { title:'Durabilidade', description:'Tecidos e construção pensados para durar e acompanhar sua rotina.' }
+        ];
+        fb.forEach(v=> valuesGrid.insertAdjacentHTML('beforeend', valueItem(v)));
+      }
+    }
+
+    function renderTimeline(list){
+      timeList.innerHTML = '';
+      (list||[]).forEach(ev=> timeList.insertAdjacentHTML('beforeend', eventItem(ev)));
+      if(!list?.length){
+        const fb = [
+          { year:'2023', title:'Ideia que virou rascunho', description:'Primeiras modelagens, testes de tecido e ajustes de caimento.' },
+          { year:'2024', title:'Primeira coleção local', description:'Lançamento com clássicos essenciais e feedback da comunidade.' },
+          { year:'2025', title:'Loja física', description:'São João do Caru (MA) vira nosso ponto de encontro.' }
+        ];
+        fb.forEach(ev=> timeList.insertAdjacentHTML('beforeend', eventItem(ev)));
+      }
+    }
+
+    function renderGallery(list){
+      galGrid.innerHTML='';
+      const urls = (list||[]).map(imgUrlFrom).filter(Boolean);
+      urls.forEach((src,i)=>{
+        const el = document.createElement('img');
+        el.src = src; el.alt = 'Bastidores '+(i+1);
+        el.onclick = ()=> openGal(i);
+        galGrid.appendChild(el);
+      });
+      GAL = urls;
+      if(!urls.length){
+        const fb = [
+          "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1600&auto=format&fit=crop",
+          "https://images.unsplash.com/photo-1520975922284-54243f13c6d1?q=80&w=1600&auto=format&fit=crop",
+          "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=1600&auto=format&fit=crop"
+        ];
+        GAL = fb;
+        fb.forEach((src,i)=>{
+          const el = document.createElement('img');
+          el.src = src; el.alt = 'Bastidores '+(i+1);
+          el.onclick = ()=> openGal(i);
+          galGrid.appendChild(el);
+        });
+      }
+    }
+
+    function renderTeam(list){
+      teamGrid.innerHTML = '';
+      (list||[]).forEach(m=> teamGrid.insertAdjacentHTML('beforeend', memberCard(m)));
+      if(!list?.length){
+        const fb = [
+          { name:'Equipe Vita', role:'Curadoria & Modelagem', bio:'Gente real escolhendo tecidos e ajustando caimentos.' },
+          { name:'Atendimento', role:'Experiência do Cliente', bio:'WhatsApp e loja física, sem complicação.' },
+          { name:'Operações', role:'Logística & Qualidade', bio:'Do corte ao envio, com cuidado.' },
+        ];
+        fb.forEach(m=> teamGrid.insertAdjacentHTML('beforeend', memberCard(m)));
+      }
+    }
+
+    function renderFaq(list){
+      faqList.innerHTML = '';
+      (list||[]).forEach(f=> faqList.insertAdjacentHTML('beforeend', faqItem(f)));
+      if(!list?.length){
+        const fb = [
+          { q:'O que significa “Vita Septem”?', a:'Inspira nossa busca por vida com propósito: presença, ordem e sobriedade no vestir.' },
+          { q:'Onde vocês produzem?', a:'Parcerias regionais com controle de qualidade e provas de caimento.' },
+          { q:'Como escolhem os tecidos?', a:'Respirabilidade, conforto e durabilidade guiam as decisões.' },
+        ];
+        fb.forEach(f=> faqList.insertAdjacentHTML('beforeend', faqItem(f)));
+      }
+    }
+
+    // ===== Load from Supabase + fallbacks =====
+    async function loadAbout(){
+      try{
+        const { data, error } = await supabase
+          .from('brand_about')
+          .select(`
+            id, slug, title, subtitle, badge, tag_text, story_html, hero_url, hero_path, is_active,
+            brand_gallery ( url, path, alt, is_primary, sort_order ),
+            brand_timeline ( year, title, description, sort_order, is_active ),
+            brand_team ( name, role, bio, photo_url, photo_path, sort_order, is_active ),
+            brand_values ( title, description, sort_order, is_active ),
+            brand_faqs ( q, a, sort_order, is_active )
+          `)
+          .eq('slug', ABOUT_SLUG)
+          .eq('is_active', true)
+          .maybeSingle();
+
+        if(error) throw error;
+
+        if(data){
+          // Hero
+          const heroFromGallery = (data.brand_gallery||[]).sort((a,b)=>{
+            if((b.is_primary|0)!==(a.is_primary|0)) return (b.is_primary?1:0)-(a.is_primary?1:0);
+            return (a.sort_order||100)-(b.sort_order||100);
+          })[0];
+          const hero = data.hero_url || (data.hero_path ? storageUrl(data.hero_path) : imgUrlFrom(heroFromGallery));
+          if(hero) heroImg.src = hero;
+          if(data.title) heroTitle.textContent = data.title;
+          if(data.subtitle) heroLead.textContent = data.subtitle;
+          if(data.badge) heroBadge.textContent = data.badge;
+          if(data.tag_text) heroTag.textContent = data.tag_text;
+
+          // História
+          if(data.story_html) storyHtml.innerHTML = data.story_html;
+
+          // Valores
+          const values = (data.brand_values||[]).filter(x=>x.is_active!==false).sort((a,b)=>(a.sort_order||100)-(b.sort_order||100));
+          renderValues(values);
+
+          // Timeline
+          const events = (data.brand_timeline||[]).filter(x=>x.is_active!==false).sort((a,b)=>(a.sort_order||100)-(b.sort_order||100));
+          renderTimeline(events);
+
+          // Galeria
+          const imgs = (data.brand_gallery||[]).sort((a,b)=>{
+            if((b.is_primary|0)!==(a.is_primary|0)) return (b.is_primary?1:0)-(a.is_primary?1:0);
+            return (a.sort_order||100)-(b.sort_order||100);
+          });
+          renderGallery(imgs);
+
+          // Equipe
+          const team = (data.brand_team||[]).filter(x=>x.is_active!==false).sort((a,b)=>(a.sort_order||100)-(b.sort_order||100));
+          renderTeam(team);
+
+          // FAQ
+          const faqs = (data.brand_faqs||[]).filter(x=>x.is_active!==false).sort((a,b)=>(a.sort_order||100)-(b.sort_order||100));
+          renderFaq(faqs);
+        }else{
+          // fallbacks
+          renderValues(); renderTimeline(); renderGallery(); renderTeam(); renderFaq();
+        }
+      }catch(err){
+        console.warn('Falha ao carregar brand_about:', err?.message);
+        renderValues(); renderTimeline(); renderGallery(); renderTeam(); renderFaq();
+      }
+    }
+
+    // start
+    loadAbout();
+  </script>
+</body>
+</html>
