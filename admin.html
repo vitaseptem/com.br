@@ -241,282 +241,420 @@
   <script src="https://unpkg.com/html5-qrcode@2.3.11/dist/html5-qrcode.min.js"></script>
 
   <script>
-    // ==== CONFIG SUPABASE ====
-    const SUPABASE_URL = "https://dwqkuwqmlhvplmgwksas.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cWt1d3FtbGh2cGxtZ3drc2FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODM4NjksImV4cCI6MjA3MDM1OTg2OX0._pFblnBzx5cf0SUfAC_w-kmcdFbidZsh23XKXJR98ng";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+/* ================== SUPABASE CONFIG ================== */
+const SUPABASE_URL = "https://dwqkuwqmlhvplmgwksas.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cWt1d3FtbGh2cGxtZ3drc2FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODM4NjksImV4cCI6MjA3MDM1OTg2OX0._pFblnBzx5cf0SUfAC_w-kmcdFbidZsh23XKXJR98ng";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
+
+/* ================== HELPERS & STATE ================== */
+const $ = (id)=>document.getElementById(id);
+const fmtBRL = (n)=> (n==null?"": Number(n).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}));
+const fmtInt = (v)=>Number(v||0).toLocaleString('pt-BR');
+const pad5 = (n)=> String(n).padStart(5,'0');
+
+let overview = [];
+let current = null;
+
+function setInfo(el, msg, tone=""){
+  if(!el) return;
+  el.textContent = msg || "";
+  el.style.color = tone==="error" ? "#ff8080" : tone==="ok" ? "#a2f3c9" : "#cfcfd6";
+}
+
+/* ================== LOGIN FLOW ================== */
+async function gate(){
+  const { data:{ session } } = await supabase.auth.getSession();
+  if(!session){ showLogin(); return; }
+  try{
+    await loadOverview();
+    hideLogin();
+  }catch(e){
+    console.error(e);
+    showLogin('Sem permissão. Confirme que seu usuário está em STAFF como admin.');
+  }
+}
+
+function showLogin(msg){
+  $('loginWrap').hidden = false;
+  setInfo($('loginMsg'), msg || '—');
+}
+function hideLogin(){ $('loginWrap').hidden = true; }
+
+$('btnLogin').addEventListener('click', async ()=>{
+  const email = $('admEmail').value.trim();
+  const password = $('admPass').value.trim();
+  if(!email || !password){ setInfo($('loginMsg'),'Preencha e-mail e senha.','error'); return; }
+  setInfo($('loginMsg'),'Entrando...');
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if(error){ setInfo($('loginMsg'), 'E-mail ou senha inválidos.', 'error'); return; }
+
+  // Valida permissão: se falhar, mantém na tela de login e faz signOut
+  try{
+    await loadOverview();
+    setInfo($('loginMsg'),'OK! Carregando...','ok');
+    hideLogin();
+  }catch(e){
+    console.error(e);
+    setInfo($('loginMsg'),'Sem permissão. Coloque este usuário em STAFF como admin.','error');
+    await supabase.auth.signOut();
+  }
+});
+
+$('btnSair').addEventListener('click', async ()=>{
+  await supabase.auth.signOut();
+  location.reload();
+});
+
+// Reage a mudanças de sessão (expiração, logout em outra aba, etc.)
+supabase.auth.onAuthStateChange(async (event)=>{
+  if(event === "SIGNED_OUT"){ showLogin(); }
+});
+
+/* ================== OVERVIEW & LIST ================== */
+async function loadOverview(){
+  const { data, error } = await supabase.rpc('admin_get_members_overview');
+  if(error) throw error;
+
+  overview = data || [];
+  renderList(overview);
+
+  const total = overview.length;
+  const sumPoints = overview.reduce((a,b)=>a+(b.points||0),0);
+  const earned = overview.reduce((a,b)=>a+(b.total_earned||0),0);
+  const spent = overview.reduce((a,b)=>a+(b.total_spent||0),0);
+
+  $('stMembers').textContent = fmtInt(total);
+  $('stPoints').textContent = fmtInt(sumPoints);
+  $('stEarned').textContent = fmtInt(earned);
+  $('stSpent').textContent = fmtInt(spent);
+  $('listHint').textContent = `${fmtInt(total)} cliente(s)`;
+}
+
+function renderList(list){
+  const box = $('list');
+  box.innerHTML = '';
+  list.sort((a,b)=> (a.member_no||0)-(b.member_no||0));
+  list.forEach(m=>{
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.dataset.id = m.id;
+    row.innerHTML = `
+      <div><b>${pad5(m.member_no)}</b> — ${m.name||'—'}</div>
+      <div class="tag">${m.points||0} pts</div>
+    `;
+    row.onclick = ()=>selectMember(m.id);
+    box.appendChild(row);
+  });
+}
+
+function markActive(id){
+  document.querySelectorAll('.row').forEach(r=>{
+    r.classList.toggle('active', r.dataset.id===id);
+  });
+}
+
+async function selectMember(id){
+  markActive(id);
+  const { data:mem, error } = await supabase.from('members').select('*').eq('id', id).maybeSingle();
+  if(error || !mem){ alert('Não foi possível carregar o cliente.'); return; }
+
+  current = mem;
+  $('mName').value = mem.name||'';
+  $('mNo').value = pad5(mem.member_no);
+  $('mPoints').value = mem.points||0;
+  $('mVip').value = mem.is_vip ? 'true' : 'false';
+  $('mBirth').value = mem.birthdate ? new Date(mem.birthdate).toISOString().slice(0,10) : '';
+  $('mPhone').value = mem.phone || '';
+  await loadLog(id);
+}
+
+async function loadLog(member_id){
+  const { data, error } = await supabase.from('points_log')
+    .select('created_at, delta, reason, value_brl, bonus_mult, performed_by')
+    .eq('member_id', member_id)
+    .order('created_at', { ascending:false })
+    .limit(50);
+  if(error){ console.error(error); return; }
+
+  const tbody = $('log');
+  tbody.innerHTML = '';
+  (data||[]).forEach(r=>{
+    const d = new Date(r.created_at);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${d.toLocaleString('pt-BR')}</td>
+      <td class="${r.delta>=0?'ok':'danger'}">${r.delta>0?'+':''}${r.delta}</td>
+      <td>${r.reason||''}</td>
+      <td>${r.value_brl? fmtBRL(r.value_brl): ''}</td>
+      <td>${r.bonus_mult||1}</td>
+      <td>${r.performed_by? String(r.performed_by).slice(0,8): ''}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ================== PERFIL ================== */
+async function salvarPerfil(){
+  if(!current) return;
+  const upd = {
+    name: $('mName').value.trim(),
+    phone: $('mPhone').value.trim() || null,
+    is_vip: $('mVip').value === 'true',
+    birthdate: $('mBirth').value ? $('mBirth').value : null
+  };
+  const { error } = await supabase.from('members').update(upd).eq('id', current.id);
+  if(error){
+    $('msgPerfil').textContent = 'Erro ao salvar.';
+    $('msgPerfil').style.color = '#ff8080';
+    return;
+  }
+  $('msgPerfil').textContent = 'Perfil salvo.';
+  $('msgPerfil').style.color = '#a2f3c9';
+  await selectMember(current.id);
+  await loadOverview();
+}
+
+/* ================== OPERAÇÕES ================== */
+function parseMoneyBR(v){
+  if(!v) return 0;
+  const n = String(v).replace(/\./g,'').replace(',', '.').replace(/[^0-9.-]/g,'');
+  const num = Number(n);
+  return isNaN(num) ? 0 : num;
+}
+
+async function opCompra(){
+  if(!current) return;
+  const val = parseMoneyBR($('opCompraValor').value);
+  if(val<=0){ $('opMsg').textContent = 'Informe um valor positivo.'; return; }
+  const motivo = $('opMotivo').value || 'Compra';
+  const { data, error } = await supabase.rpc('admin_add_purchase_points', { p_member_id: current.id, p_amount_brl: val, p_reason: motivo });
+  if(error){
+    $('opMsg').textContent = 'Erro: sem permissão ou RPC indisponível.';
+    $('opMsg').style.color = '#ff8080';
+    return;
+  }
+  $('opMsg').textContent = `OK: +${data||0} ponto(s).`;
+  $('opMsg').style.color = '#a2f3c9';
+  await selectMember(current.id);
+  await loadOverview();
+}
+
+async function opDelta(){
+  if(!current) return;
+  const delta = parseInt($('opDelta').value,10);
+  if(isNaN(delta) || delta===0){ $('opMsg').textContent = 'Informe um número (ex.: 10 ou -5).'; return; }
+  const motivo = $('opMotivo').value || (delta>0? 'Crédito manual' : 'Estorno manual');
+  const { error } = await supabase.rpc('admin_add_points', { p_member_id: current.id, p_delta: delta, p_reason: motivo, p_value_brl: 0, p_bonus_mult: 1 });
+  if(error){
+    $('opMsg').textContent = 'Erro ao lançar delta.';
+    $('opMsg').style.color = '#ff8080';
+    return;
+  }
+  $('opMsg').textContent = `OK: ${delta>0?'+':''}${delta} ponto(s).`;
+  $('opMsg').style.color = '#a2f3c9';
+  await selectMember(current.id);
+  await loadOverview();
+}
+
+async function opSet(){
+  if(!current) return;
+  const alvo = parseInt($('opSet').value,10);
+  if(isNaN(alvo) || alvo<0){ $('opMsg').textContent = 'Informe um inteiro ≥ 0.'; return; }
+  const motivo = $('opMotivo').value || 'Ajuste manual';
+  const { data, error } = await supabase.rpc('admin_set_points', { p_member_id: current.id, p_new_points: alvo, p_reason: motivo });
+  if(error){
+    $('opMsg').textContent = 'Erro ao ajustar.';
+    $('opMsg').style.color = '#ff8080';
+    return;
+  }
+  $('opMsg').textContent = `OK: diferença aplicada ${data>0?'+':''}${data}`;
+  $('opMsg').style.color = '#a2f3c9';
+  await selectMember(current.id);
+  await loadOverview();
+}
+
+async function opResgatar(){
+  if(!current) return;
+  const parts = ($('opReward').value||'').split('|');
+  const code = parts[0];
+  const cost = parseInt(parts[1]||'0',10);
+  const note = $('opRewardNote').value || '';
+  const { error } = await supabase.rpc('admin_redeem_reward', { p_member_id: current.id, p_reward_code: code, p_points_cost: cost, p_note: note });
+  if(error){
+    $('opMsg').textContent = 'Erro ao resgatar (pontos insuficientes ou permissão).';
+    $('opMsg').style.color = '#ff8080';
+    return;
+  }
+  $('opMsg').textContent = `OK: resgate ${code} (-${cost} pts).`;
+  $('opMsg').style.color = '#a2f3c9';
+  await selectMember(current.id);
+  await loadOverview();
+}
+
+/* ================== EXPORT & BUSCA ================== */
+function exportCSV(){
+  if(!overview.length){ alert('Nada para exportar.'); return; }
+  const cols = ['id','name','phone','member_no','points','is_vip','birthdate','created_at','total_earned','total_spent','last_activity'];
+  const lines = [cols.join(';')];
+  overview.forEach(r=>{
+    const row = cols.map(k=> (r[k]??'')).join(';');
+    lines.push(row);
+  });
+  const blob = new Blob(["\ufeff"+lines.join('\n')], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `vita-points-overview-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+async function doSearch(){
+  const q = $('q').value.trim();
+  if(!q){
+    renderList(overview);
+    $('listHint').textContent = `${fmtInt(overview.length)} cliente(s)`;
+    return;
+  }
+  const { data, error } = await supabase.rpc('admin_search_members', { q });
+  if(error){ console.error(error); return; }
+  const merged = (data||[]).map(m=> ({...m, total_earned:0, total_spent:0}));
+  $('listHint').textContent = `${fmtInt(merged.length)} resultado(s)`;
+  renderList(merged);
+}
+
+/* ================== QR SCANNER ================== */
+let html5scanner = null;
+let activeCamId = null;
+let cams = [];
+
+function parseMemberNoFromQR(text){
+  try{
+    const url = new URL(text);
+    const p = url.searchParams.get('mn');
+    if(p){
+      const n = parseInt(String(p).replace(/\D/g,''),10);
+      if(n>=1 && n<=32767) return n;
+    }
+  }catch(_){}
+  const digits = String(text).match(/\d{1,5}/);
+  if(digits){
+    const n = parseInt(digits[0],10);
+    if(n>=1 && n<=32767) return n;
+  }
+  return null;
+}
+
+async function openScan(){
+  // HTTPS é obrigatório para câmera
+  if(location.protocol !== 'https:' && location.hostname !== 'localhost'){
+    alert('Para usar a câmera, acesse via HTTPS (ex.: https://vitaseptem.com/admin.html).');
+    return;
+  }
+
+  $('qrModal').style.display = 'flex';
+  $('scanMsg').textContent = 'Buscando câmeras...';
+  $('btnStartScan').disabled = true;
+  $('btnStopScan').disabled = true;
+  $('camList').innerHTML = '';
+
+  try{
+    cams = await Html5Qrcode.getCameras();
+    if(!cams.length){ $('scanMsg').textContent = 'Nenhuma câmera encontrada.'; return; }
+    cams.forEach((c,i)=>{
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = c.label || `Câmera ${i+1}`;
+      $('camList').appendChild(opt);
     });
+    const back = cams.find(c=>/back|traseira|rear/i.test(c.label||''));
+    activeCamId = back ? back.id : cams[0].id;
+    $('camList').value = activeCamId;
+    $('scanMsg').textContent = 'Pronto para iniciar.';
+    $('btnStartScan').disabled = false;
+  }catch(err){
+    $('scanMsg').textContent = 'Erro ao obter câmeras. Autorize o acesso.';
+    console.error(err);
+  }
+}
 
-    // ==== HELPERS ====
-    const $ = (id)=>document.getElementById(id);
-    const fmtBRL = (n)=> (n==null?"": Number(n).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}));
-    const fmtInt = (v)=>Number(v||0).toLocaleString('pt-BR');
-    const pad5 = (n)=> String(n).padStart(5,'0');
+async function startScan(){
+  if(html5scanner){ await stopScan(); }
+  html5scanner = new Html5Qrcode('qrRegion');
+  $('btnStartScan').disabled = true;
+  $('btnStopScan').disabled = false;
+  $('scanMsg').textContent = 'Escaneando...';
 
-    let overview = []; let current = null;
+  try{
+    await html5scanner.start(
+      { deviceId: { exact: $('camList').value } },
+      { fps: 10, qrbox: 220 },
+      onScanSuccess,
+      ()=>{} // erros de decode são normais, ignorar
+    );
+  }catch(e){
+    $('scanMsg').textContent = 'Falha ao iniciar câmera.';
+    $('btnStartScan').disabled = false;
+    $('btnStopScan').disabled = true;
+    console.error(e);
+  }
+}
 
-    function setInfo(el, msg, tone=""){
-      if(!el) return; el.textContent = msg || "";
-      el.style.color = tone==="error"?"#ff8080": tone==="ok"?"#a2f3c9":"#cfcfd6";
-    }
+async function stopScan(){
+  if(html5scanner){
+    try{ await html5scanner.stop(); await html5scanner.clear(); }catch(_){}
+    html5scanner = null;
+  }
+  $('btnStartScan').disabled = false;
+  $('btnStopScan').disabled = true;
+  $('scanMsg').textContent = 'Parado.';
+}
 
-    // ==== LOGIN FLOW ====
-    async function gate(){
-      const { data:{ session } } = await supabase.auth.getSession();
-      if(!session){ showLogin(); return; }
-      hideLogin();
-      try{ await loadOverview(); }catch(e){ showLogin('Sem permissão. Confirme que seu usuário está em staff como admin.'); }
-    }
+function closeScan(){ stopScan(); $('qrModal').style.display = 'none'; }
 
-    function showLogin(msg){
-      $('loginWrap').hidden = false; setInfo($('loginMsg'), msg||'—');
-    }
-    function hideLogin(){ $('loginWrap').hidden = true; }
+async function onScanSuccess(decodedText){
+  $('scanMsg').textContent = 'QR lido. Processando...';
+  const num = parseMemberNoFromQR(decodedText);
+  if(!num){ $('scanMsg').textContent = 'QR inválido. Tente novamente.'; return; }
+  $('q').value = String(num);
+  await doSearch();
+  closeScan();
+  const firstRow = document.querySelector('.list .row');
+  if(firstRow){ firstRow.click(); }
+}
 
-    $('btnLogin').addEventListener('click', async ()=>{
-      const email = $('admEmail').value.trim();
-      const password = $('admPass').value.trim();
-      setInfo($('loginMsg'),'Entrando...');
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if(error){ setInfo($('loginMsg'), 'E-mail ou senha inválidos.', 'error'); return; }
-      setInfo($('loginMsg'), 'OK! Carregando...', 'ok');
-      hideLogin(); await loadOverview();
-    });
+/* ================== INIT & BINDINGS ================== */
+async function init(){
+  await gate();
 
-    $('btnSair').addEventListener('click', async ()=>{ await supabase.auth.signOut(); location.reload(); });
+  $('btnOverview').onclick = loadOverview;
+  $('btnExport').onclick = exportCSV;
+  $('btnBuscar').onclick = doSearch;
+  $('btnClear').onclick = ()=>{ $('q').value=''; renderList(overview); $('listHint').textContent = `${fmtInt(overview.length)} cliente(s)`; };
 
-    // ==== OVERVIEW & LIST ====
-    async function loadOverview(){
-      const { data, error } = await supabase.rpc('admin_get_members_overview');
-      if(error){ console.error(error); throw error; }
-      overview = data||[]; renderList(overview);
-      const total = overview.length;
-      const sumPoints = overview.reduce((a,b)=>a+(b.points||0),0);
-      const earned = overview.reduce((a,b)=>a+(b.total_earned||0),0);
-      const spent = overview.reduce((a,b)=>a+(b.total_spent||0),0);
-      $('stMembers').textContent = fmtInt(total);
-      $('stPoints').textContent = fmtInt(sumPoints);
-      $('stEarned').textContent = fmtInt(earned);
-      $('stSpent').textContent = fmtInt(spent);
-      $('listHint').textContent = `${fmtInt(total)} cliente(s)`;
-    }
+  $('btnCompra').onclick = opCompra;
+  $('btnDelta').onclick = opDelta;
+  $('btnSet').onclick = opSet;
+  $('btnResgatar').onclick = opResgatar;
+  $('btnSalvarPerfil').onclick = salvarPerfil;
 
-    function renderList(list){
-      const box = $('list'); box.innerHTML = '';
-      list.sort((a,b)=> (a.member_no||0)-(b.member_no||0));
-      list.forEach(m=>{
-        const row = document.createElement('div');
-        row.className = 'row'; row.dataset.id = m.id;
-        row.innerHTML = `
-          <div><b>${pad5(m.member_no)}</b> — ${m.name||'—'}</div>
-          <div class="tag">${m.points||0} pts</div>`;
-        row.onclick = ()=>selectMember(m.id);
-        box.appendChild(row);
-      });
-    }
+  $('q').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ doSearch(); } });
 
-    function markActive(id){ document.querySelectorAll('.row').forEach(r=> r.classList.toggle('active', r.dataset.id===id)); }
+  // Scanner
+  $('btnScan').onclick = openScan;
+  $('btnCloseScan').onclick = closeScan;
+  $('camList').onchange = (e)=>{ activeCamId = e.target.value; };
+  $('btnStartScan').onclick = startScan;
+  $('btnStopScan').onclick = stopScan;
+}
 
-    async function selectMember(id){
-      markActive(id);
-      const { data:mem, error } = await supabase.from('members').select('*').eq('id', id).maybeSingle();
-      if(error||!mem){ alert('Não foi possível carregar o cliente.'); return; }
-      current = mem;
-      $('mName').value = mem.name||'';
-      $('mNo').value = pad5(mem.member_no);
-      $('mPoints').value = mem.points||0;
-      $('mVip').value = mem.is_vip? 'true':'false';
-      $('mBirth').value = mem.birthdate? new Date(mem.birthdate).toISOString().slice(0,10): '';
-      $('mPhone').value = mem.phone||'';
-      await loadLog(id);
-    }
+init();
+</script>
 
-    async function loadLog(member_id){
-      const { data, error } = await supabase.from('points_log')
-        .select('created_at, delta, reason, value_brl, bonus_mult, performed_by')
-        .eq('member_id', member_id)
-        .order('created_at', { ascending:false })
-        .limit(50);
-      if(error){ console.error(error); return; }
-      const tbody = $('log'); tbody.innerHTML = '';
-      (data||[]).forEach(r=>{
-        const d = new Date(r.created_at);
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${d.toLocaleString('pt-BR')}</td>
-          <td class="${r.delta>=0?'ok':'danger'}">${r.delta>0?'+':''}${r.delta}</td>
-          <td>${r.reason||''}</td>
-          <td>${r.value_brl? fmtBRL(r.value_brl): ''}</td>
-          <td>${r.bonus_mult||1}</td>
-          <td>${r.performed_by? String(r.performed_by).slice(0,8): ''}</td>`;
-        tbody.appendChild(tr);
-      });
-    }
-
-    // ==== PERFIL ====
-    async function salvarPerfil(){
-      if(!current) return;
-      const upd = {
-        name: $('mName').value.trim(),
-        phone: $('mPhone').value.trim() || null,
-        is_vip: $('mVip').value === 'true',
-        birthdate: $('mBirth').value? $('mBirth').value: null
-      };
-      const { error } = await supabase.from('members').update(upd).eq('id', current.id);
-      if(error){ $('msgPerfil').textContent = 'Erro ao salvar.'; $('msgPerfil').style.color = '#ff8080'; return; }
-      $('msgPerfil').textContent = 'Perfil salvo.'; $('msgPerfil').style.color = '#a2f3c9';
-      await selectMember(current.id); await loadOverview();
-    }
-
-    // ==== OPERAÇÕES ====
-    function parseMoneyBR(v){ if(!v) return 0; const n = String(v).replace(/\./g,'').replace(',', '.').replace(/[^0-9.-]/g,''); const num = Number(n); return isNaN(num)?0:num; }
-
-    async function opCompra(){
-      if(!current) return; const val = parseMoneyBR($('opCompraValor').value);
-      if(val<=0){ $('opMsg').textContent = 'Informe um valor positivo.'; return; }
-      const motivo = $('opMotivo').value || 'Compra';
-      const { data, error } = await supabase.rpc('admin_add_purchase_points', { p_member_id: current.id, p_amount_brl: val, p_reason: motivo });
-      if(error){ $('opMsg').textContent = 'Erro: sem permissão ou RPC indisponível.'; $('opMsg').style.color = '#ff8080'; return; }
-      $('opMsg').textContent = `OK: +${data||0} ponto(s).`;
-      $('opMsg').style.color = '#a2f3c9'; await selectMember(current.id); await loadOverview();
-    }
-
-    async function opDelta(){
-      if(!current) return; const delta = parseInt($('opDelta').value,10);
-      if(isNaN(delta) || delta===0){ $('opMsg').textContent = 'Informe um número (ex.: 10 ou -5).'; return; }
-      const motivo = $('opMotivo').value || (delta>0? 'Crédito manual':'Estorno manual');
-      const { error } = await supabase.rpc('admin_add_points', { p_member_id: current.id, p_delta: delta, p_reason: motivo, p_value_brl: 0, p_bonus_mult: 1 });
-      if(error){ $('opMsg').textContent = 'Erro ao lançar delta.'; $('opMsg').style.color = '#ff8080'; return; }
-      $('opMsg').textContent = `OK: ${delta>0?'+':''}${delta} ponto(s).`;
-      $('opMsg').style.color = '#a2f3c9'; await selectMember(current.id); await loadOverview();
-    }
-
-    async function opSet(){
-      if(!current) return; const alvo = parseInt($('opSet').value,10);
-      if(isNaN(alvo) || alvo<0){ $('opMsg').textContent = 'Informe um inteiro ≥ 0.'; return; }
-      const motivo = $('opMotivo').value || 'Ajuste manual';
-      const { data, error } = await supabase.rpc('admin_set_points', { p_member_id: current.id, p_new_points: alvo, p_reason: motivo });
-      if(error){ $('opMsg').textContent = 'Erro ao ajustar.'; $('opMsg').style.color = '#ff8080'; return; }
-      $('opMsg').textContent = `OK: diferença aplicada ${data>0?'+':''}${data}`;
-      $('opMsg').style.color = '#a2f3c9'; await selectMember(current.id); await loadOverview();
-    }
-
-    async function opResgatar(){
-      if(!current) return; const parts = ($('opReward').value||'').split('|');
-      const code = parts[0]; const cost = parseInt(parts[1]||'0',10); const note = $('opRewardNote').value || '';
-      const { error } = await supabase.rpc('admin_redeem_reward', { p_member_id: current.id, p_reward_code: code, p_points_cost: cost, p_note: note });
-      if(error){ $('opMsg').textContent = 'Erro ao resgatar (pontos insuficientes ou permissão).'; $('opMsg').style.color = '#ff8080'; return; }
-      $('opMsg').textContent = `OK: resgate ${code} (-${cost} pts).`;
-      $('opMsg').style.color = '#a2f3c9'; await selectMember(current.id); await loadOverview();
-    }
-
-    function exportCSV(){
-      if(!overview.length){ alert('Nada para exportar.'); return; }
-      const cols = ['id','name','phone','member_no','points','is_vip','birthdate','created_at','total_earned','total_spent','last_activity'];
-      const lines = [cols.join(';')];
-      overview.forEach(r=>{ const row = cols.map(k=> (r[k]??'')).join(';'); lines.push(row); });
-      const blob = new Blob(["\ufeff"+lines.join('\n')], {type:'text/csv;charset=utf-8'});
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-      a.download = `vita-points-overview-${new Date().toISOString().slice(0,10)}.csv`;
-      a.click(); URL.revokeObjectURL(a.href);
-    }
-
-    // ==== BUSCA & ATALHOS ====
-    async function doSearch(){
-      const q = $('q').value.trim();
-      if(!q){ renderList(overview); $('listHint').textContent = `${fmtInt(overview.length)} cliente(s)`; return; }
-      const { data, error } = await supabase.rpc('admin_search_members', { q });
-      if(error){ console.error(error); return; }
-      const merged = (data||[]).map(m=> ({...m, total_earned:0, total_spent:0}));
-      $('listHint').textContent = `${fmtInt(merged.length)} resultado(s)`;
-      renderList(merged);
-    }
-
-    // ==== QR SCANNER ====
-    let html5scanner = null; let activeCamId = null; let cams = [];
-
-    function parseMemberNoFromQR(text){
-      try{
-        const url = new URL(text); const p = url.searchParams.get('mn');
-        if(p){ const n = parseInt(String(p).replace(/\D/g,''),10); if(n>=1 && n<=32767) return n; }
-      }catch(_){}
-      const digits = String(text).match(/\d{1,5}/); if(digits){ const n = parseInt(digits[0],10); if(n>=1 && n<=32767) return n; }
-      return null;
-    }
-
-    async function openScan(){
-      $('qrModal').style.display = 'flex'; $('scanMsg').textContent = 'Buscando câmeras...'; $('btnStartScan').disabled = true; $('btnStopScan').disabled = true; $('camList').innerHTML = '';
-      try{
-        cams = await Html5Qrcode.getCameras();
-        if(!cams.length){ $('scanMsg').textContent = 'Nenhuma câmera encontrada.'; return; }
-        cams.forEach((c,i)=>{ const opt = document.createElement('option'); opt.value = c.id; opt.textContent = c.label || `Câmera ${i+1}`; $('camList').appendChild(opt); });
-        const back = cams.find(c=>/back|traseira|rear/i.test(c.label||''));
-        activeCamId = back? back.id : cams[0].id; $('camList').value = activeCamId;
-        $('scanMsg').textContent = 'Pronto para iniciar.'; $('btnStartScan').disabled = false;
-      }catch(err){ $('scanMsg').textContent = 'Erro ao obter câmeras. Autorize o acesso.'; console.error(err); }
-    }
-
-    async function startScan(){
-      if(html5scanner){ await stopScan(); }
-      html5scanner = new Html5Qrcode('qrRegion');
-      $('btnStartScan').disabled = true; $('btnStopScan').disabled = false; $('scanMsg').textContent = 'Escaneando...';
-      try{
-        await html5scanner.start(
-          { deviceId: { exact: $('camList').value } },
-          { fps: 10, qrbox: 220 },
-          onScanSuccess,
-          (err)=>{/* ignore decode errors */}
-        );
-      }catch(e){ $('scanMsg').textContent = 'Falha ao iniciar câmera.'; $('btnStartScan').disabled = false; $('btnStopScan').disabled = true; console.error(e); }
-    }
-
-    async function stopScan(){
-      if(html5scanner){ try{ await html5scanner.stop(); await html5scanner.clear(); }catch(_){} html5scanner = null; }
-      $('btnStartScan').disabled = false; $('btnStopScan').disabled = true; $('scanMsg').textContent = 'Parado.';
-    }
-
-    function closeScan(){ stopScan(); $('qrModal').style.display = 'none'; }
-
-    async function onScanSuccess(decodedText){
-      $('scanMsg').textContent = 'QR lido. Processando...';
-      const num = parseMemberNoFromQR(decodedText);
-      if(!num){ $('scanMsg').textContent = 'QR inválido. Tente novamente.'; return; }
-      $('q').value = String(num);
-      await doSearch();
-      closeScan();
-      // se veio um único match, já seleciona
-      const firstRow = document.querySelector('.list .row');
-      if(firstRow){ firstRow.click(); }
-    }
-
-    // ==== INIT ====
-    async function init(){
-      await gate();
-      $('btnOverview').onclick = loadOverview;
-      $('btnExport').onclick = exportCSV;
-      $('btnBuscar').onclick = doSearch;
-      $('btnClear').onclick = ()=>{ $('q').value=''; renderList(overview); $('listHint').textContent = `${fmtInt(overview.length)} cliente(s)`; };
-
-      $('btnCompra').onclick = opCompra;
-      $('btnDelta').onclick = opDelta;
-      $('btnSet').onclick = opSet;
-      $('btnResgatar').onclick = opResgatar;
-      $('btnSalvarPerfil').onclick = salvarPerfil;
-
-      $('q').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ doSearch(); } });
-
-      // Scanner handlers
-      $('btnScan').onclick = openScan;
-      $('btnCloseScan').onclick = closeScan;
-      $('camList').onchange = (e)=>{ activeCamId = e.target.value; };
-      $('btnStartScan').onclick = startScan;
-      $('btnStopScan').onclick = stopScan;
-    }
-
-    init();
-  </script>
 </body>
 </html>
+
 
 
