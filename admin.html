@@ -8,27 +8,26 @@
   <link rel="icon" href="icon.ico" type="image/x-icon"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
   <style>
-    :root{
-      --wine:#880c21; --wine-600:#a11837; --black:#0e0e0f; --gray-900:#17171a; --gray-800:#1a1a1e; --gray-700:#232327; --gray-600:#2a2a2f; --gray-500:#6b6b72; --white:#fff; --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.35);
-      --ok:#21d07a; --warn:#e2b93b; --danger:#ff5d5d;
-    }
+    :root{ --wine:#880c21; --wine-600:#a11837; --black:#0e0e0f; --gray-900:#17171a; --gray-800:#1a1a1e; --gray-700:#232327; --gray-600:#2a2a2f; --gray-500:#6b6b72; --white:#fff; --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.35); --ok:#21d07a; --warn:#e2b93b; --danger:#ff5d5d; }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; color:var(--white); background:linear-gradient(180deg,var(--black),var(--gray-900) 35%, #0b0b0c)}
     a{color:inherit; text-decoration:none}
 
+    /* Topbar */
     header{position:sticky; top:0; z-index:40; backdrop-filter:saturate(140%) blur(8px); background:rgba(13,13,15,.7); border-bottom:1px solid rgba(255,255,255,.06)}
     .topbar{max-width:1280px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; gap:12px}
     .brand{display:flex; align-items:center; gap:10px}
     .brand img{height:40px}
     .brand b{font-family:"Playfair Display",serif; font-size:1.1rem}
     .topbar .grow{flex:1}
-    .search{display:flex; gap:8px; align-items:center; background:#131316; border:1px solid rgba(255,255,255,.08); padding:8px 10px; border-radius:12px; min-width:260px}
+    .search{display:flex; gap:8px; align-items:center; background:#131316; border:1px solid rgba(255,255,255,.08); padding:8px 10px; border-radius:12px; min-width:280px}
     .search input{background:transparent; border:none; outline:0; color:#fff; width:100%}
     .btn{display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:12px; font-weight:600; border:1px solid rgba(255,255,255,.14); background:#19191d; cursor:pointer}
     .btn.primary{background:var(--wine); border-color:rgba(255,255,255,.12)}
     .btn:hover{filter:brightness(1.06)}
 
+    /* Layout */
     .layout{max-width:1280px; margin:20px auto; padding:0 20px; display:grid; grid-template-columns:320px 1fr; gap:18px}
     .panel{background:linear-gradient(180deg,#141416,#101013); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); overflow:hidden}
     .panel .p{padding:16px}
@@ -59,18 +58,64 @@
     .stat{background:#15151a; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:12px}
     .stat b{display:block; font-size:1.2rem}
 
+    /* Login overlay */
+    .loginWrap{position:fixed; inset:0; display:grid; place-items:center; background:radial-gradient(60% 60% at 50% 40%, rgba(136,12,33,.15), transparent 60%), linear-gradient(180deg,var(--black),var(--gray-900)); z-index:100}
+    .loginCard{width:min(720px,92vw); background:linear-gradient(180deg,#151517,#111114); border:1px solid rgba(255,255,255,.08); border-radius:22px; padding:24px; box-shadow:var(--shadow)}
+    .loginHead{display:flex; gap:12px; align-items:center; justify-content:center; margin-bottom:8px}
+    .loginHead img{height:56px}
+    .loginHead h1{font-family:"Playfair Display",serif; font-size:1.6rem; margin:0}
+    .loginGrid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+    .loginFoot{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:12px}
+    .hint{font-size:.9rem; color:#cfcfd6}
+    @media (max-width:860px){ .loginGrid{grid-template-columns:1fr} }
+
+    /* QR Scanner modal */
+    .modal{position:fixed; inset:0; background:rgba(0,0,0,.65); display:none; align-items:center; justify-content:center; z-index:90}
+    .modalBox{width:min(560px,92vw); background:#0f0f12; border:1px solid rgba(255,255,255,.1); border-radius:18px; padding:16px}
+    .modalHead{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px}
+    .closeX{background:#19191d; border:1px solid rgba(255,255,255,.15); border-radius:10px; padding:6px 10px; cursor:pointer}
+
     @media (max-width:1000px){ .layout{grid-template-columns:1fr} .list{max-height:none} .statgrid{grid-template-columns:repeat(2,1fr)} }
   </style>
 </head>
 <body>
+  <!-- LOGIN OVERLAY -->
+  <div id="loginWrap" class="loginWrap" hidden>
+    <div class="loginCard">
+      <div class="loginHead">
+        <img src="icon.png" alt="Vita Septem"/>
+        <h1>Vita Points – Admin</h1>
+      </div>
+      <p class="hint" style="text-align:center; margin:0 0 12px">Acesse com seu usuário de staff para gerenciar pontos e resgates.</p>
+      <div class="loginGrid">
+        <div class="field">
+          <label for="admEmail">E-mail</label>
+          <input id="admEmail" type="email" class="input" placeholder="admin@vitaseptem.com" autocomplete="username"/>
+        </div>
+        <div class="field">
+          <label for="admPass">Senha</label>
+          <input id="admPass" type="password" class="input" placeholder="••••••••" autocomplete="current-password"/>
+        </div>
+      </div>
+      <div class="loginFoot">
+        <div id="loginMsg" class="hint">—</div>
+        <div style="display:flex; gap:8px">
+          <button id="btnLogin" class="btn primary">Entrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOPBAR -->
   <header>
     <div class="topbar">
       <div class="brand"><img src="icon.png" alt=""><b>Vita Points – Admin</b></div>
       <div class="grow">
         <div class="search">
-          <input id="q" placeholder="Buscar por nome ou nº do cartão (01–300)">
+          <input id="q" placeholder="Buscar por nome ou nº do cartão (01–32767)">
           <button id="btnBuscar" class="btn">Buscar</button>
           <button id="btnClear" class="btn">Limpar</button>
+          <button id="btnScan" class="btn">Escanear QR</button>
         </div>
       </div>
       <button id="btnOverview" class="btn">Atualizar</button>
@@ -79,6 +124,26 @@
     </div>
   </header>
 
+  <!-- QR SCANNER MODAL -->
+  <div id="qrModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
+    <div class="modalBox">
+      <div class="modalHead">
+        <h3 id="qrTitle" class="headline" style="margin:0">Escanear QR do cartão</h3>
+        <button class="closeX" id="btnCloseScan">Fechar</button>
+      </div>
+      <div id="qrRegion" style="width:100%"></div>
+      <div style="display:flex; gap:8px; align-items:center; justify-content:space-between; margin-top:10px">
+        <div class="hint" id="scanMsg">Autorize a câmera para iniciar.</div>
+        <div style="display:flex; gap:8px">
+          <select id="camList" class="input" style="min-width:200px"></select>
+          <button id="btnStartScan" class="btn primary">Iniciar</button>
+          <button id="btnStopScan" class="btn" disabled>Parar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN LAYOUT -->
   <main class="layout">
     <aside class="panel" id="panelList">
       <div class="p">
@@ -171,76 +236,99 @@
     </section>
   </main>
 
+  <!-- Libs -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
   <script>
+    // ==== CONFIG SUPABASE ====
     const SUPABASE_URL = "https://dwqkuwqmlhvplmgwksas.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cWt1d3FtbGh2cGxtZ3drc2FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODM4NjksImV4cCI6MjA3MDM1OTg2OX0._pFblnBzx5cf0SUfAC_w-kmcdFbidZsh23XKXJR98ng";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+    });
 
-    const el = (id)=>document.getElementById(id);
+    // ==== HELPERS ====
+    const $ = (id)=>document.getElementById(id);
     const fmtBRL = (n)=> (n==null?"": Number(n).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}));
     const fmtInt = (v)=>Number(v||0).toLocaleString('pt-BR');
+    const pad5 = (n)=> String(n).padStart(5,'0');
 
-    let overview = [];
-    let current = null;
+    let overview = []; let current = null;
 
-    async function requireSession(){
-      const { data:{ session } } = await supabase.auth.getSession();
-      if(!session){
-        const email = prompt('E-mail do administrador:');
-        const pass = prompt('Senha:');
-        if(!email || !pass) return alert('Login cancelado.');
-        const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
-        if(error){ alert('Falhou o login.'); return requireSession(); }
-      }
-      return true;
+    function setInfo(el, msg, tone=""){
+      if(!el) return; el.textContent = msg || "";
+      el.style.color = tone==="error"?"#ff8080": tone==="ok"?"#a2f3c9":"#cfcfd6";
     }
 
+    // ==== LOGIN FLOW ====
+    async function gate(){
+      const { data:{ session } } = await supabase.auth.getSession();
+      if(!session){ showLogin(); return; }
+      hideLogin();
+      try{ await loadOverview(); }catch(e){ showLogin('Sem permissão. Confirme que seu usuário está em staff como admin.'); }
+    }
+
+    function showLogin(msg){
+      $('loginWrap').hidden = false; setInfo($('loginMsg'), msg||'—');
+    }
+    function hideLogin(){ $('loginWrap').hidden = true; }
+
+    $('btnLogin').addEventListener('click', async ()=>{
+      const email = $('admEmail').value.trim();
+      const password = $('admPass').value.trim();
+      setInfo($('loginMsg'),'Entrando...');
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if(error){ setInfo($('loginMsg'), 'E-mail ou senha inválidos.', 'error'); return; }
+      setInfo($('loginMsg'), 'OK! Carregando...', 'ok');
+      hideLogin(); await loadOverview();
+    });
+
+    $('btnSair').addEventListener('click', async ()=>{ await supabase.auth.signOut(); location.reload(); });
+
+    // ==== OVERVIEW & LIST ====
     async function loadOverview(){
       const { data, error } = await supabase.rpc('admin_get_members_overview');
-      if(error){ console.error(error); alert('Sem permissão. Confirme que seu usuário está na tabela STAFF como admin.'); return; }
-      overview = data||[];
-      renderList(overview);
-      const totalMembers = overview.length;
+      if(error){ console.error(error); throw error; }
+      overview = data||[]; renderList(overview);
+      const total = overview.length;
       const sumPoints = overview.reduce((a,b)=>a+(b.points||0),0);
       const earned = overview.reduce((a,b)=>a+(b.total_earned||0),0);
       const spent = overview.reduce((a,b)=>a+(b.total_spent||0),0);
-      el('stMembers').textContent = fmtInt(totalMembers);
-      el('stPoints').textContent = fmtInt(sumPoints);
-      el('stEarned').textContent = fmtInt(earned);
-      el('stSpent').textContent = fmtInt(spent);
-      el('listHint').textContent = `${fmtInt(totalMembers)} cliente(s)`;
+      $('stMembers').textContent = fmtInt(total);
+      $('stPoints').textContent = fmtInt(sumPoints);
+      $('stEarned').textContent = fmtInt(earned);
+      $('stSpent').textContent = fmtInt(spent);
+      $('listHint').textContent = `${fmtInt(total)} cliente(s)`;
     }
 
     function renderList(list){
-      const box = el('list');
-      box.innerHTML = '';
+      const box = $('list'); box.innerHTML = '';
       list.sort((a,b)=> (a.member_no||0)-(b.member_no||0));
       list.forEach(m=>{
         const row = document.createElement('div');
-        row.className = 'row';
-        row.dataset.id = m.id;
-        row.innerHTML = `<div><b>${String(m.member_no).padStart(2,'0')}</b> — ${m.name||'—'}</div><div class="tag">${m.points||0} pts</div>`;
+        row.className = 'row'; row.dataset.id = m.id;
+        row.innerHTML = `
+          <div><b>${pad5(m.member_no)}</b> — ${m.name||'—'}</div>
+          <div class="tag">${m.points||0} pts</div>`;
         row.onclick = ()=>selectMember(m.id);
         box.appendChild(row);
       });
     }
 
-    function markActive(id){
-      document.querySelectorAll('.row').forEach(r=> r.classList.toggle('active', r.dataset.id===id));
-    }
+    function markActive(id){ document.querySelectorAll('.row').forEach(r=> r.classList.toggle('active', r.dataset.id===id)); }
 
     async function selectMember(id){
       markActive(id);
       const { data:mem, error } = await supabase.from('members').select('*').eq('id', id).maybeSingle();
       if(error||!mem){ alert('Não foi possível carregar o cliente.'); return; }
       current = mem;
-      el('mName').value = mem.name||'';
-      el('mNo').value = String(mem.member_no).padStart(2,'0');
-      el('mPoints').value = mem.points||0;
-      el('mVip').value = mem.is_vip? 'true':'false';
-      el('mBirth').value = mem.birthdate? new Date(mem.birthdate).toISOString().slice(0,10): '';
-      el('mPhone').value = mem.phone||'';
+      $('mName').value = mem.name||'';
+      $('mNo').value = pad5(mem.member_no);
+      $('mPoints').value = mem.points||0;
+      $('mVip').value = mem.is_vip? 'true':'false';
+      $('mBirth').value = mem.birthdate? new Date(mem.birthdate).toISOString().slice(0,10): '';
+      $('mPhone').value = mem.phone||'';
       await loadLog(id);
     }
 
@@ -251,134 +339,179 @@
         .order('created_at', { ascending:false })
         .limit(50);
       if(error){ console.error(error); return; }
-      const tbody = el('log');
-      tbody.innerHTML = '';
+      const tbody = $('log'); tbody.innerHTML = '';
       (data||[]).forEach(r=>{
-        const tr = document.createElement('tr');
         const d = new Date(r.created_at);
-        tr.innerHTML = `<td>${d.toLocaleString('pt-BR')}</td>
-                        <td class="${r.delta>=0?'ok':'danger'}">${r.delta>0?'+':''}${r.delta}</td>
-                        <td>${r.reason||''}</td>
-                        <td>${r.value_brl? fmtBRL(r.value_brl): ''}</td>
-                        <td>${r.bonus_mult||1}</td>
-                        <td>${r.performed_by? String(r.performed_by).slice(0,8): ''}</td>`;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${d.toLocaleString('pt-BR')}</td>
+          <td class="${r.delta>=0?'ok':'danger'}">${r.delta>0?'+':''}${r.delta}</td>
+          <td>${r.reason||''}</td>
+          <td>${r.value_brl? fmtBRL(r.value_brl): ''}</td>
+          <td>${r.bonus_mult||1}</td>
+          <td>${r.performed_by? String(r.performed_by).slice(0,8): ''}</td>`;
         tbody.appendChild(tr);
       });
     }
 
+    // ==== PERFIL ====
     async function salvarPerfil(){
       if(!current) return;
       const upd = {
-        name: el('mName').value.trim(),
-        phone: el('mPhone').value.trim() || null,
-        is_vip: el('mVip').value === 'true',
-        birthdate: el('mBirth').value? el('mBirth').value: null
+        name: $('mName').value.trim(),
+        phone: $('mPhone').value.trim() || null,
+        is_vip: $('mVip').value === 'true',
+        birthdate: $('mBirth').value? $('mBirth').value: null
       };
       const { error } = await supabase.from('members').update(upd).eq('id', current.id);
-      if(error){ el('msgPerfil').textContent = 'Erro ao salvar.'; el('msgPerfil').style.color = '#ff8080'; return; }
-      el('msgPerfil').textContent = 'Perfil salvo.'; el('msgPerfil').style.color = '#a2f3c9';
-      await selectMember(current.id);
-      await loadOverview();
+      if(error){ $('msgPerfil').textContent = 'Erro ao salvar.'; $('msgPerfil').style.color = '#ff8080'; return; }
+      $('msgPerfil').textContent = 'Perfil salvo.'; $('msgPerfil').style.color = '#a2f3c9';
+      await selectMember(current.id); await loadOverview();
     }
 
-    function parseMoneyBR(v){
-      if(!v) return 0;
-      const n = String(v).replace(/\./g,'').replace(',', '.').replace(/[^0-9.-]/g,'');
-      const num = Number(n);
-      return isNaN(num)?0:num;
-    }
+    // ==== OPERAÇÕES ====
+    function parseMoneyBR(v){ if(!v) return 0; const n = String(v).replace(/\./g,'').replace(',', '.').replace(/[^0-9.-]/g,''); const num = Number(n); return isNaN(num)?0:num; }
 
     async function opCompra(){
-      if(!current) return;
-      const val = parseMoneyBR(el('opCompraValor').value);
-      if(val<=0){ el('opMsg').textContent = 'Informe um valor positivo.'; return; }
-      const motivo = el('opMotivo').value || 'Compra';
+      if(!current) return; const val = parseMoneyBR($('opCompraValor').value);
+      if(val<=0){ $('opMsg').textContent = 'Informe um valor positivo.'; return; }
+      const motivo = $('opMotivo').value || 'Compra';
       const { data, error } = await supabase.rpc('admin_add_purchase_points', { p_member_id: current.id, p_amount_brl: val, p_reason: motivo });
-      if(error){ el('opMsg').textContent = 'Erro: sem permissão ou RPC indisponível.'; el('opMsg').style.color = '#ff8080'; return; }
-      el('opMsg').textContent = `OK: +${data||0} ponto(s).`;
-      el('opMsg').style.color = '#a2f3c9';
-      await selectMember(current.id); await loadOverview();
+      if(error){ $('opMsg').textContent = 'Erro: sem permissão ou RPC indisponível.'; $('opMsg').style.color = '#ff8080'; return; }
+      $('opMsg').textContent = `OK: +${data||0} ponto(s).`;
+      $('opMsg').style.color = '#a2f3c9'; await selectMember(current.id); await loadOverview();
     }
 
     async function opDelta(){
-      if(!current) return;
-      const delta = parseInt(el('opDelta').value,10);
-      if(isNaN(delta) || delta===0){ el('opMsg').textContent = 'Informe um número (ex.: 10 ou -5).'; return; }
-      const motivo = el('opMotivo').value || (delta>0? 'Crédito manual':'Estorno manual');
+      if(!current) return; const delta = parseInt($('opDelta').value,10);
+      if(isNaN(delta) || delta===0){ $('opMsg').textContent = 'Informe um número (ex.: 10 ou -5).'; return; }
+      const motivo = $('opMotivo').value || (delta>0? 'Crédito manual':'Estorno manual');
       const { error } = await supabase.rpc('admin_add_points', { p_member_id: current.id, p_delta: delta, p_reason: motivo, p_value_brl: 0, p_bonus_mult: 1 });
-      if(error){ el('opMsg').textContent = 'Erro ao lançar delta.'; el('opMsg').style.color = '#ff8080'; return; }
-      el('opMsg').textContent = `OK: ${delta>0?'+':''}${delta} ponto(s).`;
-      el('opMsg').style.color = '#a2f3c9';
-      await selectMember(current.id); await loadOverview();
+      if(error){ $('opMsg').textContent = 'Erro ao lançar delta.'; $('opMsg').style.color = '#ff8080'; return; }
+      $('opMsg').textContent = `OK: ${delta>0?'+':''}${delta} ponto(s).`;
+      $('opMsg').style.color = '#a2f3c9'; await selectMember(current.id); await loadOverview();
     }
 
     async function opSet(){
-      if(!current) return;
-      const alvo = parseInt(el('opSet').value,10);
-      if(isNaN(alvo) || alvo<0){ el('opMsg').textContent = 'Informe um inteiro ≥ 0.'; return; }
-      const motivo = el('opMotivo').value || 'Ajuste manual';
+      if(!current) return; const alvo = parseInt($('opSet').value,10);
+      if(isNaN(alvo) || alvo<0){ $('opMsg').textContent = 'Informe um inteiro ≥ 0.'; return; }
+      const motivo = $('opMotivo').value || 'Ajuste manual';
       const { data, error } = await supabase.rpc('admin_set_points', { p_member_id: current.id, p_new_points: alvo, p_reason: motivo });
-      if(error){ el('opMsg').textContent = 'Erro ao ajustar.'; el('opMsg').style.color = '#ff8080'; return; }
-      el('opMsg').textContent = `OK: diferença aplicada ${data>0?'+':''}${data}`;
-      el('opMsg').style.color = '#a2f3c9';
-      await selectMember(current.id); await loadOverview();
+      if(error){ $('opMsg').textContent = 'Erro ao ajustar.'; $('opMsg').style.color = '#ff8080'; return; }
+      $('opMsg').textContent = `OK: diferença aplicada ${data>0?'+':''}${data}`;
+      $('opMsg').style.color = '#a2f3c9'; await selectMember(current.id); await loadOverview();
     }
 
     async function opResgatar(){
-      if(!current) return;
-      const parts = (el('opReward').value||'').split('|');
-      const code = parts[0];
-      const cost = parseInt(parts[1]||'0',10);
-      const note = el('opRewardNote').value || '';
+      if(!current) return; const parts = ($('opReward').value||'').split('|');
+      const code = parts[0]; const cost = parseInt(parts[1]||'0',10); const note = $('opRewardNote').value || '';
       const { error } = await supabase.rpc('admin_redeem_reward', { p_member_id: current.id, p_reward_code: code, p_points_cost: cost, p_note: note });
-      if(error){ el('opMsg').textContent = 'Erro ao resgatar (pontos insuficientes ou permissão).'; el('opMsg').style.color = '#ff8080'; return; }
-      el('opMsg').textContent = `OK: resgate ${code} (-${cost} pts).`;
-      el('opMsg').style.color = '#a2f3c9';
-      await selectMember(current.id); await loadOverview();
+      if(error){ $('opMsg').textContent = 'Erro ao resgatar (pontos insuficientes ou permissão).'; $('opMsg').style.color = '#ff8080'; return; }
+      $('opMsg').textContent = `OK: resgate ${code} (-${cost} pts).`;
+      $('opMsg').style.color = '#a2f3c9'; await selectMember(current.id); await loadOverview();
     }
 
     function exportCSV(){
       if(!overview.length){ alert('Nada para exportar.'); return; }
       const cols = ['id','name','phone','member_no','points','is_vip','birthdate','created_at','total_earned','total_spent','last_activity'];
       const lines = [cols.join(';')];
-      overview.forEach(r=>{
-        const row = cols.map(k=> (r[k]??'')).join(';');
-        lines.push(row);
-      });
+      overview.forEach(r=>{ const row = cols.map(k=> (r[k]??'')).join(';'); lines.push(row); });
       const blob = new Blob(["\ufeff"+lines.join('\n')], {type:'text/csv;charset=utf-8'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
       a.download = `vita-points-overview-${new Date().toISOString().slice(0,10)}.csv`;
-      a.click();
-      URL.revokeObjectURL(a.href);
+      a.click(); URL.revokeObjectURL(a.href);
     }
 
+    // ==== BUSCA & ATALHOS ====
     async function doSearch(){
-      const q = el('q').value.trim();
-      if(!q){ renderList(overview); el('listHint').textContent = `${fmtInt(overview.length)} cliente(s)`; return; }
+      const q = $('q').value.trim();
+      if(!q){ renderList(overview); $('listHint').textContent = `${fmtInt(overview.length)} cliente(s)`; return; }
       const { data, error } = await supabase.rpc('admin_search_members', { q });
       if(error){ console.error(error); return; }
       const merged = (data||[]).map(m=> ({...m, total_earned:0, total_spent:0}));
-      el('listHint').textContent = `${fmtInt(merged.length)} resultado(s)`;
+      $('listHint').textContent = `${fmtInt(merged.length)} resultado(s)`;
       renderList(merged);
     }
 
+    // ==== QR SCANNER ====
+    let html5scanner = null; let activeCamId = null; let cams = [];
+
+    function parseMemberNoFromQR(text){
+      try{
+        const url = new URL(text); const p = url.searchParams.get('mn');
+        if(p){ const n = parseInt(String(p).replace(/\D/g,''),10); if(n>=1 && n<=32767) return n; }
+      }catch(_){}
+      const digits = String(text).match(/\d{1,5}/); if(digits){ const n = parseInt(digits[0],10); if(n>=1 && n<=32767) return n; }
+      return null;
+    }
+
+    async function openScan(){
+      $('qrModal').style.display = 'flex'; $('scanMsg').textContent = 'Buscando câmeras...'; $('btnStartScan').disabled = true; $('btnStopScan').disabled = true; $('camList').innerHTML = '';
+      try{
+        cams = await Html5Qrcode.getCameras();
+        if(!cams.length){ $('scanMsg').textContent = 'Nenhuma câmera encontrada.'; return; }
+        cams.forEach((c,i)=>{ const opt = document.createElement('option'); opt.value = c.id; opt.textContent = c.label || `Câmera ${i+1}`; $('camList').appendChild(opt); });
+        const back = cams.find(c=>/back|traseira|rear/i.test(c.label||''));
+        activeCamId = back? back.id : cams[0].id; $('camList').value = activeCamId;
+        $('scanMsg').textContent = 'Pronto para iniciar.'; $('btnStartScan').disabled = false;
+      }catch(err){ $('scanMsg').textContent = 'Erro ao obter câmeras. Autorize o acesso.'; console.error(err); }
+    }
+
+    async function startScan(){
+      if(html5scanner){ await stopScan(); }
+      html5scanner = new Html5Qrcode('qrRegion');
+      $('btnStartScan').disabled = true; $('btnStopScan').disabled = false; $('scanMsg').textContent = 'Escaneando...';
+      try{
+        await html5scanner.start(
+          { deviceId: { exact: $('camList').value } },
+          { fps: 10, qrbox: 220 },
+          onScanSuccess,
+          (err)=>{/* ignore decode errors */}
+        );
+      }catch(e){ $('scanMsg').textContent = 'Falha ao iniciar câmera.'; $('btnStartScan').disabled = false; $('btnStopScan').disabled = true; console.error(e); }
+    }
+
+    async function stopScan(){
+      if(html5scanner){ try{ await html5scanner.stop(); await html5scanner.clear(); }catch(_){} html5scanner = null; }
+      $('btnStartScan').disabled = false; $('btnStopScan').disabled = true; $('scanMsg').textContent = 'Parado.';
+    }
+
+    function closeScan(){ stopScan(); $('qrModal').style.display = 'none'; }
+
+    async function onScanSuccess(decodedText){
+      $('scanMsg').textContent = 'QR lido. Processando...';
+      const num = parseMemberNoFromQR(decodedText);
+      if(!num){ $('scanMsg').textContent = 'QR inválido. Tente novamente.'; return; }
+      $('q').value = String(num);
+      await doSearch();
+      closeScan();
+      // se veio um único match, já seleciona
+      const firstRow = document.querySelector('.list .row');
+      if(firstRow){ firstRow.click(); }
+    }
+
+    // ==== INIT ====
     async function init(){
-      await requireSession();
-      await loadOverview();
-      el('btnOverview').onclick = loadOverview;
-      el('btnExport').onclick = exportCSV;
-      el('btnBuscar').onclick = doSearch;
-      el('btnClear').onclick = ()=>{ el('q').value=''; renderList(overview); el('listHint').textContent = `${fmtInt(overview.length)} cliente(s)`; };
-      el('btnSair').onclick = async ()=>{ await supabase.auth.signOut(); location.reload(); };
+      await gate();
+      $('btnOverview').onclick = loadOverview;
+      $('btnExport').onclick = exportCSV;
+      $('btnBuscar').onclick = doSearch;
+      $('btnClear').onclick = ()=>{ $('q').value=''; renderList(overview); $('listHint').textContent = `${fmtInt(overview.length)} cliente(s)`; };
 
-      el('btnCompra').onclick = opCompra;
-      el('btnDelta').onclick = opDelta;
-      el('btnSet').onclick = opSet;
-      el('btnResgatar').onclick = opResgatar;
-      el('btnSalvarPerfil').onclick = salvarPerfil;
+      $('btnCompra').onclick = opCompra;
+      $('btnDelta').onclick = opDelta;
+      $('btnSet').onclick = opSet;
+      $('btnResgatar').onclick = opResgatar;
+      $('btnSalvarPerfil').onclick = salvarPerfil;
 
-      el('q').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ doSearch(); } });
+      $('q').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ doSearch(); } });
+
+      // Scanner handlers
+      $('btnScan').onclick = openScan;
+      $('btnCloseScan').onclick = closeScan;
+      $('camList').onchange = (e)=>{ activeCamId = e.target.value; };
+      $('btnStartScan').onclick = startScan;
+      $('btnStopScan').onclick = stopScan;
     }
 
     init();
